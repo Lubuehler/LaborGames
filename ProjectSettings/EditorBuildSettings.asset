@@ -5,6 +5,9 @@ EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Scenes:
+  - enabled: 0
+    path: Assets/Scenes/Test.unity
+    guid: cf4ba940e28422f409376ce20770c6a4
   - enabled: 1
     path: Assets/Scenes/LukasScene.unity
     guid: 06dde85479d7cb34e95416c84ef35466
