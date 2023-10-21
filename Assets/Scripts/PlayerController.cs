@@ -9,7 +9,7 @@ public class PlayerController : MonoBehaviour
     private bool facingRight = true;
     private Rigidbody2D rb;
 
-    public GameObject playArea;
+    //public GameObject playArea;
 
     private BoxCollider2D boxCollider;
     private float minX, maxX, minY, maxY;
@@ -18,18 +18,18 @@ public class PlayerController : MonoBehaviour
 
     void Start()
     {
-        rb = GetComponent<Rigidbody2D>();
+        // rb = GetComponent<Rigidbody2D>();
 
-        boxCollider = playArea.GetComponent<BoxCollider2D>();
-        Bounds bounds = boxCollider.bounds;
-        minX = bounds.min.x;
-        maxX = bounds.max.x;
-        minY = bounds.min.y;
-        maxY = bounds.max.y;
+        // boxCollider = playArea.GetComponent<BoxCollider2D>();
+        // Bounds bounds = boxCollider.bounds;
+        // minX = bounds.min.x;
+        // maxX = bounds.max.x;
+        // minY = bounds.min.y;
+        // maxY = bounds.max.y;
 
-        Bounds ownBounds = GetComponent<BoxCollider2D>().bounds;
-        width = ownBounds.max.x - ownBounds.min.x;
-        height = ownBounds.max.y - ownBounds.min.y;
+        // Bounds ownBounds = GetComponent<BoxCollider2D>().bounds;
+        // width = ownBounds.max.x - ownBounds.min.x;
+        // height = ownBounds.max.y - ownBounds.min.y;
     }
 
     void Update()
@@ -44,15 +44,15 @@ public class PlayerController : MonoBehaviour
         float tilt = horizontal * -tiltAmount;
         transform.rotation = Quaternion.Euler(0, 0, tilt);
 
-        // Image Flipping
-        bool steeringRight = horizontal > 0;
-        bool steeringLeft = horizontal < 0;
+        // // Image Flipping
+        // bool steeringRight = horizontal > 0;
+        // bool steeringLeft = horizontal < 0;
 
-        if (steeringRight && !facingRight || steeringLeft && facingRight)
-        {
-            transform.localScale = new Vector3(-transform.localScale.x, transform.localScale.y, transform.localScale.z);
-            facingRight = !facingRight;
-        }
+        // if (steeringRight && !facingRight || steeringLeft && facingRight)
+        // {
+        //     transform.localScale = new Vector3(-transform.localScale.x, transform.localScale.y, transform.localScale.z);
+        //     facingRight = !facingRight;
+        // }
 
         float clampedX = Mathf.Clamp(transform.position.x, minX + width / 2, maxX - width / 2);
         float clampedY = Mathf.Clamp(transform.position.y, minY + height / 2, maxY - height / 2);
