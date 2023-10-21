@@ -44,15 +44,15 @@ public class PlayerController : MonoBehaviour
         float tilt = horizontal * -tiltAmount;
         transform.rotation = Quaternion.Euler(0, 0, tilt);
 
-        // Image Flipping
-        bool steeringRight = horizontal > 0;
-        bool steeringLeft = horizontal < 0;
+        // // Image Flipping
+        // bool steeringRight = horizontal > 0;
+        // bool steeringLeft = horizontal < 0;
 
-        if (steeringRight && !facingRight || steeringLeft && facingRight)
-        {
-            transform.localScale = new Vector3(-transform.localScale.x, transform.localScale.y, transform.localScale.z);
-            facingRight = !facingRight;
-        }
+        // if (steeringRight && !facingRight || steeringLeft && facingRight)
+        // {
+        //     transform.localScale = new Vector3(-transform.localScale.x, transform.localScale.y, transform.localScale.z);
+        //     facingRight = !facingRight;
+        // }
 
         float clampedX = Mathf.Clamp(transform.position.x, minX + width / 2, maxX - width / 2);
         float clampedY = Mathf.Clamp(transform.position.y, minY + height / 2, maxY - height / 2);

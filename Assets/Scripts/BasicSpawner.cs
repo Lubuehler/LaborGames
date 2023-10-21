@@ -10,25 +10,12 @@ public class BasicSpawner : MonoBehaviour, INetworkRunnerCallbacks
 {
 
   private NetworkRunner _runner;
+  private GameController _gameController;
 
-  private void OnGUI()
-  {
-    if (_runner == null)
-    {
-      if (GUI.Button(new Rect(0, 0, 200, 40), "Host"))
-      {
-        StartGame(GameMode.Host);
-        Debug.Log("StartGame");
-      }
-      if (GUI.Button(new Rect(0, 40, 200, 40), "Join"))
-      {
-        StartGame(GameMode.Client);
-      }
-    }
-  }
 
-  async void StartGame(GameMode mode)
+  public async void StartGame(GameMode mode, GameController gameController)
   {
+    _gameController = gameController;
     // Create the Fusion runner and let it know that we will be providing user input
     _runner = gameObject.AddComponent<NetworkRunner>();
     _runner.ProvideInput = true;
@@ -44,8 +31,14 @@ public class BasicSpawner : MonoBehaviour, INetworkRunnerCallbacks
     Debug.Log("Game started");
   }
 
+  public PlayerRef GetLocalPlayer()
+  {
+
+    return _runner.LocalPlayer;
+  }
+
   [SerializeField] private NetworkPrefabRef _playerPrefab;
-  private Dictionary<PlayerRef, NetworkObject> _spawnedCharacters = new Dictionary<PlayerRef, NetworkObject>();
+
 
   public void OnPlayerJoined(NetworkRunner runner, PlayerRef player)
   {
@@ -53,29 +46,22 @@ public class BasicSpawner : MonoBehaviour, INetworkRunnerCallbacks
     {
       // Create a unique position for the player
       Vector2 spawnPosition = new Vector2(0, 0);
-      Debug.Log("spawn");
+      Debug.Log("spawn: server");
       NetworkObject networkPlayerObject = runner.Spawn(_playerPrefab, spawnPosition, Quaternion.identity, player);
       // Keep track of the player avatars so we can remove it when they disconnect
-      _spawnedCharacters.Add(player, networkPlayerObject);
-    }
-    else
-    {
-      // Create a unique position for the player
-      Vector2 spawnPosition = new Vector2(0, 0);
-      Debug.Log("spawn");
-      NetworkObject networkPlayerObject = runner.Spawn(_playerPrefab, spawnPosition, Quaternion.identity, player);
-      // Keep track of the player avatars so we can remove it when they disconnect
-      _spawnedCharacters.Add(player, networkPlayerObject);
+      _gameController.AddPlayerChar(player, networkPlayerObject);
+      // _gameController.PlayerInitialized(player, networkPlayerObject);
     }
   }
 
   public void OnPlayerLeft(NetworkRunner runner, PlayerRef player)
   {
     // Find and remove the players avatar
-    if (_spawnedCharacters.TryGetValue(player, out NetworkObject networkObject))
+    NetworkObject networkObject = _gameController.GetPlayerAvatar(player);
+    if (networkObject != null)
     {
       runner.Despawn(networkObject);
-      _spawnedCharacters.Remove(player);
+      _gameController.RemovePlayerChar(player);
     }
   }
 
@@ -99,7 +85,8 @@ public class BasicSpawner : MonoBehaviour, INetworkRunnerCallbacks
   }
 
   public void OnInputMissing(NetworkRunner runner, PlayerRef player, NetworkInput input) { }
-  public void OnShutdown(NetworkRunner runner, ShutdownReason shutdownReason) { 
+  public void OnShutdown(NetworkRunner runner, ShutdownReason shutdownReason)
+  {
     Debug.Log(shutdownReason);
   }
   public void OnConnectedToServer(NetworkRunner runner) { }
