@@ -7,12 +7,16 @@ using ExitGames.Client.Photon.StructWrapping;
 
 public class GameController : NetworkBehaviour
 {
+
     public static GameController Instance;
+
     private bool _gameStarted = false;
     public GameObject networkController;
     public LevelController levelController;
     public Camera MainCamera;
-    public Dictionary<PlayerRef, NetworkObject> spawnedCharacters = new Dictionary<PlayerRef, NetworkObject>();
+    private Dictionary<PlayerRef, NetworkObject> _spawnedCharacters = new Dictionary<PlayerRef, NetworkObject>();
+
+    public List<NetworkObject> dummyEnemies;
 
     private void Awake()
     {
@@ -22,9 +26,15 @@ public class GameController : NetworkBehaviour
         }
         else
         {
-            Destroy(gameObject);
+            Destroy(this.gameObject);
         }
     }
+
+    public List<NetworkObject> GetEnemies()
+    {
+        return dummyEnemies;
+    }
+
 
     public void OnGUI()
     {

@@ -1,5 +1,8 @@
 using Fusion;
 using UnityEngine;
+using System.Collections;
+using System.Collections.Generic;
+
 
 
 public class Player : NetworkBehaviour
@@ -10,12 +13,24 @@ public class Player : NetworkBehaviour
 
   private SpriteRenderer m_spriteRenderer;
 
+  public Projectile _projectilePrefab;
+
 
   private void Awake()
   {
     _nrb2d = GetComponent<NetworkRigidbody2D>();
     m_spriteRenderer = GetComponentInChildren<SpriteRenderer>();
   }
+
+  private void Start()
+  {
+    StartCoroutine(Fire());
+  }
+
+  private float delayBetweenCalls = 0.5f;
+  private bool repeatCondition = true;
+
+
 
   public override void FixedUpdateNetwork()
   {
@@ -33,7 +48,52 @@ public class Player : NetworkBehaviour
       // float clampedY = Mathf.Clamp(transform.position.y, minY + height / 2, maxY - height / 2);
       // transform.position = new Vector2(clampedX, clampedY);
     }
+
   }
+
+  private IEnumerator Fire()
+  {
+    while (repeatCondition)
+    {
+      List<NetworkObject> enemies = GameController.Instance.GetEnemies();
+      NetworkObject closestEnemy = null;
+      float minDistance = float.MaxValue;
+
+      foreach (var enemy in enemies)
+      {
+        if (enemy != null)
+        {
+          Vector3 direction = enemy.transform.position - _nrb2d.transform.position;
+          float distance = direction.magnitude;
+
+          if (distance < minDistance)
+          {
+            minDistance = distance;
+            closestEnemy = enemy;
+          }
+        }
+      }
+
+      if (closestEnemy != null)
+      {
+        Vector3 direction = closestEnemy.transform.position - _nrb2d.transform.position;
+
+        // Calculate the rotation to look at the closest enemy
+        Quaternion rotation = Quaternion.LookRotation(Vector3.forward, direction);
+
+        var projectile = Runner.Spawn(_projectilePrefab, _nrb2d.transform.position, rotation, Object.InputAuthority);
+
+        if (projectile != null)
+        {
+          projectile.Fire(direction.normalized);
+        }
+      }
+
+      yield return new WaitForSeconds(delayBetweenCalls);
+    }
+  }
+
+
 
   public override void Spawned()
   {
