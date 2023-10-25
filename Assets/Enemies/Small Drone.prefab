@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 7190710070354511446}
   - component: {fileID: 540145920878856162}
   - component: {fileID: 8067038276088827474}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Drone
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -111,7 +111,7 @@ GameObject:
   - component: {fileID: 6852596507332962957}
   - component: {fileID: 8413325857278983398}
   - component: {fileID: 5579897410103918639}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Small Drone
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -172,7 +172,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _interpolationDataSource: 0
-  speed: 4
+  speed: 1
   health: 100
   viewingDistance: 4
 --- !u!50 &6852596507332962957
@@ -239,7 +239,7 @@ PolygonCollider2D:
   m_GameObject: {fileID: 4776032338861653262}
   m_Enabled: 1
   m_Density: 1
-  m_Material: {fileID: 0}
+  m_Material: {fileID: 6200000, guid: 46bf9225396fb7546bf2ff74e5a4cf9d, type: 2}
   m_IncludeLayers:
     serializedVersion: 2
     m_Bits: 0

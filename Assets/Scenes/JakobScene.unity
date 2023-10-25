@@ -419,6 +419,7 @@ MonoBehaviour:
   networkController: {fileID: 49690127}
   levelController: {fileID: 800742876}
   MainCamera: {fileID: 1093129631}
+  dummyEnemies: []
 --- !u!114 &1085362258
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -192,6 +192,11 @@ MonoBehaviour:
   speed: 5
   tiltAmount: 15
   _projectilePrefab: {fileID: 1350390008315525890, guid: 95fb6b4a33b3a6543bcec83d35c8c1bf, type: 3}
+  enemyMask:
+    serializedVersion: 2
+    m_Bits: 64
+  isShooting: 1
+  attackSpeed: 2
 --- !u!50 &4367411694323758693
 Rigidbody2D:
   serializedVersion: 4

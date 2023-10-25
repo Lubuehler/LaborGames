@@ -11,20 +11,19 @@ public class Player : NetworkBehaviour
   public float speed = 5.0f;
   public float tiltAmount = 15.0f; // The amount of tilt when moving left or right
 
-  private SpriteRenderer m_spriteRenderer;
-
   public Projectile _projectilePrefab;
+  public LayerMask enemyMask;
+  private float currentTime;
+  public bool isShooting = false;
+
+  public float attackSpeed;// Schüsse pro Sekunde
+  private float attackInterval;
 
 
   private void Awake()
   {
     _nrb2d = GetComponent<NetworkRigidbody2D>();
-    m_spriteRenderer = GetComponentInChildren<SpriteRenderer>();
-  }
-
-  private void Start()
-  {
-    StartCoroutine(Fire());
+    attackInterval = 1f / attackSpeed;
   }
 
   private float delayBetweenCalls = 0.5f;
@@ -51,45 +50,21 @@ public class Player : NetworkBehaviour
 
   }
 
-  private IEnumerator Fire()
+  private void Fire(NetworkObject target)
   {
-    while (repeatCondition)
+    if (target != null)
     {
-      List<NetworkObject> enemies = GameController.Instance.GetEnemies();
-      NetworkObject closestEnemy = null;
-      float minDistance = float.MaxValue;
+      Vector3 direction = target.transform.position - _nrb2d.transform.position;
 
-      foreach (var enemy in enemies)
+      // Calculate the rotation to look at the closest enemy
+      Quaternion rotation = Quaternion.LookRotation(Vector3.forward, direction);
+
+      var projectile = Runner.Spawn(_projectilePrefab, _nrb2d.transform.position, rotation, Object.InputAuthority);
+
+      if (projectile != null)
       {
-        if (enemy != null)
-        {
-          Vector3 direction = enemy.transform.position - _nrb2d.transform.position;
-          float distance = direction.magnitude;
-
-          if (distance < minDistance)
-          {
-            minDistance = distance;
-            closestEnemy = enemy;
-          }
-        }
+        projectile.Fire(direction.normalized);
       }
-
-      if (closestEnemy != null)
-      {
-        Vector3 direction = closestEnemy.transform.position - _nrb2d.transform.position;
-
-        // Calculate the rotation to look at the closest enemy
-        Quaternion rotation = Quaternion.LookRotation(Vector3.forward, direction);
-
-        var projectile = Runner.Spawn(_projectilePrefab, _nrb2d.transform.position, rotation, Object.InputAuthority);
-
-        if (projectile != null)
-        {
-          projectile.Fire(direction.normalized);
-        }
-      }
-
-      yield return new WaitForSeconds(delayBetweenCalls);
     }
   }
 
@@ -101,5 +76,49 @@ public class Player : NetworkBehaviour
     {
       Camera.main.GetComponent<CameraScript>().target = GetComponent<NetworkTransform>().InterpolationTarget;
     }
+  }
+
+  public override void Render()
+  {
+
+    if (isShooting)
+    {
+      currentTime += Time.deltaTime;
+      if (currentTime >= attackInterval)
+      {
+        Fire(findNearestEnemy());
+        currentTime = 0f;
+      }
+    }
+  }
+
+  private NetworkObject findNearestEnemy()
+  {
+    // Calculate the bounds of the camera's view
+    float height = 2f * GameController.Instance.MainCamera.orthographicSize;
+    float width = height * GameController.Instance.MainCamera.aspect;
+    Vector2 boxSize = new Vector2(width, height);
+    Vector2 boxCenter = transform.position;
+
+    // Get all colliders within the camera's view
+    Collider2D[] hitColliders = Physics2D.OverlapBoxAll(boxCenter, boxSize, GameController.Instance.MainCamera.transform.eulerAngles.z, enemyMask);
+
+    float minDistance = float.MaxValue;
+    NetworkObject closestEnemy = null;
+    foreach (var enemy in hitColliders)
+    {
+      if (enemy != null)
+      {
+        Vector3 direction = enemy.transform.position - _nrb2d.transform.position;
+        float distance = direction.magnitude;
+
+        if (distance < minDistance)
+        {
+          minDistance = distance;
+          closestEnemy = enemy.GetComponent<NetworkObject>();
+        }
+      }
+    }
+    return closestEnemy;
   }
 }

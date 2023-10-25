@@ -6,24 +6,36 @@ public class LevelController : NetworkBehaviour
 {
     private List<NetworkObject> _spawnedEnemies = new List<NetworkObject>();
     public GameObject dronePrefab;
+    public static LevelController Instance;
 
-    private NetworkRunner _networkRunner;
+    private void Awake()
+    {
+        if (Instance == null)
+        {
+            Instance = this;
+        }
+        else
+        {
+            Destroy(this.gameObject);
+        }
+    }
 
     private void SpawnEnemy(Vector3 position, EnemyType enemyType)
     {
         if (enemyType == EnemyType.Drone)
         {
-            NetworkObject spawnedEnemy = _networkRunner.Spawn(dronePrefab, position, Quaternion.identity);
+            NetworkObject spawnedEnemy = Runner.Spawn(dronePrefab, position, Quaternion.identity);
             _spawnedEnemies.Add(spawnedEnemy);
+        }
+        else if (enemyType == EnemyType.Jet)
+        {
+
         }
     }
 
     public void StartLevel()
     {
-        _networkRunner = FindObjectOfType<NetworkRunner>();
-        print("Started Level");
-
-        for (int i = 0; i < 5; i++)
+        for (int i = 0; i < 20; i++)
         {
             Vector2 spawnPosition = new Vector2(Random.Range(-10, 10), Random.Range(-10, 10));
             SpawnEnemy(spawnPosition, EnemyType.Drone);
@@ -32,10 +44,10 @@ public class LevelController : NetworkBehaviour
 
     public void EnemyDefeated(Enemy enemy)
     {
-        if (_networkRunner.IsServer)
+        if (Runner.IsServer)
         {
             _spawnedEnemies.Remove(enemy.GetComponentInParent<NetworkObject>());
-            _networkRunner.Despawn(enemy.GetComponentInParent<NetworkObject>());
+            Runner.Despawn(enemy.GetComponentInParent<NetworkObject>());
             CheckForLevelCompletion();
         }
     }

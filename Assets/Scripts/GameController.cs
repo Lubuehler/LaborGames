@@ -14,7 +14,7 @@ public class GameController : NetworkBehaviour
     public GameObject networkController;
     public LevelController levelController;
     public Camera MainCamera;
-    private Dictionary<PlayerRef, NetworkObject> _spawnedCharacters = new Dictionary<PlayerRef, NetworkObject>();
+    public Dictionary<PlayerRef, NetworkObject> spawnedCharacters = new Dictionary<PlayerRef, NetworkObject>();
 
     public List<NetworkObject> dummyEnemies;
 
