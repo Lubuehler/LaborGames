@@ -8,10 +8,32 @@ using ExitGames.Client.Photon.StructWrapping;
 public class GameController : MonoBehaviour
 {
 
+    public static GameController Instance;
+
     private bool _gameStarted = false;
     public GameObject networkController;
     public Camera MainCamera;
     private Dictionary<PlayerRef, NetworkObject> _spawnedCharacters = new Dictionary<PlayerRef, NetworkObject>();
+
+    public List<NetworkObject> dummyEnemies;
+
+    private void Awake()
+    {
+        if (Instance == null)
+        {
+            Instance = this;
+        } 
+        else
+        {
+            Destroy(this.gameObject);
+        }
+    }
+
+    public List<NetworkObject> GetEnemies()
+    {
+        return dummyEnemies;
+    }
+
 
     public void OnGUI()
     {
