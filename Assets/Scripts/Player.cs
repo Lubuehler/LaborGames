@@ -28,21 +28,6 @@ public class Player : NetworkBehaviour
       float tilt = data.direction.x * -tiltAmount;
       transform.rotation = Quaternion.Euler(0, 0, tilt);
 
-      // // Image Flipping
-      // bool steeringRight = data.direction.x > 0;
-      // bool steeringLeft = data.direction.x < 0;
-
-      // if (steeringRight)
-      // {
-      //   m_spriteRenderer.flipX = steeringLeft;
-      // }
-      // else if (steeringLeft)
-      // {
-      //   m_spriteRenderer.flipX = steeringLeft;
-
-      // }
-
-
 
       // float clampedX = Mathf.Clamp(transform.position.x, minX + width / 2, maxX - width / 2);
       // float clampedY = Mathf.Clamp(transform.position.y, minY + height / 2, maxY - height / 2);
@@ -54,8 +39,6 @@ public class Player : NetworkBehaviour
   {
     if (HasInputAuthority)
     {
-
-      Debug.Log("Has Authority!");
       Camera.main.GetComponent<CameraScript>().target = GetComponent<NetworkTransform>().InterpolationTarget;
     }
   }
