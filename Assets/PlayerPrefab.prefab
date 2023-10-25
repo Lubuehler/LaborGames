@@ -74,7 +74,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: 21300000, guid: dad9dda586b1bd9449f8a47bd7b6cc5c, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 438af40dc26225d49a9c94157fd7fbe1, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -110,7 +110,7 @@ GameObject:
   - component: {fileID: 877542082776545150}
   - component: {fileID: 8103653053424819092}
   - component: {fileID: 4367411694323758693}
-  - component: {fileID: 3281321753226948179}
+  - component: {fileID: 2754143876365907347}
   m_Layer: 0
   m_Name: PlayerPrefab
   m_TagString: Untagged
@@ -174,7 +174,7 @@ MonoBehaviour:
   NetworkedBehaviours:
   - {fileID: 6722568458623865022}
   - {fileID: 8103653053424819092}
-  - {fileID: 3281321753226948179}
+  - {fileID: 2754143876365907347}
   SimulationBehaviours: []
 --- !u!114 &8103653053424819092
 MonoBehaviour:
@@ -191,6 +191,12 @@ MonoBehaviour:
   _interpolationDataSource: 0
   speed: 5
   tiltAmount: 15
+  _projectilePrefab: {fileID: 1350390008315525890, guid: 95fb6b4a33b3a6543bcec83d35c8c1bf, type: 3}
+  enemyMask:
+    serializedVersion: 2
+    m_Bits: 64
+  isShooting: 1
+  attackSpeed: 2
 --- !u!50 &4367411694323758693
 Rigidbody2D:
   serializedVersion: 4
@@ -218,7 +224,7 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 0
   m_Constraints: 0
---- !u!114 &3281321753226948179
+--- !u!114 &2754143876365907347
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}

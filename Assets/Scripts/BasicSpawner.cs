@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using UnityEngine;
 using Fusion;
 using Fusion.Sockets;
@@ -10,12 +11,9 @@ public class BasicSpawner : MonoBehaviour, INetworkRunnerCallbacks
 {
 
   private NetworkRunner _runner;
-  private GameController _gameController;
 
-
-  public async void StartGame(GameMode mode, GameController gameController)
+  public async void StartGame(GameMode mode)
   {
-    _gameController = gameController;
     // Create the Fusion runner and let it know that we will be providing user input
     _runner = gameObject.AddComponent<NetworkRunner>();
     _runner.ProvideInput = true;
@@ -28,7 +26,7 @@ public class BasicSpawner : MonoBehaviour, INetworkRunnerCallbacks
       Scene = SceneManager.GetActiveScene().buildIndex,
       SceneManager = gameObject.AddComponent<NetworkSceneManagerDefault>()
     });
-    Debug.Log("Game started");
+    GameController.Instance.GameInitialized();
   }
 
   public PlayerRef GetLocalPlayer()
@@ -49,19 +47,18 @@ public class BasicSpawner : MonoBehaviour, INetworkRunnerCallbacks
       Debug.Log("spawn: server");
       NetworkObject networkPlayerObject = runner.Spawn(_playerPrefab, spawnPosition, Quaternion.identity, player);
       // Keep track of the player avatars so we can remove it when they disconnect
-      _gameController.AddPlayerChar(player, networkPlayerObject);
-      // _gameController.PlayerInitialized(player, networkPlayerObject);
+      GameController.Instance.AddPlayerChar(player, networkPlayerObject);
     }
   }
 
   public void OnPlayerLeft(NetworkRunner runner, PlayerRef player)
   {
     // Find and remove the players avatar
-    NetworkObject networkObject = _gameController.GetPlayerAvatar(player);
+    NetworkObject networkObject = GameController.Instance.GetPlayerAvatar(player);
     if (networkObject != null)
     {
       runner.Despawn(networkObject);
-      _gameController.RemovePlayerChar(player);
+      GameController.Instance.RemovePlayerChar(player);
     }
   }
 
