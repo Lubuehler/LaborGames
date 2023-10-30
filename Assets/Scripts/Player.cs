@@ -26,10 +26,6 @@ public class Player : NetworkBehaviour
     attackInterval = 1f / attackSpeed;
   }
 
-  private float delayBetweenCalls = 0.5f;
-  private bool repeatCondition = true;
-
-
 
   public override void FixedUpdateNetwork()
   {

@@ -175,6 +175,15 @@ MonoBehaviour:
   speed: 1
   health: 100
   viewingDistance: 4
+  enemyLayerMask:
+    serializedVersion: 2
+    m_Bits: 64
+  separationRadius: 1
+  deathExplosionPrefab: {fileID: 7726421982602285071, guid: cc38b5938cf4f7947a6710d03457cb5f, type: 3}
+  playerLayer:
+    serializedVersion: 2
+    m_Bits: 128
+  explosionRange: 0.8
 --- !u!50 &6852596507332962957
 Rigidbody2D:
   serializedVersion: 4

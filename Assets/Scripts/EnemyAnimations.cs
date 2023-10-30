@@ -17,11 +17,11 @@ public class EnemyAnimations : MonoBehaviour
 
     void LateUpdate()
     {
-        if (_rb.ReadVelocity().x < -.1f)
+        if (_rb.ReadVelocity().x < -.5f)
         {
             _renderer.flipX = true;
         }
-        else if (_rb.ReadVelocity().x > .1f)
+        else if (_rb.ReadVelocity().x > .5f)
         {
             _renderer.flipX = false;
         }

@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 8671176579313137741}
   - component: {fileID: 852282977295098502}
   - component: {fileID: 2480788310583902713}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: PlayerChar
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -111,7 +111,8 @@ GameObject:
   - component: {fileID: 8103653053424819092}
   - component: {fileID: 4367411694323758693}
   - component: {fileID: 2754143876365907347}
-  m_Layer: 0
+  - component: {fileID: 2734766463685694589}
+  m_Layer: 7
   m_Name: PlayerPrefab
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -207,7 +208,7 @@ Rigidbody2D:
   m_GameObject: {fileID: 8443049997164568140}
   m_BodyType: 1
   m_Simulated: 1
-  m_UseFullKinematicContacts: 0
+  m_UseFullKinematicContacts: 1
   m_UseAutoMass: 0
   m_Mass: 1
   m_LinearDrag: 0
@@ -252,3 +253,38 @@ MonoBehaviour:
     RotTeleportRadians: 1.5
   UseLegacySharedModeInterpolation: 0
   TargetInterpolationDelay: 0.03
+--- !u!70 &2734766463685694589
+CapsuleCollider2D:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8443049997164568140}
+  m_Enabled: 1
+  m_Density: 1
+  m_Material: {fileID: 6200000, guid: 46bf9225396fb7546bf2ff74e5a4cf9d, type: 2}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_ForceSendLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ForceReceiveLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ContactCaptureLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_CallbackLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_IsTrigger: 0
+  m_UsedByEffector: 0
+  m_UsedByComposite: 0
+  m_Offset: {x: 0.026425494, y: 0.07794852}
+  m_Size: {x: 1.8876116, y: 0.86227536}
+  m_Direction: 1
