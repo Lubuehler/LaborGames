@@ -18,6 +18,9 @@ public class BasicSpawner : MonoBehaviour, INetworkRunnerCallbacks
     _runner = gameObject.AddComponent<NetworkRunner>();
     _runner.ProvideInput = true;
 
+    var result = _runner.JoinSessionLobby(SessionLobby.ClientServer);
+    Debug.Log("Sessions" + result);
+
     // Start or join (depends on gamemode) a session with a specific name
     await _runner.StartGame(new StartGameArgs()
     {
@@ -91,7 +94,10 @@ public class BasicSpawner : MonoBehaviour, INetworkRunnerCallbacks
   public void OnConnectRequest(NetworkRunner runner, NetworkRunnerCallbackArgs.ConnectRequest request, byte[] token) { }
   //public void OnConnectFailed(NetworkRunner runner, NetAddress remoteAddress, NetConnectFailedReason reason) { }
   public void OnUserSimulationMessage(NetworkRunner runner, SimulationMessagePtr message) { }
-  public void OnSessionListUpdated(NetworkRunner runner, List<SessionInfo> sessionList) { }
+  public void OnSessionListUpdated(NetworkRunner runner, List<SessionInfo> sessionList) 
+  { 
+    Debug.Log("Sessions:" + sessionList);
+  }
   public void OnCustomAuthenticationResponse(NetworkRunner runner, Dictionary<string, object> data) { }
   public void OnHostMigration(NetworkRunner runner, HostMigrationToken hostMigrationToken) { }
   //public void OnReliableDataReceived(NetworkRunner runner, PlayerRef player, ArraySegment<byte> data) { }
