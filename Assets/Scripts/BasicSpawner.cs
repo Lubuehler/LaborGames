@@ -1,33 +1,47 @@
-using System.Collections;
 using System.Collections.Generic;
-using System.Threading.Tasks;
 using UnityEngine;
 using Fusion;
 using Fusion.Sockets;
 using System;
 using UnityEngine.SceneManagement;
+using System.Threading.Tasks;
 
 public class BasicSpawner : MonoBehaviour, INetworkRunnerCallbacks
 {
 
+  public List<SessionInfo> sessionList;
+
   private NetworkRunner _runner;
 
-  public async void StartGame(GameMode mode)
+  public async Task<StartGameResult> JoinLobby()
+  {
+    _runner = GetComponent<NetworkRunner>();
+    if (_runner == null)
+    {
+      _runner = gameObject.AddComponent<NetworkRunner>();
+      _runner.ProvideInput = true;
+    }
+    return await _runner.JoinSessionLobby(SessionLobby.ClientServer);
+  }
+
+  public async void StartGame(GameMode mode, string sessionName)
   {
     // Create the Fusion runner and let it know that we will be providing user input
-    _runner = gameObject.AddComponent<NetworkRunner>();
-    _runner.ProvideInput = true;
-
-    var result = _runner.JoinSessionLobby(SessionLobby.ClientServer);
-    Debug.Log("Sessions" + result);
+    _runner = GetComponent<NetworkRunner>();
+    if (_runner == null)
+    {
+      _runner = gameObject.AddComponent<NetworkRunner>();
+      _runner.ProvideInput = true;
+    }
 
     // Start or join (depends on gamemode) a session with a specific name
     await _runner.StartGame(new StartGameArgs()
     {
       GameMode = mode,
-      SessionName = "TestRoom",
+      SessionName = sessionName,
       Scene = SceneManager.GetActiveScene().buildIndex,
-      SceneManager = gameObject.AddComponent<NetworkSceneManagerDefault>()
+      SceneManager = gameObject.AddComponent<NetworkSceneManagerDefault>(),
+      PlayerCount = 4
     });
     GameController.Instance.GameInitialized();
   }
@@ -94,9 +108,15 @@ public class BasicSpawner : MonoBehaviour, INetworkRunnerCallbacks
   public void OnConnectRequest(NetworkRunner runner, NetworkRunnerCallbackArgs.ConnectRequest request, byte[] token) { }
   //public void OnConnectFailed(NetworkRunner runner, NetAddress remoteAddress, NetConnectFailedReason reason) { }
   public void OnUserSimulationMessage(NetworkRunner runner, SimulationMessagePtr message) { }
-  public void OnSessionListUpdated(NetworkRunner runner, List<SessionInfo> sessionList) 
-  { 
-    Debug.Log("Sessions:" + sessionList);
+  public void OnSessionListUpdated(NetworkRunner runner, List<SessionInfo> sessionList)
+  {
+    this.sessionList = sessionList;
+    Debug.Log("Session list size: " + sessionList.Count);
+    for (int i = 0; i < sessionList.Count; i++)
+    {
+      Debug.Log(i + " " + sessionList[i]);
+    }
+
   }
   public void OnCustomAuthenticationResponse(NetworkRunner runner, Dictionary<string, object> data) { }
   public void OnHostMigration(NetworkRunner runner, HostMigrationToken hostMigrationToken) { }

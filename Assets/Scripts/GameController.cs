@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using Fusion;
 using ExitGames.Client.Photon.StructWrapping;
+using System.Threading.Tasks;
 
 
 public class GameController : NetworkBehaviour
@@ -35,24 +36,31 @@ public class GameController : NetworkBehaviour
         return dummyEnemies;
     }
 
+    public async Task<StartGameResult> JoinLobby()
+    {
+        return await networkController.GetComponent<BasicSpawner>().JoinLobby();
+    }
 
-    public void OnGUI()
+    public void StartSession(string sessionName)
     {
         if (!_gameStarted)
         {
-            if (GUI.Button(new Rect(0, 0, 200, 40), "Host"))
-            {
-                networkController.GetComponent<BasicSpawner>().StartGame(GameMode.Host);
-                _gameStarted = true;
-
-                return;
-            }
-            if (GUI.Button(new Rect(0, 40, 200, 40), "Join"))
-            {
-                networkController.GetComponent<BasicSpawner>().StartGame(GameMode.Client);
-
-            }
+            networkController.GetComponent<BasicSpawner>().StartGame(GameMode.Host, sessionName);
+            _gameStarted = true;
         }
+    }
+
+    public void JoinSession(string sessionName)
+    {
+        if (!_gameStarted)
+        {
+            networkController.GetComponent<BasicSpawner>().StartGame(GameMode.Client, sessionName);
+        }
+    }
+
+    public List<SessionInfo> GetSessions()
+    {
+        return networkController.GetComponent<BasicSpawner>().sessionList;
     }
 
     public void GameInitialized()
