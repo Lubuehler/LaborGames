@@ -4,20 +4,20 @@ using UnityEngine;
 
 public class MultiplayerMenu : MonoBehaviour
 {
+    public Canvas joinCanvas;
+
     public void OnHostClick()
     {
-        MenuManager.Instance.ShowHost();
-        Debug.Log("Host clicked");
+        MenuManager.Instance.ShowUIElement(UIElement.Host);
     }
 
     public void OnJoinClick()
     {
-        Debug.Log("Join clicked");
+        MenuManager.Instance.ShowUIElement(UIElement.Join);
     }
 
     public void OnBackClick()
     {
-        MenuManager.Instance.ShowMain();
-        Debug.Log("Back clicked");
+        MenuManager.Instance.ShowUIElement(UIElement.Main);
     }
 }
