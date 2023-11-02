@@ -30,6 +30,9 @@ public class Enemy : NetworkBehaviour
         UpdateTarget();
     }
 
+    private float movementSmoothing = .5f;
+
+
     protected virtual void Move()
     {
         if (currentTarget != null && networkRigidbody2D != null)
@@ -37,9 +40,11 @@ public class Enemy : NetworkBehaviour
             Vector2 toTarget = (currentTarget.transform.position - transform.position);
             Vector2 separationForce = CalculateSeparationForce();
 
-            networkRigidbody2D.Rigidbody.velocity = (toTarget.normalized + separationForce).normalized * speed;
+            Vector2 desiredVelocity = (toTarget.normalized + separationForce).normalized * speed;
+            networkRigidbody2D.Rigidbody.velocity = Vector2.Lerp(networkRigidbody2D.Rigidbody.velocity, desiredVelocity, Time.deltaTime * movementSmoothing);
         }
     }
+
 
     protected List<Transform> GetNearbyEnemies()
     {
@@ -60,16 +65,25 @@ public class Enemy : NetworkBehaviour
     protected Vector2 CalculateSeparationForce()
     {
         Vector2 separationForce = Vector2.zero;
-        foreach (var otherEnemy in GetNearbyEnemies())
+        List<Transform> nearbyEnemies = GetNearbyEnemies();
+
+        foreach (var otherEnemy in nearbyEnemies)
         {
             Vector2 toOtherEnemy = transform.position - otherEnemy.position;
-            if (toOtherEnemy.magnitude < separationRadius)
+            if (toOtherEnemy.sqrMagnitude < separationRadius * separationRadius)
             {
-                separationForce += toOtherEnemy.normalized / toOtherEnemy.magnitude;
+                separationForce += toOtherEnemy.normalized / (toOtherEnemy.sqrMagnitude + 0.1f); // Add a small value to prevent division by zero
             }
+        }
+
+        float maxSeparationForce = 1f;
+        if (separationForce.magnitude > maxSeparationForce)
+        {
+            separationForce = separationForce.normalized * maxSeparationForce;
         }
         return separationForce;
     }
+
 
     public void TakeDamage(int damage)
     {

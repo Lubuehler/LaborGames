@@ -28,7 +28,10 @@ public class ShopMenu : MonoBehaviour
             { "Crit Chance", p=> p.critChance.ToString("F2") },
             { "Crit Damage Multiplier", p=> p.critDamageMultiplier.ToString("F2") },
             { "Dodge Chance", p=> p.dodgeProbability.ToString("F2") },
-            { "Movement Speed", p => p.movementSpeed.ToString("F2") }
+            { "Movement Speed", p => p.movementSpeed.ToString("F2") },
+            { "Dodge Chance", p => p.movementSpeed.ToString("F2")  },
+            { "Armor", p => p.movementSpeed.ToString("F2")  },
+            { "Range", p => p.movementSpeed.ToString()  }
 
         };
 
