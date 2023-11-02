@@ -2,13 +2,14 @@ using Fusion;
 using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using System;
 
 
 
 public class Player : NetworkBehaviour
 {
   protected NetworkRigidbody2D _nrb2d;
-  public float speed = 5.0f;
+
   public float tiltAmount = 15.0f; // The amount of tilt when moving left or right
 
   public Projectile _projectilePrefab;
@@ -16,14 +17,41 @@ public class Player : NetworkBehaviour
   private float currentTime;
   public bool isShooting = false;
 
-  public float attackSpeed;// Schüsse pro Sekunde
-  private float attackInterval;
+  // Player Stats:
+  [Networked]
+  public int maxHealth { get; set; }
+  [Networked]
+  public float attackDamage { get; set; }
+  [Networked]
+  public float attackSpeed { get; set; } // Schüsse pro Sekunde
+  [Networked]
+  public float critChance { get; set; }
+  [Networked]
+  public float critDamageMultiplier { get; set; }
+  [Networked]
+  public float dodgeProbability { get; set; }
+  [Networked]
+  public float movementSpeed { get; set; }
+
+  public event Action OnStatsChanged;
 
 
   private void Awake()
   {
     _nrb2d = GetComponent<NetworkRigidbody2D>();
-    attackInterval = 1f / attackSpeed;
+  }
+
+  private void InitiallySetStats()
+  {
+    maxHealth = 100;
+    attackDamage = 20;
+    attackSpeed = 1;
+    critChance = 0;
+    critDamageMultiplier = 1;
+    dodgeProbability = 0;
+    movementSpeed = 5;
+
+    OnStatsChanged?.Invoke();
   }
 
 
@@ -32,7 +60,7 @@ public class Player : NetworkBehaviour
     if (GetInput(out NetworkInputData data))
     {
       data.direction.Normalize();
-      _nrb2d.Rigidbody.velocity = data.direction * speed;
+      _nrb2d.Rigidbody.velocity = data.direction * movementSpeed;
 
       // Image Tilting
       float tilt = data.direction.x * -tiltAmount;
@@ -71,21 +99,29 @@ public class Player : NetworkBehaviour
     if (HasInputAuthority)
     {
       Camera.main.GetComponent<CameraScript>().target = GetComponent<NetworkTransform>().InterpolationTarget;
+      GameController.Instance.localPlayer = this;
+      print("setting local player");
+      InitiallySetStats();
     }
   }
 
   public override void Render()
   {
-
     if (isShooting)
     {
       currentTime += Time.deltaTime;
-      if (currentTime >= attackInterval)
+      if (currentTime >= 1f/attackSpeed)
       {
         Fire(findNearestEnemy());
         currentTime = 0f;
       }
     }
+
+
+    if(Input.GetKeyDown(KeyCode.E))
+        {
+            MenuManager.Instance.ShowUIElement(UIElement.Shop);
+        }
   }
 
   private NetworkObject findNearestEnemy()

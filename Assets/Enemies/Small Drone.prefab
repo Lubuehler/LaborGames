@@ -172,7 +172,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _interpolationDataSource: 0
-  speed: 1
+  speed: 3
   health: 100
   viewingDistance: 4
   enemyLayerMask:

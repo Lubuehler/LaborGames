@@ -18,6 +18,7 @@ public class MainMenu : MonoBehaviour
         multiplayerBtn.interactable = false;
         await GameController.Instance.JoinLobby();
         MenuManager.Instance.ShowUIElement(UIElement.Multiplayer);
+
     }
 
 

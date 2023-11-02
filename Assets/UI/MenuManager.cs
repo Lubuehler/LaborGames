@@ -11,6 +11,7 @@ public class MenuManager : MonoBehaviour
     public GameObject hostCanvas;
     public GameObject joinCanvas;
     public GameObject directJoinCanvas;
+    public GameObject shopCanvas;
 
     public Dictionary<UIElement, GameObject> canvasDict = new Dictionary<UIElement, GameObject>();
 
@@ -30,6 +31,7 @@ public class MenuManager : MonoBehaviour
         canvasDict[UIElement.Host] = hostCanvas;
         canvasDict[UIElement.Join] = joinCanvas;
         canvasDict[UIElement.DirectJoin] = directJoinCanvas;
+        canvasDict[UIElement.Shop] = shopCanvas;
 
         ShowUIElement(UIElement.Main);
     }
@@ -76,5 +78,6 @@ public enum UIElement
     Host,
     Join,
     DirectJoin,
-    Game
+    Game,
+    Shop
 }

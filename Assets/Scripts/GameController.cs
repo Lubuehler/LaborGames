@@ -9,32 +9,33 @@ using System.Threading.Tasks;
 public class GameController : NetworkBehaviour
 {
 
-    public static GameController Instance;
+  public static GameController Instance;
 
-    private bool _gameStarted = false;
-    public GameObject networkController;
-    public LevelController levelController;
-    public Camera MainCamera;
-    public Dictionary<PlayerRef, NetworkObject> spawnedCharacters = new Dictionary<PlayerRef, NetworkObject>();
+  private bool _gameStarted = false;
+  public GameObject networkController;
+  public LevelController levelController;
+  public Camera MainCamera;
+  public Dictionary<PlayerRef, NetworkObject> spawnedCharacters = new Dictionary<PlayerRef, NetworkObject>();
 
-    public List<NetworkObject> dummyEnemies;
+  public List<NetworkObject> dummyEnemies;
+  public Player localPlayer;
 
-    private void Awake()
+  private void Awake()
+  {
+    if (Instance == null)
     {
-        if (Instance == null)
-        {
-            Instance = this;
-        }
-        else
-        {
-            Destroy(this.gameObject);
-        }
+      Instance = this;
     }
-
-    public List<NetworkObject> GetEnemies()
+    else
     {
-        return dummyEnemies;
+      Destroy(this.gameObject);
     }
+  }
+
+  public List<NetworkObject> GetEnemies()
+  {
+    return dummyEnemies;
+  }
 
     public async Task<StartGameResult> JoinLobby()
     {
@@ -65,7 +66,7 @@ public class GameController : NetworkBehaviour
 
     public void GameInitialized()
     {
-        levelController.StartLevel();
+       // levelController.StartLevel();
         _gameStarted = true;
         print("game started");
     }

@@ -20,10 +20,22 @@ public class LevelController : NetworkBehaviour
         }
     }
 
+    public override void Spawned()
+    {
+        if (Runner.IsServer)
+        {
+            StartLevel();
+        }
+    }
+
     private void SpawnEnemy(Vector3 position, EnemyType enemyType)
     {
         if (enemyType == EnemyType.Drone)
         {
+            if (Runner == null)
+            {
+                print("runner is null in spawn enemy");
+            }
             NetworkObject spawnedEnemy = Runner.Spawn(dronePrefab, position, Quaternion.identity);
             _spawnedEnemies.Add(spawnedEnemy);
         }

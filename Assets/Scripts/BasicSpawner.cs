@@ -121,8 +121,8 @@ public class BasicSpawner : MonoBehaviour, INetworkRunnerCallbacks
   public void OnCustomAuthenticationResponse(NetworkRunner runner, Dictionary<string, object> data) { }
   public void OnHostMigration(NetworkRunner runner, HostMigrationToken hostMigrationToken) { }
   //public void OnReliableDataReceived(NetworkRunner runner, PlayerRef player, ArraySegment<byte> data) { }
-  public void OnSceneLoadDone(NetworkRunner runner) { }
-  public void OnSceneLoadStart(NetworkRunner runner) { }
+  public void OnSceneLoadDone(NetworkRunner runner) { print("scene load done"); }
+  public void OnSceneLoadStart(NetworkRunner runner) { print("scene load started"); }
 
   public void OnConnectFailed(NetworkRunner runner, NetAddress remoteAddress, NetConnectFailedReason reason)
   {

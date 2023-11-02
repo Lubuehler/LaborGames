@@ -11,6 +11,7 @@ public class HostMenu : MonoBehaviour
         {
             GameController.Instance.StartSession(sessionName);
             MenuManager.Instance.ShowUIElement(UIElement.Game);
+
         }
 
     }

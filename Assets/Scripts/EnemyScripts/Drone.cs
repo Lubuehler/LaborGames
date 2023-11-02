@@ -44,6 +44,7 @@ public class Drone : Enemy
         }
 
         // Destroy the drone after the explosion
+        
         Die();
     }
 }
