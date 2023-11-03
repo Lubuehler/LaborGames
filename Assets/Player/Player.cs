@@ -40,6 +40,8 @@ public class Player : NetworkBehaviour
     public float range { get; set; }
 
 
+    public int no { get; set; }
+
     public event Action OnStatsChanged;
 
 
@@ -48,7 +50,7 @@ public class Player : NetworkBehaviour
         _nrb2d = GetComponent<NetworkRigidbody2D>();
     }
 
-    private void InitiallySetStats()
+    public void InitiallySetStats()
     {
         maxHealth = 100;
         attackDamage = 20;
@@ -61,6 +63,7 @@ public class Player : NetworkBehaviour
         armor = 0;
         range = 0;
 
+        print("set stats initially");
         OnStatsChanged?.Invoke();
     }
 
@@ -102,16 +105,15 @@ public class Player : NetworkBehaviour
         }
     }
 
-
-
     public override void Spawned()
     {
         if (HasInputAuthority)
         {
             Camera.main.GetComponent<CameraScript>().target = GetComponent<NetworkTransform>().InterpolationTarget;
-            GameController.Instance.localPlayer = this;
-            InitiallySetStats();
+            print("if id: "+no);
         }
+        print("outside id: "+no);
+        
     }
 
     public override void Render()
@@ -130,13 +132,13 @@ public class Player : NetworkBehaviour
     private NetworkObject findNearestEnemy()
     {
         // Calculate the bounds of the camera's view
-        float height = 2f * GameController.Instance.MainCamera.orthographicSize;
-        float width = height * GameController.Instance.MainCamera.aspect;
+        float height = 2f * Camera.main.orthographicSize;
+        float width = height * Camera.main.aspect;
         Vector2 boxSize = new Vector2(width, height);
         Vector2 boxCenter = transform.position;
 
         // Get all colliders within the camera's view
-        Collider2D[] hitColliders = Physics2D.OverlapBoxAll(boxCenter, boxSize, GameController.Instance.MainCamera.transform.eulerAngles.z, enemyMask);
+        Collider2D[] hitColliders = Physics2D.OverlapBoxAll(boxCenter, boxSize, Camera.main.transform.eulerAngles.z, enemyMask);
 
         float minDistance = float.MaxValue;
         NetworkObject closestEnemy = null;

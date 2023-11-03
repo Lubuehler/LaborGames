@@ -8,17 +8,17 @@ public class MultiplayerMenu : MonoBehaviour
 
     public void OnHostClick()
     {
-        MenuManager.Instance.ShowUIElement(UIElement.Host);
+        UIController.Instance.ShowUIElement(UIElement.Host);
     }
 
     public void OnJoinClick()
     {
-        MenuManager.Instance.ShowUIElement(UIElement.Join);
+        UIController.Instance.ShowUIElement(UIElement.Join);
     }
 
     public void OnBackClick()
     {
-        MenuManager.Instance.ShowUIElement(UIElement.Main);
+        UIController.Instance.ShowUIElement(UIElement.Main);
 
     }
 }

@@ -9,9 +9,8 @@ public class HostMenu : MonoBehaviour
     {
         if (!string.IsNullOrEmpty(sessionName))
         {
-            GameController.Instance.StartSession(sessionName);
-            MenuManager.Instance.ShowUIElement(UIElement.Game);
-
+            NetworkController.Instance.StartGame(Fusion.GameMode.Host, sessionName);
+            UIController.Instance.ShowUIElement(UIElement.Game);
         }
 
     }
@@ -24,6 +23,6 @@ public class HostMenu : MonoBehaviour
 
     public void OnBackClick()
     {
-        MenuManager.Instance.ShowUIElement(UIElement.Multiplayer);
+        UIController.Instance.ShowUIElement(UIElement.Multiplayer);
     }
 }

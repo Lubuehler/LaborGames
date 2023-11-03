@@ -116,22 +116,16 @@ public class Enemy : NetworkBehaviour
         currentTarget = null;
         double closestDistance = double.MaxValue;
 
-        if (GameController.Instance?.spawnedCharacters != null)
+
+        foreach (NetworkObject player in NetworkController.Instance.characters.Values)
         {
-            foreach (NetworkObject player in GameController.Instance.spawnedCharacters.Values)
+            Vector3 playerPosition = player.transform.position;
+            double distance = (playerPosition - transform.position).magnitude;
+            if (distance < closestDistance)
             {
-                Vector3 playerPosition = player.transform.position;
-                double distance = (playerPosition - transform.position).magnitude;
-                if (distance < closestDistance)
-                {
-                    closestDistance = distance;
-                    currentTarget = player;
-                }
+                closestDistance = distance;
+                currentTarget = player;
             }
-        }
-        else
-        {
-            Debug.LogWarning("GameController or spawnedCharacters is null");
         }
     }
 }

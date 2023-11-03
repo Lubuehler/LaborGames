@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class ShopMenu : MonoBehaviour
-
 {
     public GameObject statRowPrefab;
     public Transform statsPanelTransform;
@@ -14,7 +13,7 @@ public class ShopMenu : MonoBehaviour
 
     private void Awake()
     {
-        player = GameController.Instance.localPlayer;
+        player = NetworkController.Instance.GetLocalPlayerObject().GetComponent<Player>();
         if (player == null)
         {
             print("wrong order; player not initialised in ShopMenu Awake");

@@ -16,8 +16,8 @@ public class MainMenu : MonoBehaviour
     public async void OnMultiplayerClick()
     {
         multiplayerBtn.interactable = false;
-        await GameController.Instance.JoinLobby();
-        MenuManager.Instance.ShowUIElement(UIElement.Multiplayer);
+        await NetworkController.Instance.JoinLobby();
+        UIController.Instance.ShowUIElement(UIElement.Multiplayer);
 
     }
 
@@ -25,13 +25,13 @@ public class MainMenu : MonoBehaviour
 
     public void OnDebugJoinClick()
     {
-        GameController.Instance.JoinSession("TestSession");
-        MenuManager.Instance.ShowUIElement(UIElement.Game);
+        NetworkController.Instance.StartGame(Fusion.GameMode.Client, "TestSession");
+        UIController.Instance.ShowUIElement(UIElement.Game);
     }
 
     public void OnDebugHostClick()
     {
-        GameController.Instance.StartSession("TestSession");
-        MenuManager.Instance.ShowUIElement(UIElement.Game);
+        NetworkController.Instance.StartGame(Fusion.GameMode.Host, "TestSession");
+        UIController.Instance.ShowUIElement(UIElement.Game);
     }
 }

@@ -2,9 +2,9 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class MenuManager : MonoBehaviour
+public class UIController : MonoBehaviour
 {
-    public static MenuManager Instance;
+    public static UIController Instance;
 
     public GameObject mainCanvas;
     public GameObject multiplayerCanvas;

@@ -1,3 +1,4 @@
+using Fusion;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -9,8 +10,9 @@ public class DirectJoinMenu : MonoBehaviour
     {
         if (!string.IsNullOrEmpty(sessionName))
         {
-            GameController.Instance.JoinSession(sessionName);
-            MenuManager.Instance.ShowUIElement(UIElement.Game);
+            NetworkController.Instance.StartGame(GameMode.Client, sessionName);
+
+            UIController.Instance.ShowUIElement(UIElement.Game);
         }
 
     }
@@ -23,6 +25,6 @@ public class DirectJoinMenu : MonoBehaviour
 
     public void OnCancelClick()
     {
-        MenuManager.Instance.HideDialog(UIElement.DirectJoin);
+        UIController.Instance.HideDialog(UIElement.DirectJoin);
     }
 }

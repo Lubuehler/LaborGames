@@ -7,11 +7,22 @@ using TMPro;
 
 public class JoinMenu : MonoBehaviour
 {
-    public string? selectedSession;
+    public string selectedSession = "";
     public Transform elementParent;
     public GameObject template;
     public GameObject placeholder;
     void OnEnable()
+    {
+        NetworkController.Instance.OnSessionListChanged += UpdateSessionList;
+        UpdateSessionList();
+    }
+
+    private void OnDisable()
+    {
+        NetworkController.Instance.OnSessionListChanged -= UpdateSessionList;
+    }
+
+    public  void UpdateSessionList()
     {
         for (int i = elementParent.childCount - 1; i >= 0; i--)
         {
@@ -19,7 +30,7 @@ public class JoinMenu : MonoBehaviour
             Destroy(child.gameObject);
         }
 
-        List<SessionInfo> sessionList = GameController.Instance.GetSessions();
+        List<SessionInfo> sessionList = NetworkController.Instance.sessionList;
 
         for (int i = 0; i < sessionList.Count; i++)
         {
@@ -31,7 +42,7 @@ public class JoinMenu : MonoBehaviour
             button.onClick.AddListener(() => OnButtonClick(g));
         }
 
-        if(sessionList.Count < 1)
+        if (sessionList.Count < 1)
         {
             placeholder.SetActive(true);
         }
@@ -51,20 +62,20 @@ public class JoinMenu : MonoBehaviour
 
     public void OnDirectConnectClick()
     {
-        MenuManager.Instance.ShowDialog(UIElement.DirectJoin);
+        UIController.Instance.ShowDialog(UIElement.DirectJoin);
     }
 
     public void OnJoinGameClick()
     {
         if (!string.IsNullOrEmpty(selectedSession))
         {
-            GameController.Instance.JoinSession(selectedSession);
-            MenuManager.Instance.ShowUIElement(UIElement.Game);
+            NetworkController.Instance.StartGame(GameMode.Client, selectedSession);
+            UIController.Instance.ShowUIElement(UIElement.Game);
         }
     }
 
     public void OnBackClick()
     {
-        MenuManager.Instance.ShowUIElement(UIElement.Multiplayer);
+        UIController.Instance.ShowUIElement(UIElement.Multiplayer);
     }
 }
