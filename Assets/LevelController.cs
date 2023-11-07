@@ -8,6 +8,17 @@ public class LevelController : NetworkBehaviour
     public GameObject dronePrefab;
     public static LevelController Instance;
 
+
+    [Networked(OnChanged = nameof(GameStarted))]
+    public bool gameStarted { get; set; }
+    private static void GameStarted(Changed<LevelController> changed)
+    {
+        if(changed.Behaviour.gameStarted)
+        {
+            UIController.Instance.ShowUIElement(UIElement.Game);
+        }
+    }
+
     private void Awake()
     {
         if (Instance == null)
@@ -22,9 +33,31 @@ public class LevelController : NetworkBehaviour
 
     public override void Spawned()
     {
-        if (Runner.IsServer)
+        gameStarted = false;
+        // if (Runner.IsServer)
+        // {
+        //     StartLevel();
+        // }
+    }
+
+    [Rpc]
+    public void RPC_CheckReady()
+    {
+        bool allPlayersReady = true;
+        List<PlayerRef> players = new List<PlayerRef>(Runner.ActivePlayers);
+        foreach (PlayerRef player in players)
+        {
+            if (!Runner.GetPlayerObject(player).GetComponent<Player>().ready)
+            {
+                allPlayersReady = false;
+            }
+        }
+        if (allPlayersReady && Runner.IsServer)
         {
             StartLevel();
+            Runner.SessionInfo.IsVisible = false;
+            Runner.SessionInfo.IsOpen = false;
+            this.gameStarted = true;
         }
     }
 

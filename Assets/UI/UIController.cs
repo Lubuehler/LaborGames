@@ -12,6 +12,8 @@ public class UIController : MonoBehaviour
     public GameObject joinCanvas;
     public GameObject directJoinCanvas;
     public GameObject shopCanvas;
+    public GameObject playerNameCanvas;
+    public GameObject lobbyCanvas;
 
     public Dictionary<UIElement, GameObject> canvasDict = new Dictionary<UIElement, GameObject>();
 
@@ -32,8 +34,18 @@ public class UIController : MonoBehaviour
         canvasDict[UIElement.Join] = joinCanvas;
         canvasDict[UIElement.DirectJoin] = directJoinCanvas;
         canvasDict[UIElement.Shop] = shopCanvas;
+        canvasDict[UIElement.PlayerName] = playerNameCanvas;
+        canvasDict[UIElement.Lobby] = lobbyCanvas;
 
-        ShowUIElement(UIElement.Main);
+        DataController.Instance.LoadData();
+        if(string.IsNullOrEmpty(DataController.Instance.playerData.playerName))
+        {   
+            ShowUIElement(UIElement.PlayerName);
+        } 
+        else 
+        {
+            ShowUIElement(UIElement.Main);
+        }
     }
 
     public void ShowUIElement(UIElement uIElement)
@@ -79,5 +91,7 @@ public enum UIElement
     Join,
     DirectJoin,
     Game,
-    Shop
+    Shop,
+    PlayerName,
+    Lobby
 }

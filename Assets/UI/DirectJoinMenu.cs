@@ -2,17 +2,30 @@ using Fusion;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using TMPro;
 
 public class DirectJoinMenu : MonoBehaviour
 {
     private string sessionName;
-    public void OnDirectConnectClick()
+
+    public TMP_InputField inputField;
+
+    void OnEnable()
+    {
+        sessionName = "";
+        inputField.Select();
+        inputField.text = "";
+    }
+    public async void OnDirectConnectClick()
     {
         if (!string.IsNullOrEmpty(sessionName))
         {
-            NetworkController.Instance.StartGame(GameMode.Client, sessionName);
-
-            UIController.Instance.ShowUIElement(UIElement.Game);
+            StartGameResult result = await NetworkController.Instance.StartGame(GameMode.Client, sessionName);
+            if (result.Ok)
+            {
+                UIController.Instance.ShowUIElement(UIElement.Lobby);
+            }
+            UIController.Instance.HideDialog(UIElement.DirectJoin);
         }
 
     }
@@ -20,7 +33,6 @@ public class DirectJoinMenu : MonoBehaviour
     public void GetSessionName(string input)
     {
         sessionName = input;
-        Debug.Log(sessionName);
     }
 
     public void OnCancelClick()

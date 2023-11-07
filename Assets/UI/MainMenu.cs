@@ -23,15 +23,15 @@ public class MainMenu : MonoBehaviour
 
 
 
-    public void OnDebugJoinClick()
+    public async void OnDebugJoinClick()
     {
-        NetworkController.Instance.StartGame(Fusion.GameMode.Client, "TestSession");
+        await NetworkController.Instance.StartGame(Fusion.GameMode.Client, "TestSession");
         UIController.Instance.ShowUIElement(UIElement.Game);
     }
 
-    public void OnDebugHostClick()
+    public async void OnDebugHostClick()
     {
-        NetworkController.Instance.StartGame(Fusion.GameMode.Host, "TestSession");
+        await NetworkController.Instance.StartGame(Fusion.GameMode.Host, "TestSession");
         UIController.Instance.ShowUIElement(UIElement.Game);
     }
 }

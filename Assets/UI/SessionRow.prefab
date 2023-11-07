@@ -281,7 +281,7 @@ GameObject:
   - component: {fileID: 8610247751539779465}
   - component: {fileID: 3697024619222850724}
   m_Layer: 5
-  m_Name: SessionTemplate
+  m_Name: SessionRow
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
