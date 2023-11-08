@@ -35,14 +35,17 @@ public class Enemy : NetworkBehaviour
 
     protected virtual void Move()
     {
-        if (currentTarget != null && networkRigidbody2D != null)
+        if (currentTarget == null || !currentTarget.GetComponent<Player>().isAlive)
         {
-            Vector2 toTarget = (currentTarget.transform.position - transform.position);
-            Vector2 separationForce = CalculateSeparationForce();
-
-            Vector2 desiredVelocity = (toTarget.normalized + separationForce).normalized * speed;
-            networkRigidbody2D.Rigidbody.velocity = Vector2.Lerp(networkRigidbody2D.Rigidbody.velocity, desiredVelocity, Time.deltaTime * movementSmoothing);
+            networkRigidbody2D.Rigidbody.velocity = Vector2.Lerp(networkRigidbody2D.Rigidbody.velocity, Vector2.zero, Time.deltaTime * movementSmoothing);
+            return;
         }
+        Vector2 toTarget = (currentTarget.transform.position - transform.position);
+        Vector2 separationForce = CalculateSeparationForce();
+
+        Vector2 desiredVelocity = (toTarget.normalized + separationForce).normalized * speed;
+        networkRigidbody2D.Rigidbody.velocity = Vector2.Lerp(networkRigidbody2D.Rigidbody.velocity, desiredVelocity, Time.deltaTime * movementSmoothing);
+
     }
 
 
@@ -108,24 +111,32 @@ public class Enemy : NetworkBehaviour
 
     protected void UpdateTarget()
     {
-        if (currentTarget != null && (currentTarget.transform.position - transform.position).magnitude < viewingDistance)
+        if (currentTarget == null ||
+            !currentTarget.GetComponent<Player>().isAlive ||
+            (currentTarget.transform.position - transform.position).magnitude < viewingDistance)
         {
-            return;
+            currentTarget = GetClosestPlayer();
         }
+    }
 
-        currentTarget = null;
+    private NetworkObject GetClosestPlayer()
+    {
+        NetworkObject closestPlayer = null;
         double closestDistance = double.MaxValue;
-
-
-        foreach (NetworkObject player in NetworkController.Instance.characters.Values)
+        foreach (NetworkObject playerObject in NetworkController.Instance.characters.Values)
         {
-            Vector3 playerPosition = player.transform.position;
+            if (!playerObject.GetComponent<Player>().isAlive)
+            {
+                continue;
+            }
+            Vector3 playerPosition = playerObject.transform.position;
             double distance = (playerPosition - transform.position).magnitude;
             if (distance < closestDistance)
             {
                 closestDistance = distance;
-                currentTarget = player;
+                closestPlayer = playerObject;
             }
         }
+        return closestPlayer;
     }
 }

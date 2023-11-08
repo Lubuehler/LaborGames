@@ -28,9 +28,8 @@ public class ShopMenu : MonoBehaviour
             { "Crit Damage Multiplier", p=> p.critDamageMultiplier.ToString("F2") },
             { "Dodge Chance", p=> p.dodgeProbability.ToString("F2") },
             { "Movement Speed", p => p.movementSpeed.ToString("F2") },
-            { "Dodge Chance", p => p.movementSpeed.ToString("F2")  },
-            { "Armor", p => p.movementSpeed.ToString("F2")  },
-            { "Range", p => p.movementSpeed.ToString()  }
+            { "Armor", p => p.armor.ToString("F2")  },
+            { "Range", p => p.range.ToString()  }
 
         };
 
@@ -78,5 +77,17 @@ public class ShopMenu : MonoBehaviour
                 statRows[propertyName].SetStat(propertyName, getStatValue(player));
             }
         }
+    }
+
+    public void OnContinueClick()
+    {
+        UIController.Instance.ShowUIElement(UIElement.Game);
+        LevelController.Instance.StartNextWave();
+    }
+
+    public void OnBackClick()
+    {
+        UIController.Instance.ShowUIElement(UIElement.Main);
+
     }
 }

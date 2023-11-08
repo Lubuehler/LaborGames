@@ -190,14 +190,24 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _interpolationDataSource: 0
-  speed: 5
-  tiltAmount: 15
-  _projectilePrefab: {fileID: 1350390008315525890, guid: 95fb6b4a33b3a6543bcec83d35c8c1bf, type: 3}
+  deathExplosionPrefab: {fileID: 1121192042590650, guid: 1338e286d1686e247aa85314408fe635, type: 3}
   enemyMask:
     serializedVersion: 2
     m_Bits: 64
+  _projectilePrefab: {fileID: 1350390008315525890, guid: 95fb6b4a33b3a6543bcec83d35c8c1bf, type: 3}
+  tiltAmount: 15
   isShooting: 1
-  attackSpeed: 2
+  _maxHealth: 0
+  _attackDamage: 0
+  _attackSpeed: 0
+  _critChance: 0
+  _critDamageMultiplier: 0
+  _dodgeProbability: 0
+  _movementSpeed: 0
+  _luck: 0
+  _armor: 0
+  _range: 0
+  _currentHealth: 0
 --- !u!50 &4367411694323758693
 Rigidbody2D:
   serializedVersion: 4

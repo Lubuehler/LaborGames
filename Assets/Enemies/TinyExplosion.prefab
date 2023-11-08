@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 2235500039069920183}
   - component: {fileID: 2593140974683481289}
   - component: {fileID: 1453669857635858613}
+  - component: {fileID: -2178096859476181513}
   m_Layer: 0
   m_Name: TinyExplosion
   m_TagString: Untagged
@@ -51,7 +52,7 @@ ParticleSystem:
   emitterVelocityMode: 0
   looping: 0
   prewarm: 0
-  playOnAwake: 1
+  playOnAwake: 0
   useUnscaledTime: 0
   autoRandomSeed: 1
   startDelay:
@@ -4958,3 +4959,15 @@ MonoBehaviour:
   NestedObjects: []
   NetworkedBehaviours: []
   SimulationBehaviours: []
+--- !u!114 &-2178096859476181513
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7726421982602285071}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 140f0b104e00ba140b42d5c7be17a513, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 

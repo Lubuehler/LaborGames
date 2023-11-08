@@ -8,18 +8,20 @@ using System;
 
 public class Player : NetworkBehaviour
 {
-    protected NetworkRigidbody2D _nrb2d;
 
-    public float tiltAmount = 15.0f; // The amount of tilt when moving left or right
+    [SerializeField] private GameObject deathExplosionPrefab;
+    [SerializeField] private LayerMask enemyMask;
+    [SerializeField] public Projectile _projectilePrefab;
+    [SerializeField] private float tiltAmount = 15.0f; // The amount of tilt when moving left or right
 
-    public Projectile _projectilePrefab;
-    public LayerMask enemyMask;
+    private NetworkRigidbody2D _nrb2d;
     private float currentTime;
     public bool isShooting = false;
+    public bool isAlive = true;
 
     // Player Stats:
     [Networked]
-    public int maxHealth { get; set; }
+    public float maxHealth { get; set; }
     [Networked]
     public float attackDamage { get; set; }
     [Networked]
@@ -39,11 +41,12 @@ public class Player : NetworkBehaviour
     [Networked]
     public float range { get; set; }
 
-
+    [Networked]
+    public float currentHealth { get; set; }
     public int no { get; set; }
 
     public event Action OnStatsChanged;
-
+    public event Action<float, float> OnHealthChanged;
 
     private void Awake()
     {
@@ -63,9 +66,12 @@ public class Player : NetworkBehaviour
         armor = 0;
         range = 0;
 
+        currentHealth = maxHealth;
+
         print("set stats initially");
         OnStatsChanged?.Invoke();
-    }
+        OnHealthChanged?.Invoke(currentHealth, maxHealth);
+}
 
 
     public override void FixedUpdateNetwork()
@@ -110,9 +116,8 @@ public class Player : NetworkBehaviour
         if (HasInputAuthority)
         {
             Camera.main.GetComponent<CameraScript>().target = GetComponent<NetworkTransform>().InterpolationTarget;
-            print("if id: "+no);
+            LevelController.Instance.localPlayer = this;
         }
-        print("outside id: "+no);
         
     }
 
@@ -157,5 +162,40 @@ public class Player : NetworkBehaviour
             }
         }
         return closestEnemy;
+    }
+
+    public void TakeDamage(float damage)
+    {
+        currentHealth -= damage;
+        currentHealth = Mathf.Clamp(currentHealth, 0, maxHealth);
+
+        OnHealthChanged?.Invoke(currentHealth, maxHealth);
+        print("Took Damage - remaining Health: " + currentHealth);
+        if(currentHealth <= 0)
+        {
+            Die();
+        }
+    }
+
+    public void Heal(float amount)
+    {
+        currentHealth += amount;
+        currentHealth = Mathf.Clamp(currentHealth, 0, maxHealth);
+
+        OnHealthChanged?.Invoke(currentHealth, maxHealth);
+    }
+
+    public void IncreaseMaxHealth(float amount)
+    {
+        maxHealth += amount;
+        Heal(amount);
+        OnHealthChanged?.Invoke(currentHealth, maxHealth);
+    }
+
+    public void Die()
+    {
+        Runner.Spawn(deathExplosionPrefab, transform.position, transform.rotation);
+        isAlive = false;
+        gameObject.SetActive (false);
     }
 }

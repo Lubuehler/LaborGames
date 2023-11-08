@@ -12,6 +12,7 @@ public class UIController : MonoBehaviour
     public GameObject joinCanvas;
     public GameObject directJoinCanvas;
     public GameObject shopCanvas;
+    public GameObject hudCanvas;
 
     public Dictionary<UIElement, GameObject> canvasDict = new Dictionary<UIElement, GameObject>();
 
@@ -32,6 +33,7 @@ public class UIController : MonoBehaviour
         canvasDict[UIElement.Join] = joinCanvas;
         canvasDict[UIElement.DirectJoin] = directJoinCanvas;
         canvasDict[UIElement.Shop] = shopCanvas;
+        canvasDict[UIElement.Game] = hudCanvas;
 
         ShowUIElement(UIElement.Main);
     }
@@ -40,21 +42,16 @@ public class UIController : MonoBehaviour
     {
         foreach (var canvas in canvasDict)
         {
-            if (uIElement == UIElement.Game)
+
+            if (canvas.Key == uIElement)
             {
-                canvas.Value.SetActive(false);
+                canvas.Value.SetActive(true);
             }
             else
             {
-                if (canvas.Key == uIElement)
-                {
-                    canvas.Value.SetActive(true);
-                }
-                else
-                {
-                    canvas.Value.SetActive(false);
-                }
+                canvas.Value.SetActive(false);
             }
+
         }
     }
 

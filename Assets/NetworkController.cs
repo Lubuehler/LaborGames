@@ -93,7 +93,8 @@ public class NetworkController : MonoBehaviour, INetworkRunnerCallbacks
             // Keep track of the player avatars so we can remove it when they disconnect
             characters.Add(player, networkPlayerObject);
             networkPlayerObject.GetComponent<Player>().InitiallySetStats();
-            print("is Server!");
+            //StartCoroutine(LevelController.Instance.DelayedStartRoutine());
+            LevelController.Instance.StartLevel();
         }
     }
 

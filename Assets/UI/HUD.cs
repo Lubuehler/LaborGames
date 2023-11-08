@@ -11,15 +11,11 @@ public class HUD : MonoBehaviour
     public Image healthbarBackground;
     public Image healthbarForeground;
 
-    // Start is called before the first frame update
-    void Start()
+    private void Update()
     {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
+        if (LevelController.Instance != null)
+        {
+            waveTimer.text = LevelController.Instance.RemainingWaveTime.ToString("F0");
+        }
     }
 }
