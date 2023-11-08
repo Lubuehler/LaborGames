@@ -22,7 +22,7 @@ public class JoinMenu : MonoBehaviour
         NetworkController.Instance.OnSessionListChanged -= UpdateSessionList;
     }
 
-    public  void UpdateSessionList()
+    public void UpdateSessionList()
     {
         for (int i = elementParent.childCount - 1; i >= 0; i--)
         {
@@ -65,12 +65,15 @@ public class JoinMenu : MonoBehaviour
         UIController.Instance.ShowDialog(UIElement.DirectJoin);
     }
 
-    public void OnJoinGameClick()
+    public async void OnJoinGameClick()
     {
         if (!string.IsNullOrEmpty(selectedSession))
         {
-            NetworkController.Instance.StartGame(GameMode.Client, selectedSession);
-            UIController.Instance.ShowUIElement(UIElement.Game);
+            StartGameResult result = await NetworkController.Instance.StartGame(GameMode.Client, selectedSession);
+            if (result.Ok)
+            {
+                UIController.Instance.ShowUIElement(UIElement.Lobby);
+            }
         }
     }
 

@@ -19,6 +19,14 @@ public class Player : NetworkBehaviour
     public bool isShooting = false;
     public bool isAlive = true;
 
+
+    [Networked(OnChanged = nameof(PlayerInfoChanged))]
+    public string playerName { get; set; }
+
+    [Networked(OnChanged = nameof(PlayerInfoChanged))]
+    public bool ready { get; set; }
+
+
     // Player Stats:
     [Networked]
     public float maxHealth { get; set; }
@@ -43,7 +51,6 @@ public class Player : NetworkBehaviour
 
     [Networked]
     public float currentHealth { get; set; }
-    public int no { get; set; }
 
     public event Action OnStatsChanged;
     public event Action<float, float> OnHealthChanged;
@@ -51,6 +58,24 @@ public class Player : NetworkBehaviour
     private void Awake()
     {
         _nrb2d = GetComponent<NetworkRigidbody2D>();
+    }
+
+    [Rpc(sources: RpcSources.InputAuthority, targets: RpcTargets.StateAuthority)]
+    public void RPC_Configure(string playerName)
+    {
+        Debug.Log("RPC_Configure");
+        this.playerName = playerName;
+    }
+
+    [Rpc(sources: RpcSources.InputAuthority, targets: RpcTargets.StateAuthority)]
+    public void RPC_Ready(bool ready)
+    {
+        Debug.Log("RPC_Ready");
+        this.ready = ready;
+        if(this.ready)
+        {
+            LevelController.Instance.RPC_CheckReady();
+        }
     }
 
     public void InitiallySetStats()
@@ -76,7 +101,7 @@ public class Player : NetworkBehaviour
 
     public override void FixedUpdateNetwork()
     {
-        if (GetInput(out NetworkInputData data))
+        if (GetInput(out NetworkInputData data) && LevelController.Instance.gameStarted)
         {
             data.direction.Normalize();
             _nrb2d.Rigidbody.velocity = data.direction * movementSpeed;
@@ -116,9 +141,14 @@ public class Player : NetworkBehaviour
         if (HasInputAuthority)
         {
             Camera.main.GetComponent<CameraScript>().target = GetComponent<NetworkTransform>().InterpolationTarget;
+            RPC_Configure(DataController.Instance.playerData.playerName);
             LevelController.Instance.localPlayer = this;
         }
-        
+    }
+
+    public static void PlayerInfoChanged(Changed<Player> changed)
+    {
+        NetworkController.Instance.TriggerPlayerListChanged();
     }
 
     public override void Render()

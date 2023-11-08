@@ -9,14 +9,19 @@ using System.Threading.Tasks;
 public class NetworkController : MonoBehaviour, INetworkRunnerCallbacks
 {
 
-    public List<SessionInfo> sessionList;
+    public GameObject players;
 
+    public List<SessionInfo> sessionList;
     private NetworkRunner _runner;
     public static NetworkController Instance;
 
     public Dictionary<PlayerRef, NetworkObject> characters = new Dictionary<PlayerRef, NetworkObject>();
 
     public event Action OnSessionListChanged;
+
+    public event Action OnPlayerListChanged;
+
+    public SessionInfo currentSession;
 
 
     private void Awake()
@@ -30,6 +35,8 @@ public class NetworkController : MonoBehaviour, INetworkRunnerCallbacks
             Destroy(this.gameObject);
         }
     }
+
+
     public async Task<StartGameResult> JoinLobby()
     {
         _runner = GetComponent<NetworkRunner>();
@@ -41,7 +48,7 @@ public class NetworkController : MonoBehaviour, INetworkRunnerCallbacks
         return await _runner.JoinSessionLobby(SessionLobby.ClientServer);
     }
 
-    public async void StartGame(GameMode mode, string sessionName)
+    public async Task<StartGameResult> StartGame(GameMode mode, string sessionName)
     {
         // Create the Fusion runner and let it know that we will be providing user input
         _runner = GetComponent<NetworkRunner>();
@@ -52,7 +59,7 @@ public class NetworkController : MonoBehaviour, INetworkRunnerCallbacks
         }
 
         // Start or join (depends on gamemode) a session with a specific name
-        await _runner.StartGame(new StartGameArgs()
+        StartGameResult result = await _runner.StartGame(new StartGameArgs()
         {
             GameMode = mode,
             SessionName = sessionName,
@@ -60,6 +67,9 @@ public class NetworkController : MonoBehaviour, INetworkRunnerCallbacks
             SceneManager = gameObject.AddComponent<NetworkSceneManagerDefault>(),
             PlayerCount = 4
         });
+
+        currentSession = _runner.SessionInfo;
+        return result;
     }
 
     public NetworkObject GetLocalPlayerObject()
@@ -71,7 +81,7 @@ public class NetworkController : MonoBehaviour, INetworkRunnerCallbacks
 
     public NetworkObject GetPlayerAvatar(PlayerRef player)
     {
-        if (characters.TryGetValue(player, out NetworkObject networkObject))
+        if (_runner.TryGetPlayerObject(player, out NetworkObject networkObject))
         {
             return networkObject;
         }
@@ -81,7 +91,6 @@ public class NetworkController : MonoBehaviour, INetworkRunnerCallbacks
         }
     }
 
-    public int counter = 0;
     public void OnPlayerJoined(NetworkRunner runner, PlayerRef player)
     {
         if (runner.IsServer)
@@ -91,11 +100,22 @@ public class NetworkController : MonoBehaviour, INetworkRunnerCallbacks
             Debug.Log("spawn: server");
             NetworkObject networkPlayerObject = runner.Spawn(_playerPrefab, spawnPosition, Quaternion.identity, player);
             // Keep track of the player avatars so we can remove it when they disconnect
+
+            // Test for playerlist in lobby
+            _runner.SetPlayerObject(player, networkPlayerObject);
+
             characters.Add(player, networkPlayerObject);
             networkPlayerObject.GetComponent<Player>().InitiallySetStats();
-            //StartCoroutine(LevelController.Instance.DelayedStartRoutine());
-            LevelController.Instance.StartLevel();
+            print("is Server!");
+
+            OnPlayerListChanged?.Invoke();
+            
         }
+    }
+
+    public void TriggerPlayerListChanged()
+    {
+        OnPlayerListChanged?.Invoke();
     }
 
     public void OnPlayerLeft(NetworkRunner runner, PlayerRef player)
@@ -106,6 +126,9 @@ public class NetworkController : MonoBehaviour, INetworkRunnerCallbacks
         {
             runner.Despawn(networkObject);
             characters.Remove(player);
+
+
+            OnPlayerListChanged?.Invoke();
         }
     }
 

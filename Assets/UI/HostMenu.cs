@@ -5,12 +5,12 @@ using UnityEngine;
 public class HostMenu : MonoBehaviour
 {
     private string sessionName;
-    public void OnCreateClick()
+    public async void OnCreateClick()
     {
         if (!string.IsNullOrEmpty(sessionName))
         {
-            NetworkController.Instance.StartGame(Fusion.GameMode.Host, sessionName);
-            UIController.Instance.ShowUIElement(UIElement.Game);
+            await NetworkController.Instance.StartGame(Fusion.GameMode.Host, sessionName);
+            UIController.Instance.ShowUIElement(UIElement.Lobby);
         }
 
     }
@@ -18,7 +18,6 @@ public class HostMenu : MonoBehaviour
     public void GetSessionName(string input)
     {
         sessionName = input;
-        Debug.Log(sessionName);
     }
 
     public void OnBackClick()

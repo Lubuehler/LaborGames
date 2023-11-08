@@ -10,6 +10,17 @@ public class LevelController : NetworkBehaviour
     public GameObject dronePrefab;
     public static LevelController Instance;
 
+
+    [Networked(OnChanged = nameof(GameStarted))]
+    public bool gameStarted { get; set; }
+    private static void GameStarted(Changed<LevelController> changed)
+    {
+        if(changed.Behaviour.gameStarted)
+        {
+            UIController.Instance.ShowUIElement(UIElement.Game);
+        }
+    }
+
     private int currentWave = 0;
     private float waveDuration = 30f;
     private float waveDurationIncrease = 2f;
@@ -47,17 +58,31 @@ public class LevelController : NetworkBehaviour
 
     public override void Spawned()
     {
+        gameStarted = false;
         if (!Runner.IsServer) return;
 
         currentEnemyPool = new List<EnemyType> { EnemyType.Drone };
-
     }
 
-    private void SpawnRandomEnemy()
+    [Rpc]
+    public void RPC_CheckReady()
     {
-        Vector3 position = GetRandomPosition(); // Implement this method based on your game's logic
-        EnemyType enemyType = currentEnemyPool[UnityEngine.Random.Range(0, currentEnemyPool.Count)];
-        SpawnEnemy(position, enemyType);
+        bool allPlayersReady = true;
+        List<PlayerRef> players = new List<PlayerRef>(Runner.ActivePlayers);
+        foreach (PlayerRef player in players)
+        {
+            if (!Runner.GetPlayerObject(player).GetComponent<Player>().ready)
+            {
+                allPlayersReady = false;
+            }
+        }
+        if (allPlayersReady && Runner.IsServer)
+        {
+            StartLevel();
+            Runner.SessionInfo.IsVisible = false;
+            Runner.SessionInfo.IsOpen = false;
+            this.gameStarted = true;
+        }
     }
 
     private void SpawnEnemy(Vector3 position, EnemyType enemyType)
