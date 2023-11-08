@@ -123,8 +123,9 @@ public class Enemy : NetworkBehaviour
     {
         NetworkObject closestPlayer = null;
         double closestDistance = double.MaxValue;
-        foreach (NetworkObject playerObject in NetworkController.Instance.characters.Values)
+        foreach (PlayerRef playerRef in Runner.ActivePlayers)
         {
+            NetworkObject playerObject = NetworkController.Instance.GetPlayerAvatar(playerRef);
             if (!playerObject.GetComponent<Player>().isAlive)
             {
                 continue;

@@ -15,8 +15,6 @@ public class NetworkController : MonoBehaviour, INetworkRunnerCallbacks
     private NetworkRunner _runner;
     public static NetworkController Instance;
 
-    public Dictionary<PlayerRef, NetworkObject> characters = new Dictionary<PlayerRef, NetworkObject>();
-
     public event Action OnSessionListChanged;
 
     public event Action OnPlayerListChanged;
@@ -104,7 +102,6 @@ public class NetworkController : MonoBehaviour, INetworkRunnerCallbacks
             // Test for playerlist in lobby
             _runner.SetPlayerObject(player, networkPlayerObject);
 
-            characters.Add(player, networkPlayerObject);
             networkPlayerObject.GetComponent<Player>().InitiallySetStats();
             print("is Server!");
 
@@ -120,16 +117,9 @@ public class NetworkController : MonoBehaviour, INetworkRunnerCallbacks
 
     public void OnPlayerLeft(NetworkRunner runner, PlayerRef player)
     {
-        // Find and remove the players avatar
-        characters.TryGetValue(player, out NetworkObject networkObject);
-        if (networkObject != null)
-        {
-            runner.Despawn(networkObject);
-            characters.Remove(player);
 
-
-            OnPlayerListChanged?.Invoke();
-        }
+        OnPlayerListChanged?.Invoke();
+        
     }
 
     public void OnInput(NetworkRunner runner, NetworkInput input)

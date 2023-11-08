@@ -141,6 +141,13 @@ public class LevelController : NetworkBehaviour
         RpcEndWave();
     }
 
+    private void SpawnRandomEnemy()
+    {
+        Vector3 position = GetRandomPosition(); // Implement this method based on your game's logic
+        EnemyType enemyType = currentEnemyPool[UnityEngine.Random.Range(0, currentEnemyPool.Count)];
+        SpawnEnemy(position, enemyType);
+    }
+
     private void EnterShoppingPhase()
     {
         Debug.Log("Shop phase started. Player can buy stuff now.");
