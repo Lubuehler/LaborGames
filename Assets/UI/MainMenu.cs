@@ -32,6 +32,7 @@ public class MainMenu : MonoBehaviour
     public async void OnDebugHostClick()
     {
         await NetworkController.Instance.StartGame(Fusion.GameMode.Host, "TestSession");
+        LevelController.Instance.StartLevel();
         UIController.Instance.ShowUIElement(UIElement.Game);
     }
 }

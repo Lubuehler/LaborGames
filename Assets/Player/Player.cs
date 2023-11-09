@@ -203,7 +203,7 @@ public class Player : NetworkBehaviour
         print("Took Damage - remaining Health: " + currentHealth);
         if(currentHealth <= 0)
         {
-            Die();
+            RpcDie();
         }
     }
 
@@ -222,10 +222,12 @@ public class Player : NetworkBehaviour
         OnHealthChanged?.Invoke(currentHealth, maxHealth);
     }
 
-    public void Die()
+    [Rpc(RpcSources.All, RpcTargets.All)]
+    public void RpcDie()
     {
         Runner.Spawn(deathExplosionPrefab, transform.position, transform.rotation);
         isAlive = false;
         gameObject.SetActive (false);
+       // LevelController.Instance.PlayerDowned(this);
     }
 }

@@ -37,14 +37,14 @@ public class Enemy : NetworkBehaviour
     {
         if (currentTarget == null || !currentTarget.GetComponent<Player>().isAlive)
         {
-            networkRigidbody2D.Rigidbody.velocity = Vector2.Lerp(networkRigidbody2D.Rigidbody.velocity, Vector2.zero, Time.deltaTime * movementSmoothing);
+            networkRigidbody2D.Rigidbody.velocity = Vector2.Lerp(networkRigidbody2D.Rigidbody.velocity, Vector2.zero, Runner.DeltaTime * movementSmoothing);
             return;
         }
         Vector2 toTarget = (currentTarget.transform.position - transform.position);
         Vector2 separationForce = CalculateSeparationForce();
 
         Vector2 desiredVelocity = (toTarget.normalized + separationForce).normalized * speed;
-        networkRigidbody2D.Rigidbody.velocity = Vector2.Lerp(networkRigidbody2D.Rigidbody.velocity, desiredVelocity, Time.deltaTime * movementSmoothing);
+        networkRigidbody2D.Rigidbody.velocity = Vector2.Lerp(networkRigidbody2D.Rigidbody.velocity, desiredVelocity, Runner.DeltaTime * movementSmoothing);
 
     }
 

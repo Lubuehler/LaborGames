@@ -28,6 +28,7 @@ public class LevelController : NetworkBehaviour
     private float waveEndTime; // Time when the current wave will end
     private bool waveInProgress = false;
 
+    [Networked]
     public float RemainingWaveTime { get; private set; }
 
     private List<EnemyType> currentEnemyPool;
@@ -36,6 +37,7 @@ public class LevelController : NetworkBehaviour
     public GameObject background;
     public Player localPlayer;
     private List<Player> livingPlayers;
+    
 
     private void Awake()
     {
@@ -81,7 +83,11 @@ public class LevelController : NetworkBehaviour
             StartLevel();
             Runner.SessionInfo.IsVisible = false;
             Runner.SessionInfo.IsOpen = false;
-            this.gameStarted = true;
+            livingPlayers = new List<Player>();
+            foreach (PlayerRef player in players)
+            {
+                livingPlayers.Add(Runner.GetPlayerObject(player).GetComponent<Player>());
+            }
         }
     }
 
@@ -129,7 +135,7 @@ public class LevelController : NetworkBehaviour
 
         RemainingWaveTime = duration;
 
-        while (RemainingWaveTime > 0)
+        while (RemainingWaveTime > 0 )
         {
             // Assuming the game is not paused and you're counting down
             RemainingWaveTime -= 1;
@@ -171,6 +177,7 @@ public class LevelController : NetworkBehaviour
     public void StartLevel()
     {
         StartNextWave();
+        this.gameStarted = true;
     }
 
     public void EnemyDefeated(Enemy enemy)
@@ -183,9 +190,12 @@ public class LevelController : NetworkBehaviour
         }
     }
 
-    public void PlayerDowned()
+    public void PlayerDowned(Player player)
     {
-
+        livingPlayers.Remove(player);
+        if(livingPlayers.Count == 0) {
+            RpcPauseGame();
+        }
     }
 
     private void CheckForLevelCompletion()
@@ -213,5 +223,17 @@ public class LevelController : NetworkBehaviour
 
         return offsetPosition;
 
+    }
+
+    [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
+    public void RpcPauseGame()
+    {
+        Time.timeScale = 0;
+    }
+
+    [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
+    public void RpcUnpauseGame()
+    {
+        Time.timeScale = 1;
     }
 }
