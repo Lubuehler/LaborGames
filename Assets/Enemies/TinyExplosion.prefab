@@ -13,6 +13,8 @@ GameObject:
   - component: {fileID: 2593140974683481289}
   - component: {fileID: 1453669857635858613}
   - component: {fileID: -2178096859476181513}
+  - component: {fileID: 1671289270682131814}
+  - component: {fileID: 3848061444349200920}
   m_Layer: 0
   m_Name: TinyExplosion
   m_TagString: Untagged
@@ -4957,7 +4959,8 @@ MonoBehaviour:
   NetworkGuid:
     RawGuidValue: cc38b5938cf4f7947a6710d03457cb5f
   NestedObjects: []
-  NetworkedBehaviours: []
+  NetworkedBehaviours:
+  - {fileID: 3848061444349200920}
   SimulationBehaviours: []
 --- !u!114 &-2178096859476181513
 MonoBehaviour:
@@ -4971,3 +4974,58 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 140f0b104e00ba140b42d5c7be17a513, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!50 &1671289270682131814
+Rigidbody2D:
+  serializedVersion: 4
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7726421982602285071}
+  m_BodyType: 0
+  m_Simulated: 1
+  m_UseFullKinematicContacts: 0
+  m_UseAutoMass: 0
+  m_Mass: 1
+  m_LinearDrag: 0
+  m_AngularDrag: 0.05
+  m_GravityScale: 1
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_Interpolate: 0
+  m_SleepingMode: 1
+  m_CollisionDetection: 0
+  m_Constraints: 0
+--- !u!114 &3848061444349200920
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7726421982602285071}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: -1779252708, guid: e725a070cec140c4caffb81624c8c787, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _interpolationDataSource: 0
+  InterpolationSpace: 0
+  InterpolationTarget: {fileID: 0}
+  InterpolateErrorCorrection: 1
+  InterpolatedErrorCorrectionSettings:
+    MinRate: 3.3
+    MaxRate: 10
+    PosBlendStart: 0.25
+    PosBlendEnd: 1
+    PosMinCorrection: 0.025
+    PosTeleportDistance: 2
+    RotBlendStart: 0.1
+    RotBlendEnd: 0.5
+    RotTeleportRadians: 1.5
+  UseLegacySharedModeInterpolation: 0
+  TargetInterpolationDelay: 0.03

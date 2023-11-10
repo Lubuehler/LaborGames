@@ -96,6 +96,7 @@ public class Player : NetworkBehaviour
         print("set stats initially");
         OnStatsChanged?.Invoke();
         OnHealthChanged?.Invoke(currentHealth, maxHealth);
+
 }
 
 
@@ -196,11 +197,12 @@ public class Player : NetworkBehaviour
 
     public void TakeDamage(float damage)
     {
+        float prev = currentHealth;
         currentHealth -= damage;
         currentHealth = Mathf.Clamp(currentHealth, 0, maxHealth);
 
         OnHealthChanged?.Invoke(currentHealth, maxHealth);
-        print("Took Damage - remaining Health: " + currentHealth);
+        print("Took Damage - previously: " + prev + " now remaining Health: " + currentHealth);
         if(currentHealth <= 0)
         {
             RpcDie();
@@ -229,5 +231,20 @@ public class Player : NetworkBehaviour
         isAlive = false;
         gameObject.SetActive (false);
        // LevelController.Instance.PlayerDowned(this);
+    }
+
+    public void printStats()
+    {
+        print("maxHealth: " + maxHealth);
+        print("attackDamage: " + attackDamage);
+        print("attackSpeed: " + attackSpeed);
+        print("critChance: " + critChance);
+        print("critDamageMultiplier: " + critDamageMultiplier);
+        print("dodgeProbability: " + dodgeProbability);
+        print("movementSpeed: " + movementSpeed);
+        print("luck: " + luck);
+        print("armor: " + armor);
+        print("range: " + range);
+        print("Current Health : " + currentHealth);
     }
 }
