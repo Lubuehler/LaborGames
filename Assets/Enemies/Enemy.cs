@@ -19,6 +19,8 @@ public class Enemy : NetworkBehaviour
     protected NetworkRigidbody2D networkRigidbody2D;
     protected NetworkObject currentTarget;
 
+    [SerializeField] private GameObject coin;
+
     public override void Spawned()
     {
         networkRigidbody2D = GetComponent<NetworkRigidbody2D>();
@@ -100,6 +102,8 @@ public class Enemy : NetworkBehaviour
     protected virtual void Die()
     {
         Debug.Log("Enemy died");
+        NetworkObject spawnedCoin = Runner.Spawn(coin, gameObject.transform.position, Quaternion.identity);
+        LevelController.Instance._spawnedCoins.Add(spawnedCoin);
         Runner.Despawn(GetComponent<NetworkObject>());
     }
 

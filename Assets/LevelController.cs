@@ -7,6 +7,7 @@ using System.Collections;
 public class LevelController : NetworkBehaviour
 {
     private List<NetworkObject> _spawnedEnemies = new List<NetworkObject>();
+    public List<NetworkObject> _spawnedCoins = new List<NetworkObject>();
     public GameObject dronePrefab;
     public static LevelController Instance;
 
@@ -119,6 +120,10 @@ public class LevelController : NetworkBehaviour
     [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
     private void RpcEndWave()
     {
+        foreach(NetworkObject coin in _spawnedCoins)
+        {
+            Runner.Despawn(coin);
+        }
         foreach(NetworkObject enemy in _spawnedEnemies)
         {
             Runner.Despawn(enemy);

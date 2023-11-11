@@ -4869,6 +4869,7 @@ MonoBehaviour:
   _interpolationDataSource: 0
   dronePrefab: {fileID: 4776032338861653262, guid: c277ef3b8d5d3ae49b14c01c25e63955, type: 3}
   _gameStarted: 0
+  _RemainingWaveTime: 0
   background: {fileID: 791546675}
   localPlayer: {fileID: 0}
 --- !u!1 &803030854

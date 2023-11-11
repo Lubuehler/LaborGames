@@ -11,6 +11,7 @@ public class Player : NetworkBehaviour
 
     [SerializeField] private GameObject deathExplosionPrefab;
     [SerializeField] private LayerMask enemyMask;
+    [SerializeField] private LayerMask coinMask;
     [SerializeField] public Projectile _projectilePrefab;
     [SerializeField] private float tiltAmount = 15.0f; // The amount of tilt when moving left or right
 
@@ -28,6 +29,8 @@ public class Player : NetworkBehaviour
 
 
     // Player Stats:
+    [Networked]
+    public int coins { get; set; }
     [Networked]
     public float maxHealth { get; set; }
     [Networked]
@@ -48,12 +51,12 @@ public class Player : NetworkBehaviour
     public float armor { get; set; }
     [Networked]
     public float range { get; set; }
-
     [Networked]
     public float currentHealth { get; set; }
 
     public event Action OnStatsChanged;
     public event Action<float, float> OnHealthChanged;
+    public event Action<int> OnCoinsChanged;
 
     private void Awake()
     {
@@ -72,7 +75,7 @@ public class Player : NetworkBehaviour
     {
         Debug.Log("RPC_Ready");
         this.ready = ready;
-        if(this.ready)
+        if (this.ready)
         {
             LevelController.Instance.RPC_CheckReady();
         }
@@ -80,6 +83,7 @@ public class Player : NetworkBehaviour
 
     public void InitiallySetStats()
     {
+        coins = 0;
         maxHealth = 100;
         attackDamage = 20;
         attackSpeed = 1;
@@ -96,7 +100,8 @@ public class Player : NetworkBehaviour
         print("set stats initially");
         OnStatsChanged?.Invoke();
         OnHealthChanged?.Invoke(currentHealth, maxHealth);
-}
+
+    }
 
 
     public override void FixedUpdateNetwork()
@@ -136,6 +141,17 @@ public class Player : NetworkBehaviour
         }
     }
 
+    void OnTriggerEnter2D(Collider2D collider)
+    {
+        if (((1 << collider.gameObject.layer) & coinMask) != 0)
+        {
+            Runner.Despawn(collider.gameObject.GetComponent<NetworkObject>());
+            coins++;
+            OnCoinsChanged?.Invoke(coins);
+        }
+
+    }
+
     public override void Spawned()
     {
         if (HasInputAuthority)
@@ -162,6 +178,7 @@ public class Player : NetworkBehaviour
                 currentTime = 0f;
             }
         }
+
     }
 
     private NetworkObject findNearestEnemy()
@@ -201,7 +218,7 @@ public class Player : NetworkBehaviour
 
         OnHealthChanged?.Invoke(currentHealth, maxHealth);
         print("Took Damage - remaining Health: " + currentHealth);
-        if(currentHealth <= 0)
+        if (currentHealth <= 0)
         {
             RpcDie();
         }
@@ -227,7 +244,7 @@ public class Player : NetworkBehaviour
     {
         Runner.Spawn(deathExplosionPrefab, transform.position, transform.rotation);
         isAlive = false;
-        gameObject.SetActive (false);
-       // LevelController.Instance.PlayerDowned(this);
+        gameObject.SetActive(false);
+        // LevelController.Instance.PlayerDowned(this);
     }
 }
