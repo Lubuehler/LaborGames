@@ -6,23 +6,20 @@ using System.Collections;
 
 public class LevelController : NetworkBehaviour
 {
+    public static LevelController Instance;
+
+    public GameObject dronePrefab;
+
     private List<NetworkObject> _spawnedEnemies = new List<NetworkObject>();
     public List<NetworkObject> _spawnedCoins = new List<NetworkObject>();
-    public GameObject dronePrefab;
-    public static LevelController Instance;
+    
+    
 
 
     [Networked(OnChanged = nameof(GameStarted))]
     public bool gameStarted { get; set; }
-    private static void GameStarted(Changed<LevelController> changed)
-    {
-        if(changed.Behaviour.gameStarted)
-        {
-            UIController.Instance.ShowUIElement(UIElement.Game);
-        }
-    }
 
-    private int currentWave = 0;
+    public int currentWave = 0;
     private float waveDuration = 30f;
     private float waveDurationIncrease = 2f;
 
@@ -34,7 +31,6 @@ public class LevelController : NetworkBehaviour
 
     private List<EnemyType> currentEnemyPool;
 
-    public event Action onStartGame;
     public GameObject background;
     public Player localPlayer;
     private List<Player> livingPlayers;
@@ -52,13 +48,6 @@ public class LevelController : NetworkBehaviour
         }
     }
 
-    public IEnumerator DelayedStartRoutine()
-    {
-        print("delayed start");
-        yield return new WaitForSeconds(.5f);
-        StartNextWave();
-    }
-
     public override void Spawned()
     {
         gameStarted = false;
@@ -66,6 +55,14 @@ public class LevelController : NetworkBehaviour
 
         currentEnemyPool = new List<EnemyType> { EnemyType.Drone };
     }
+
+    public IEnumerator DelayedStartRoutine()
+    {
+        yield return new WaitForSeconds(.5f);
+        StartNextWave();
+    }
+
+    
 
     [Rpc]
     public void RPC_CheckReady()
@@ -161,7 +158,6 @@ public class LevelController : NetworkBehaviour
 
     private void EnterShoppingPhase()
     {
-        Debug.Log("Shop phase started. Player can buy stuff now.");
         UIController.Instance.ShowUIElement(UIElement.Shop);
     }
 
@@ -227,7 +223,14 @@ public class LevelController : NetworkBehaviour
         Vector3 offsetPosition = new Vector3(x, y, 0) + spriteRenderer.gameObject.transform.position;
 
         return offsetPosition;
+    }
 
+    private static void GameStarted(Changed<LevelController> changed)
+    {
+        if(changed.Behaviour.gameStarted)
+        {
+            UIController.Instance.ShowUIElement(UIElement.Game);
+        }
     }
 
     [Rpc(RpcSources.StateAuthority, RpcTargets.All)]

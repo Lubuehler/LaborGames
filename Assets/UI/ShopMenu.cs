@@ -1,11 +1,16 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using TMPro;
 
 public class ShopMenu : MonoBehaviour
 {
     public GameObject statRowPrefab;
     public Transform statsPanelTransform;
+
+    public TMP_Text coins;
+
+
     private Player player;
 
     private Dictionary<string, Func<Player, string>> statMappings;
@@ -39,6 +44,7 @@ public class ShopMenu : MonoBehaviour
         {
             InstantiateStatRow(mapping.Key);
         }
+        this.coins.text = player.coins.ToString();
     }
 
     private void OnEnable()
@@ -83,11 +89,5 @@ public class ShopMenu : MonoBehaviour
     {
         UIController.Instance.ShowUIElement(UIElement.Game);
         LevelController.Instance.StartNextWave();
-    }
-
-    public void OnBackClick()
-    {
-        UIController.Instance.ShowUIElement(UIElement.Main);
-
     }
 }

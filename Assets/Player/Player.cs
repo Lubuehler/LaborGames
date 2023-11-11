@@ -13,7 +13,7 @@ public class Player : NetworkBehaviour
     [SerializeField] private LayerMask enemyMask;
     [SerializeField] private LayerMask coinMask;
     [SerializeField] public Projectile _projectilePrefab;
-    [SerializeField] private float tiltAmount = 15.0f; // The amount of tilt when moving left or right
+    [SerializeField] private float tiltAmount = 15.0f;
 
     private NetworkRigidbody2D _nrb2d;
     private float currentTime;
@@ -28,32 +28,21 @@ public class Player : NetworkBehaviour
     public bool ready { get; set; }
 
 
-    // Player Stats:
-    [Networked]
-    public int coins { get; set; }
-    [Networked]
-    public float maxHealth { get; set; }
-    [Networked]
-    public float attackDamage { get; set; }
-    [Networked]
-    public float attackSpeed { get; set; } // Schüsse pro Sekunde
-    [Networked]
-    public float critChance { get; set; }
-    [Networked]
-    public float critDamageMultiplier { get; set; }
-    [Networked]
-    public float dodgeProbability { get; set; }
-    [Networked]
-    public float movementSpeed { get; set; }
-    [Networked]
-    public float luck { get; set; }
-    [Networked]
-    public float armor { get; set; }
-    [Networked]
-    public float range { get; set; }
-    [Networked]
-    public float currentHealth { get; set; }
+    // Player Stats
+    [Networked] public int coins { get; set; }
+    [Networked] public float maxHealth { get; set; }
+    [Networked] public float attackDamage { get; set; }
+    [Networked] public float attackSpeed { get; set; } // Schüsse pro Sekunde
+    [Networked] public float critChance { get; set; }
+    [Networked] public float critDamageMultiplier { get; set; }
+    [Networked] public float dodgeProbability { get; set; }
+    [Networked] public float movementSpeed { get; set; }
+    [Networked] public float luck { get; set; }
+    [Networked] public float armor { get; set; }
+    [Networked] public float range { get; set; }
+    [Networked] public float currentHealth { get; set; }
 
+    // Actions
     public event Action OnStatsChanged;
     public event Action<float, float> OnHealthChanged;
     public event Action<int> OnCoinsChanged;
@@ -61,6 +50,16 @@ public class Player : NetworkBehaviour
     private void Awake()
     {
         _nrb2d = GetComponent<NetworkRigidbody2D>();
+    }
+
+    public override void Spawned()
+    {
+        if (HasInputAuthority)
+        {
+            Camera.main.GetComponent<CameraScript>().target = GetComponent<NetworkTransform>().InterpolationTarget;
+            RPC_Configure(DataController.Instance.playerData.playerName);
+            LevelController.Instance.localPlayer = this;
+        }
     }
 
     [Rpc(sources: RpcSources.InputAuthority, targets: RpcTargets.StateAuthority)]
@@ -129,7 +128,6 @@ public class Player : NetworkBehaviour
         {
             Vector3 direction = target.transform.position - _nrb2d.transform.position;
 
-            // Calculate the rotation to look at the closest enemy
             Quaternion rotation = Quaternion.LookRotation(Vector3.forward, direction);
 
             var projectile = Runner.Spawn(_projectilePrefab, _nrb2d.transform.position, rotation, Object.InputAuthority);
@@ -150,16 +148,6 @@ public class Player : NetworkBehaviour
             OnCoinsChanged?.Invoke(coins);
         }
 
-    }
-
-    public override void Spawned()
-    {
-        if (HasInputAuthority)
-        {
-            Camera.main.GetComponent<CameraScript>().target = GetComponent<NetworkTransform>().InterpolationTarget;
-            RPC_Configure(DataController.Instance.playerData.playerName);
-            LevelController.Instance.localPlayer = this;
-        }
     }
 
     public static void PlayerInfoChanged(Changed<Player> changed)
