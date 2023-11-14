@@ -2,13 +2,17 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
+using UnityEngine.UI;
 
 public class ShopMenu : MonoBehaviour
 {
     public GameObject statRowPrefab;
     public Transform statsPanelTransform;
 
+    public TMP_Text wave;
     public TMP_Text coins;
+
+    public Button goButton;
 
 
     private Player player;
@@ -44,16 +48,20 @@ public class ShopMenu : MonoBehaviour
         {
             InstantiateStatRow(mapping.Key);
         }
+        this.wave.text = "Shop (Wave " + LevelController.Instance.currentWave.ToString() + ")";
         this.coins.text = player.coins.ToString();
     }
 
     private void OnEnable()
     {
+        goButton.interactable = true;
         if (player != null)
         {
             player.OnStatsChanged += UpdateStats;
             UpdateStats(); // Update immediately to show current stats
         }
+        this.wave.text = "Shop (Wave " + LevelController.Instance.currentWave.ToString() + ")";
+        this.coins.text = player.coins.ToString();
     }
 
     private void OnDisable()
@@ -85,9 +93,9 @@ public class ShopMenu : MonoBehaviour
         }
     }
 
-    public void OnContinueClick()
+    public void OnGoClick()
     {
-        UIController.Instance.ShowUIElement(UIElement.Game);
-        LevelController.Instance.StartNextWave();
+        goButton.interactable = false;
+        LevelController.Instance.RPC_Ready(NetworkController.Instance.GetLocalPlayerObject(), true);
     }
 }

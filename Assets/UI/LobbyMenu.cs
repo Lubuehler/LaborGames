@@ -18,6 +18,9 @@ public class LobbyMenu : MonoBehaviour
     void OnEnable()
     {
         ready = false;
+        readyButton.GetComponent<Button>().interactable = true;
+        readyButton.transform.GetChild(0).GetComponent<TMP_Text>().text = "Ready";
+
         header.text = NetworkController.Instance.currentSession.Name;
         NetworkController.Instance.OnPlayerListChanged += UpdatePlayerList;
         UpdatePlayerList();
@@ -54,7 +57,6 @@ public class LobbyMenu : MonoBehaviour
         playerCount.text = players.Count + "/4";
     }
 
-
     private bool buttonEnabled = true;
 
     public void OnReadyClick()
@@ -73,8 +75,7 @@ public class LobbyMenu : MonoBehaviour
                 ready = true;
                 readyButton.transform.GetChild(0).GetComponent<TMP_Text>().text = "Unready";
             }
-
-            NetworkController.Instance.GetLocalPlayerObject().GetComponent<Player>().RPC_Ready(ready);
+            LevelController.Instance.RPC_Ready(NetworkController.Instance.GetLocalPlayerObject(), ready);
             StartCoroutine(EnableButtonAfterDelay(1.0f));
         }
     }
