@@ -3,6 +3,7 @@ using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 using System;
+using System.Linq;
 
 
 
@@ -11,13 +12,15 @@ public class Player : NetworkBehaviour
 
     [SerializeField] private GameObject deathExplosionPrefab;
     [SerializeField] private LayerMask enemyMask;
+    [SerializeField] private LayerMask coinMask;
     [SerializeField] public Projectile _projectilePrefab;
-    [SerializeField] private float tiltAmount = 15.0f; // The amount of tilt when moving left or right
+    [SerializeField] private float tiltAmount = 15.0f;
 
     private NetworkRigidbody2D _nrb2d;
     private float currentTime;
     public bool isShooting = false;
-    public bool isAlive = true;
+
+    [Networked] public bool isAlive { get; set; }
 
 
     [Networked(OnChanged = nameof(PlayerInfoChanged))]
@@ -27,59 +30,51 @@ public class Player : NetworkBehaviour
     public bool ready { get; set; }
 
 
-    // Player Stats:
-    [Networked]
-    public float maxHealth { get; set; }
-    [Networked]
-    public float attackDamage { get; set; }
-    [Networked]
-    public float attackSpeed { get; set; } // Schüsse pro Sekunde
-    [Networked]
-    public float critChance { get; set; }
-    [Networked]
-    public float critDamageMultiplier { get; set; }
-    [Networked]
-    public float dodgeProbability { get; set; }
-    [Networked]
-    public float movementSpeed { get; set; }
-    [Networked]
-    public float luck { get; set; }
-    [Networked]
-    public float armor { get; set; }
-    [Networked]
-    public float range { get; set; }
+    // Player Stats
+    [Networked] public int coins { get; set; }
+    [Networked] public float maxHealth { get; set; }
+    [Networked] public float attackDamage { get; set; }
+    [Networked] public float attackSpeed { get; set; } // Schüsse pro Sekunde
+    [Networked] public float critChance { get; set; }
+    [Networked] public float critDamageMultiplier { get; set; }
+    [Networked] public float dodgeProbability { get; set; }
+    [Networked] public float movementSpeed { get; set; }
+    [Networked] public float luck { get; set; }
+    [Networked] public float armor { get; set; }
+    [Networked] public float range { get; set; }
+    [Networked] public float currentHealth { get; set; }
 
-    [Networked]
-    public float currentHealth { get; set; }
-
+    // Actions
     public event Action OnStatsChanged;
     public event Action<float, float> OnHealthChanged;
+    public event Action<int> OnCoinsChanged;
 
     private void Awake()
     {
         _nrb2d = GetComponent<NetworkRigidbody2D>();
     }
 
-    [Rpc(sources: RpcSources.InputAuthority, targets: RpcTargets.StateAuthority)]
-    public void RPC_Configure(string playerName)
+    public override void Spawned()
     {
-        Debug.Log("RPC_Configure");
-        this.playerName = playerName;
+        if (HasInputAuthority)
+        {
+            Camera.main.GetComponent<CameraScript>().target = this.gameObject.GetComponent<NetworkObject>();
+            RPC_Configure(DataController.Instance.playerData.playerName);
+            LevelController.Instance.localPlayer = this;
+        }
     }
 
     [Rpc(sources: RpcSources.InputAuthority, targets: RpcTargets.StateAuthority)]
-    public void RPC_Ready(bool ready)
+    public void RPC_Configure(string playerName)
     {
-        Debug.Log("RPC_Ready");
-        this.ready = ready;
-        if(this.ready)
-        {
-            LevelController.Instance.RPC_CheckReady();
-        }
+        this.playerName = playerName;
+        this.isAlive = true;
+        InitiallySetStats();
     }
 
     public void InitiallySetStats()
     {
+        coins = 0;
         maxHealth = 100;
         attackDamage = 20;
         attackSpeed = 1;
@@ -92,12 +87,10 @@ public class Player : NetworkBehaviour
         range = 0;
 
         currentHealth = maxHealth;
-
-        print("set stats initially");
         OnStatsChanged?.Invoke();
         OnHealthChanged?.Invoke(currentHealth, maxHealth);
 
-}
+    }
 
 
     public override void FixedUpdateNetwork()
@@ -125,7 +118,6 @@ public class Player : NetworkBehaviour
         {
             Vector3 direction = target.transform.position - _nrb2d.transform.position;
 
-            // Calculate the rotation to look at the closest enemy
             Quaternion rotation = Quaternion.LookRotation(Vector3.forward, direction);
 
             var projectile = Runner.Spawn(_projectilePrefab, _nrb2d.transform.position, rotation, Object.InputAuthority);
@@ -137,14 +129,15 @@ public class Player : NetworkBehaviour
         }
     }
 
-    public override void Spawned()
+    void OnTriggerEnter2D(Collider2D collider)
     {
-        if (HasInputAuthority)
+        if (((1 << collider.gameObject.layer) & coinMask) != 0)
         {
-            Camera.main.GetComponent<CameraScript>().target = GetComponent<NetworkTransform>().InterpolationTarget;
-            RPC_Configure(DataController.Instance.playerData.playerName);
-            LevelController.Instance.localPlayer = this;
+            Runner.Despawn(collider.gameObject.GetComponent<NetworkObject>());
+            coins++;
+            OnCoinsChanged?.Invoke(coins);
         }
+
     }
 
     public static void PlayerInfoChanged(Changed<Player> changed)
@@ -163,6 +156,7 @@ public class Player : NetworkBehaviour
                 currentTime = 0f;
             }
         }
+
     }
 
     private NetworkObject findNearestEnemy()
@@ -200,11 +194,27 @@ public class Player : NetworkBehaviour
         float prev = currentHealth;
         currentHealth -= damage;
         currentHealth = Mathf.Clamp(currentHealth, 0, maxHealth);
-
         OnHealthChanged?.Invoke(currentHealth, maxHealth);
-        print("Took Damage - previously: " + prev + " now remaining Health: " + currentHealth);
-        if(currentHealth <= 0)
+
+        if (currentHealth <= 0)
         {
+            if (HasInputAuthority)
+            {
+                this.isAlive = false;
+
+                List<NetworkObject> players = new List<NetworkObject>(Runner.ActivePlayers.Select(player => Runner.GetPlayerObject(player)));
+                NetworkObject selectedPlayer = players.FirstOrDefault(player => player.GetComponent<Player>().isAlive);
+                
+                if(selectedPlayer != null)
+                {
+                    UIController.Instance.ShowUIElement(UIElement.Spectator);
+                    Camera.main.GetComponent<CameraScript>().target = selectedPlayer;
+                }
+                else
+                {
+                    UIController.Instance.ShowUIElement(UIElement.Endscreen);
+                }
+            }
             RpcDie();
         }
     }
@@ -228,9 +238,8 @@ public class Player : NetworkBehaviour
     public void RpcDie()
     {
         Runner.Spawn(deathExplosionPrefab, transform.position, transform.rotation);
-        isAlive = false;
-        gameObject.SetActive (false);
-       // LevelController.Instance.PlayerDowned(this);
+        gameObject.SetActive(false);
+        // LevelController.Instance.PlayerDowned(this);
     }
 
     public void printStats()

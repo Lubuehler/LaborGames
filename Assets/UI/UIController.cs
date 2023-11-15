@@ -15,6 +15,8 @@ public class UIController : MonoBehaviour
     public GameObject playerNameCanvas;
     public GameObject lobbyCanvas;
     public GameObject hudCanvas;
+    public GameObject spectatorCanvas;
+    public GameObject endscreenCanvas;
 
     public Dictionary<UIElement, GameObject> canvasDict = new Dictionary<UIElement, GameObject>();
 
@@ -38,6 +40,8 @@ public class UIController : MonoBehaviour
         canvasDict[UIElement.PlayerName] = playerNameCanvas;
         canvasDict[UIElement.Lobby] = lobbyCanvas;
         canvasDict[UIElement.Game] = hudCanvas;
+        canvasDict[UIElement.Spectator] = spectatorCanvas;
+        canvasDict[UIElement.Endscreen] = endscreenCanvas;
 
         DataController.Instance.LoadData();
         if(string.IsNullOrEmpty(DataController.Instance.playerData.playerName))
@@ -90,5 +94,7 @@ public enum UIElement
     Game,
     Shop,
     PlayerName,
-    Lobby
+    Lobby,
+    Spectator,
+    Endscreen
 }

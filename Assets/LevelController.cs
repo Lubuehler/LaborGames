@@ -7,27 +7,29 @@ using System.Linq;
 
 public class LevelController : NetworkBehaviour
 {
-    private List<NetworkObject> _spawnedEnemies = new List<NetworkObject>();
-
+    public GameObject dronePrefab;
     public static LevelController Instance;
 
+    public GameObject dronePrefab;
 
-    [Networked(OnChanged = nameof(GameStarted))]
+    private List<NetworkObject> _spawnedEnemies = new List<NetworkObject>();
+    public List<NetworkObject> _spawnedCoins = new List<NetworkObject>();
+
+
+
+
+    [Networked]
     public bool gameStarted { get; set; }
-    private static void GameStarted(Changed<LevelController> changed)
-    {
-        if(changed.Behaviour.gameStarted)
-        {
-            UIController.Instance.ShowUIElement(UIElement.Game);
-        }
-    }
 
-    private int currentWave = 0;
+    [Networked]
+    public int currentWave { get; set; }
     private float waveDuration = 30f;
     private float waveDurationIncrease = 2f;
 
     private float waveEndTime; // Time when the current wave will end
-    private bool waveInProgress = false;
+
+    [Networked(OnChanged = nameof(ShowGame))]
+    public bool waveInProgress { get; set; }
 
     [Networked]
     public float RemainingWaveTime { get; private set; }
@@ -51,16 +53,10 @@ public class LevelController : NetworkBehaviour
         }
     }
 
-    public IEnumerator DelayedStartRoutine()
-    {
-        print("delayed start");
-        yield return new WaitForSeconds(.5f);
-        StartNextWave();
-    }
-
     public override void Spawned()
     {
-        gameStarted = false;
+        this.gameStarted = false;
+        this.waveInProgress = false;
         if (!Runner.IsServer) return;
 
         enemySpawner = GetComponent<EnemySpawner>();
@@ -68,27 +64,48 @@ public class LevelController : NetworkBehaviour
 
     }
 
-    [Rpc]
-    public void RPC_CheckReady()
+    public IEnumerator DelayedStartRoutine()
     {
-        bool allPlayersReady = true;
-        List<PlayerRef> players = new List<PlayerRef>(Runner.ActivePlayers);
-        foreach (PlayerRef player in players)
+        yield return new WaitForSeconds(.5f);
+        StartNextWave();
+    }
+
+    [Rpc]
+    public void RPC_Ready(NetworkObject networkObject, bool ready)
+    {
+        if (Runner.IsServer)
         {
-            if (!Runner.GetPlayerObject(player).GetComponent<Player>().ready)
-            {
-                allPlayersReady = false;
-            }
-        }
-        if (allPlayersReady && Runner.IsServer)
-        {
-            StartLevel();
-            Runner.SessionInfo.IsVisible = false;
-            Runner.SessionInfo.IsOpen = false;
-            livingPlayers = new List<Player>();
+            networkObject.GetComponent<Player>().ready = ready;
+
+            bool allPlayersReady = true;
+            List<PlayerRef> players = new List<PlayerRef>(Runner.ActivePlayers);
             foreach (PlayerRef player in players)
             {
-                livingPlayers.Add(Runner.GetPlayerObject(player).GetComponent<Player>());
+                if (!Runner.GetPlayerObject(player).GetComponent<Player>().ready)
+                {
+                    allPlayersReady = false;
+                }
+            }
+            if (allPlayersReady)
+            {
+                if (!gameStarted)
+                {
+                    StartLevel();
+                    Runner.SessionInfo.IsVisible = false;
+                }
+                else
+                {
+                    StartNextWave();
+                }
+
+                livingPlayers = new List<Player>();
+                foreach (PlayerRef playerRef in players)
+                {
+                    Player player = Runner.GetPlayerObject(playerRef).GetComponent<Player>();
+                    player.ready = false;
+                    livingPlayers.Add(player);
+                }
+
             }
         }
     }
@@ -99,6 +116,7 @@ public class LevelController : NetworkBehaviour
     private void RpcStartWave()
     {
         print("starting wave no: " + currentWave);
+        waveInProgress = true;
         currentWave++;
         StartCoroutine(WaveRoutine(waveDuration));
     }
@@ -106,10 +124,15 @@ public class LevelController : NetworkBehaviour
     [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
     private void RpcEndWave()
     {
-        foreach(NetworkObject enemy in _spawnedEnemies)
+        foreach (NetworkObject coin in _spawnedCoins)
+        {
+            Runner.Despawn(coin);
+        }
+        foreach (NetworkObject enemy in _spawnedEnemies)
         {
             Runner.Despawn(enemy);
         }
+        waveInProgress = false;
         EnterShoppingPhase();
     }
 
@@ -122,7 +145,7 @@ public class LevelController : NetworkBehaviour
 
         RemainingWaveTime = duration;
 
-        while (RemainingWaveTime > 0 )
+        while (RemainingWaveTime > 0)
         {
             // Assuming the game is not paused and you're counting down
             RemainingWaveTime -= 1;
@@ -138,7 +161,6 @@ public class LevelController : NetworkBehaviour
 
     private void EnterShoppingPhase()
     {
-        Debug.Log("Shop phase started. Player can buy stuff now.");
         UIController.Instance.ShowUIElement(UIElement.Shop);
     }
 
@@ -180,7 +202,8 @@ public class LevelController : NetworkBehaviour
     public void PlayerDowned(Player player)
     {
         livingPlayers.Remove(player);
-        if(livingPlayers.Count == 0) {
+        if (livingPlayers.Count == 0)
+        {
             RpcPauseGame();
         }
     }
@@ -195,6 +218,13 @@ public class LevelController : NetworkBehaviour
     }
 
 
+    private static void ShowGame(Changed<LevelController> changed)
+    {
+        if (changed.Behaviour.waveInProgress)
+        {
+            UIController.Instance.ShowUIElement(UIElement.Game);
+        }
+    }
 
     [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
     public void RpcPauseGame()

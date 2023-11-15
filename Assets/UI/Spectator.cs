@@ -3,14 +3,20 @@ using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using Fusion;
 
-public class HUD : MonoBehaviour
+public class Spectator : MonoBehaviour
 {
     public TMP_Text waveCounter;
     public TMP_Text waveTimer;
-    public Image healthbarBackground;
-    public Image healthbarForeground;
-    public TMP_Text coins;
+    public GameObject camera;
+    public TMP_Text playerName;
+
+    private void OnEnable()
+    {
+        string name = camera.GetComponent<CameraScript>().target.GetComponent<Player>().playerName;
+        this.playerName.text = "You are spectating " + name;
+    }
 
     private void Update()
     {
@@ -19,14 +25,5 @@ public class HUD : MonoBehaviour
             waveCounter.text = "WAVE " + LevelController.Instance.currentWave.ToString();
             waveTimer.text = LevelController.Instance.RemainingWaveTime.ToString("F0");
         }
-        if (LevelController.Instance.localPlayer != null)
-        {
-            LevelController.Instance.localPlayer.OnCoinsChanged += UpdateCoinsCounter;
-        }
-    }
-
-    public void UpdateCoinsCounter(int coins)
-    {
-        this.coins.text = coins.ToString();
     }
 }

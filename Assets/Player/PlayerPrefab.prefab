@@ -194,9 +194,15 @@ MonoBehaviour:
   enemyMask:
     serializedVersion: 2
     m_Bits: 64
+  coinMask:
+    serializedVersion: 2
+    m_Bits: 256
   _projectilePrefab: {fileID: 1350390008315525890, guid: 95fb6b4a33b3a6543bcec83d35c8c1bf, type: 3}
   tiltAmount: 15
   isShooting: 1
+  isAlive: 1
+  _playerName: 
+  _ready: 0
   _maxHealth: 0
   _attackDamage: 0
   _attackSpeed: 0
@@ -272,7 +278,7 @@ CapsuleCollider2D:
   m_GameObject: {fileID: 8443049997164568140}
   m_Enabled: 1
   m_Density: 1
-  m_Material: {fileID: 6200000, guid: 46bf9225396fb7546bf2ff74e5a4cf9d, type: 2}
+  m_Material: {fileID: 0}
   m_IncludeLayers:
     serializedVersion: 2
     m_Bits: 0
