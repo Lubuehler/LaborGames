@@ -14,7 +14,12 @@ public class Enemy : NetworkBehaviour
     [SerializeField] private int health = 100;
     [SerializeField] private double viewingDistance = 20d;
     [SerializeField] private LayerMask enemyLayerMask;
+    [SerializeField] private LayerMask playerLayerMask;
     [SerializeField] private float separationRadius = 5f;
+    [SerializeField] private float explosionRange = 1f;
+    [SerializeField] private float explosionDamage = 40f;
+    [SerializeField] private GameObject deathExplosionPrefab;
+
 
     protected NetworkRigidbody2D networkRigidbody2D;
     protected NetworkObject currentTarget;
@@ -79,7 +84,7 @@ public class Enemy : NetworkBehaviour
             }
         }
 
-        float maxSeparationForce = 1f;
+        float maxSeparationForce = .4f;
         if (separationForce.magnitude > maxSeparationForce)
         {
             separationForce = separationForce.normalized * maxSeparationForce;
@@ -139,5 +144,23 @@ public class Enemy : NetworkBehaviour
             }
         }
         return closestPlayer;
+    }
+
+    void OnCollisionEnter2D(Collision2D collision)
+    {
+        print("collision"); 
+        if ((playerLayerMask.value & (1 << collision.gameObject.layer)) != 0)
+        {
+            print("hit player");
+            collision.gameObject.GetComponent<Player>().TakeDamage(explosionDamage);
+            Explode();
+        }
+    }
+
+    private void Explode()
+    {
+
+        Runner.Spawn(deathExplosionPrefab, transform.position, transform.rotation);
+        Die();
     }
 }

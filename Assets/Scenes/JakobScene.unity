@@ -4808,6 +4808,7 @@ GameObject:
   - component: {fileID: 800742874}
   - component: {fileID: 800742876}
   - component: {fileID: 800742875}
+  - component: {fileID: 800742877}
   m_Layer: 0
   m_Name: LevelController
   m_TagString: Untagged
@@ -4853,6 +4854,7 @@ MonoBehaviour:
   NestedObjects: []
   NetworkedBehaviours:
   - {fileID: 800742876}
+  - {fileID: 800742877}
   SimulationBehaviours: []
 --- !u!114 &800742876
 MonoBehaviour:
@@ -4867,10 +4869,25 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _interpolationDataSource: 0
-  dronePrefab: {fileID: 4776032338861653262, guid: c277ef3b8d5d3ae49b14c01c25e63955, type: 3}
   _gameStarted: 0
-  background: {fileID: 791546675}
+  _RemainingWaveTime: 0
   localPlayer: {fileID: 0}
+--- !u!114 &800742877
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 800742873}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 70d4e7379f31dfa489e4636b556543e2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _interpolationDataSource: 0
+  dronePrefab: {fileID: 4776032338861653262, guid: c277ef3b8d5d3ae49b14c01c25e63955, type: 3}
+  jetPrefab: {fileID: 8933241707471840372, guid: 93f248326ffcc6e438b85289384b468e, type: 3}
+  background: {fileID: 791546675}
 --- !u!1 &803030854
 GameObject:
   m_ObjectHideFlags: 0
