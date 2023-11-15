@@ -9,10 +9,17 @@ using static Unity.Collections.Unicode;
 
 public class EnemySpawner : NetworkBehaviour
 {
-    public Dictionary<EnemyType, float> enemySpawnRates = new Dictionary<EnemyType, float>();
-    public GameObject dronePrefab;
-    public GameObject jetPrefab;
-    public GameObject background;
+    private Dictionary<EnemyType, float> enemySpawnRates = new Dictionary<EnemyType, float>();
+
+    private List<NetworkObject> _spawnedEnemies = new List<NetworkObject>();
+    private List<NetworkObject> _spawnedCoins = new List<NetworkObject>();
+    public static EnemySpawner Instance;
+
+    [SerializeField] private GameObject coinPrefab;
+    [SerializeField] private GameObject dronePrefab;
+    [SerializeField] private GameObject jetPrefab;
+    [SerializeField] private GameObject background;
+
 
     public enum SpawnLocation
     {
@@ -21,7 +28,19 @@ public class EnemySpawner : NetworkBehaviour
         Top
     }
 
-    public NetworkObject SpawnEnemy()
+    private void Awake()
+    {
+        if (Instance == null)
+        {
+            Instance = this;
+        }
+        else
+        {
+            Destroy(this.gameObject);
+        }
+    }
+
+    public void SpawnEnemy()
     {
         EnemyType enemyType = SelectEnemyTypeBasedOnSpawnRate();
         if (Runner == null)
@@ -45,7 +64,7 @@ public class EnemySpawner : NetworkBehaviour
 
 
         }
-        return spawnedEnemy;
+        _spawnedEnemies.Add(spawnedEnemy);
 
     }
 
@@ -100,9 +119,32 @@ public class EnemySpawner : NetworkBehaviour
                 if (Random.value < 0.5) x = -width / 2 - padding; else x = width / 2 + padding;
                 y = Random.Range(-height / 2, height / 2); break;
         }
-        print("Width: " + width + "height: " + height + "x: " + x + "y:  " + y);
-
         return new Vector2(x, y);
 
+    }
+
+    public void RPC_DespawnEverything()
+    {
+        foreach (NetworkObject coin in _spawnedCoins)
+        {
+            Runner.Despawn(coin);
+        }
+        foreach (NetworkObject enemy in _spawnedEnemies)
+        {
+            Runner.Despawn(enemy);
+        }
+        _spawnedEnemies.Clear();
+        _spawnedCoins.Clear();
+    }
+
+    public void EnemyDefeated(Enemy enemy, Vector2 position)
+    {
+        if (Runner.IsServer)
+        {
+            _spawnedEnemies.Remove(enemy.GetComponentInParent<NetworkObject>());
+            Runner.Despawn(enemy.GetComponentInParent<NetworkObject>());
+            NetworkObject spawnedCoin = Runner.Spawn(coinPrefab, position, Quaternion.identity);
+            _spawnedCoins.Add(spawnedCoin);
+        }
     }
 }

@@ -24,7 +24,6 @@ public class Enemy : NetworkBehaviour
     protected NetworkRigidbody2D networkRigidbody2D;
     protected NetworkObject currentTarget;
 
-    [SerializeField] private GameObject coin;
 
     public override void Spawned()
     {
@@ -104,13 +103,7 @@ public class Enemy : NetworkBehaviour
         }
     }
 
-    protected virtual void Die()
-    {
-        Debug.Log("Enemy died");
-        NetworkObject spawnedCoin = Runner.Spawn(coin, gameObject.transform.position, Quaternion.identity);
-        LevelController.Instance._spawnedCoins.Add(spawnedCoin);
-        Runner.Despawn(GetComponent<NetworkObject>());
-    }
+
 
     public override void Render()
     {
@@ -152,10 +145,8 @@ public class Enemy : NetworkBehaviour
 
     void OnCollisionEnter2D(Collision2D collision)
     {
-        print("collision"); 
         if ((playerLayerMask.value & (1 << collision.gameObject.layer)) != 0)
         {
-            print("hit player");
             collision.gameObject.GetComponent<Player>().TakeDamage(explosionDamage);
             Explode();
         }
@@ -166,5 +157,10 @@ public class Enemy : NetworkBehaviour
 
         Runner.Spawn(deathExplosionPrefab, transform.position, transform.rotation);
         Die();
+    }
+
+    protected virtual void Die()
+    {
+        EnemySpawner.Instance.EnemyDefeated(this, transform.position);
     }
 }

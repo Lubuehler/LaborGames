@@ -7,13 +7,7 @@ using System.Linq;
 
 public class LevelController : NetworkBehaviour
 {
-    public GameObject dronePrefab;
     public static LevelController Instance;
-
-    private List<NetworkObject> _spawnedEnemies = new List<NetworkObject>();
-    public List<NetworkObject> _spawnedCoins = new List<NetworkObject>();
-
-
 
 
     [Networked]
@@ -32,11 +26,8 @@ public class LevelController : NetworkBehaviour
     [Networked]
     public float RemainingWaveTime { get; private set; }
 
-    public event Action onStartGame;
-
     public Player localPlayer;
     private List<Player> livingPlayers;
-    private EnemySpawner enemySpawner;
     
 
     private void Awake()
@@ -57,8 +48,7 @@ public class LevelController : NetworkBehaviour
         this.waveInProgress = false;
         if (!Runner.IsServer) return;
 
-        enemySpawner = GetComponent<EnemySpawner>();
-        enemySpawner.UpdateEnemySpawnRate(EnemyType.Drone, 1);
+        EnemySpawner.Instance.UpdateEnemySpawnRate(EnemyType.Drone, 1);
 
     }
 
@@ -122,15 +112,8 @@ public class LevelController : NetworkBehaviour
     [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
     private void RpcEndWave()
     {
-        foreach (NetworkObject coin in _spawnedCoins)
-        {
-            Runner.Despawn(coin);
-        }
-        foreach (NetworkObject enemy in _spawnedEnemies)
-        {
-            Runner.Despawn(enemy);
-        }
         waveInProgress = false;
+        EnemySpawner.Instance.RPC_DespawnEverything();
         EnterShoppingPhase();
     }
 
@@ -148,7 +131,7 @@ public class LevelController : NetworkBehaviour
             // Assuming the game is not paused and you're counting down
             RemainingWaveTime -= 1;
 
-            enemySpawner.SpawnEnemy();
+            EnemySpawner.Instance.SpawnEnemy();
             yield return new WaitForSeconds(1);
         }
 
@@ -166,15 +149,15 @@ public class LevelController : NetworkBehaviour
     {
         if (currentWave >= 0)
         {
-            enemySpawner.UpdateEnemySpawnRate(EnemyType.Jet, 2);
-            enemySpawner.UpdateEnemySpawnRate(EnemyType.Drone, 3);
+            EnemySpawner.Instance.UpdateEnemySpawnRate(EnemyType.Jet, 2);
+            EnemySpawner.Instance.UpdateEnemySpawnRate(EnemyType.Drone, 3);
 
         }
     }
 
     public void StartNextWave()
     {
-        if (!Object.HasStateAuthority) return;
+        if (!Runner.IsServer) return;
 
         UpdateEnemyPool();
         waveDuration += currentWave; // Increase wave duration based on current wave
@@ -183,18 +166,9 @@ public class LevelController : NetworkBehaviour
 
     public void StartLevel()
     {
+        print("baum");
         StartNextWave();
         this.gameStarted = true;
-    }
-
-    public void EnemyDefeated(Enemy enemy)
-    {
-        if (Runner.IsServer)
-        {
-            _spawnedEnemies.Remove(enemy.GetComponentInParent<NetworkObject>());
-            Runner.Despawn(enemy.GetComponentInParent<NetworkObject>());
-            CheckForLevelCompletion();
-        }
     }
 
     public void PlayerDowned(Player player)
@@ -203,15 +177,6 @@ public class LevelController : NetworkBehaviour
         if (livingPlayers.Count == 0)
         {
             RpcPauseGame();
-        }
-    }
-
-    private void CheckForLevelCompletion()
-    {
-        if (_spawnedEnemies.Count == 0)
-        {
-            Debug.Log("Level Completed!");
-            // Handle level completion logic here
         }
     }
 

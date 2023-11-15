@@ -198,10 +198,9 @@ public class Player : NetworkBehaviour
 
         if (currentHealth <= 0)
         {
+            RpcDie();
             if (HasInputAuthority)
             {
-                this.isAlive = false;
-
                 List<NetworkObject> players = new List<NetworkObject>(Runner.ActivePlayers.Select(player => Runner.GetPlayerObject(player)));
                 NetworkObject selectedPlayer = players.FirstOrDefault(player => player.GetComponent<Player>().isAlive);
                 
@@ -215,7 +214,7 @@ public class Player : NetworkBehaviour
                     UIController.Instance.ShowUIElement(UIElement.Endscreen);
                 }
             }
-            RpcDie();
+            
         }
     }
 
@@ -237,6 +236,7 @@ public class Player : NetworkBehaviour
     [Rpc(RpcSources.All, RpcTargets.All)]
     public void RpcDie()
     {
+        this.isAlive = false;
         Runner.Spawn(deathExplosionPrefab, transform.position, transform.rotation);
         gameObject.SetActive(false);
         // LevelController.Instance.PlayerDowned(this);

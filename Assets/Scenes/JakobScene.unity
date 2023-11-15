@@ -951,6 +951,52 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 128511962}
   m_CullTransparentMesh: 1
+--- !u!1 &133395427
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 133395429}
+  - component: {fileID: 133395428}
+  m_Layer: 0
+  m_Name: DataController
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &133395428
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 133395427}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dc03fd2de088cba47a5ff21628bf37cc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  playerData:
+    playerName: 
+--- !u!4 &133395429
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 133395427}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -0.53475165, y: -12.384279, z: -0.4536799}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &171147359
 GameObject:
   m_ObjectHideFlags: 0
@@ -5954,7 +6000,6 @@ GameObject:
   - component: {fileID: 800742876}
   - component: {fileID: 800742875}
   - component: {fileID: 800742877}
-  - component: {fileID: 800742878}
   m_Layer: 0
   m_Name: LevelController
   m_TagString: Untagged
@@ -6015,8 +6060,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _interpolationDataSource: 0
-  dronePrefab: {fileID: 0}
-  _spawnedCoins: []
   _gameStarted: 0
   _currentWave: 0
   _waveInProgress: 0
@@ -6035,23 +6078,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _interpolationDataSource: 0
+  coinPrefab: {fileID: 7642399719152706105, guid: fb1664e303f842649974e2b83a76942f, type: 3}
   dronePrefab: {fileID: 4776032338861653262, guid: c277ef3b8d5d3ae49b14c01c25e63955, type: 3}
   jetPrefab: {fileID: 8933241707471840372, guid: 93f248326ffcc6e438b85289384b468e, type: 3}
   background: {fileID: 791546675}
---- !u!114 &800742878
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 800742873}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: dc03fd2de088cba47a5ff21628bf37cc, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  playerData:
-    playerName: 
 --- !u!1 &806878301
 GameObject:
   m_ObjectHideFlags: 0
@@ -10631,7 +10661,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!114 &1429899539
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -15570,3 +15600,4 @@ SceneRoots:
   - {fileID: 1016564257}
   - {fileID: 103271553}
   - {fileID: 271352926}
+  - {fileID: 133395429}
