@@ -10,8 +10,6 @@ public class LevelController : NetworkBehaviour
     public GameObject dronePrefab;
     public static LevelController Instance;
 
-    public GameObject dronePrefab;
-
     private List<NetworkObject> _spawnedEnemies = new List<NetworkObject>();
     public List<NetworkObject> _spawnedCoins = new List<NetworkObject>();
 

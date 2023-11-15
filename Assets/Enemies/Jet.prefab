@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 186824261282344461}
   - component: {fileID: 1994029329870135258}
   - component: {fileID: 3270572236083424333}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Jet
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -111,7 +111,7 @@ GameObject:
   - component: {fileID: 3553296336192315441}
   - component: {fileID: -5329795165710176766}
   - component: {fileID: 6457949608489514799}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Jet
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -147,7 +147,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _interpolationDataSource: 0
-  speed: 5
+  speed: 2
   health: 100
   viewingDistance: 20
   enemyLayerMask:
@@ -160,6 +160,7 @@ MonoBehaviour:
   explosionRange: 1
   explosionDamage: 40
   deathExplosionPrefab: {fileID: 7726421982602285071, guid: cc38b5938cf4f7947a6710d03457cb5f, type: 3}
+  coin: {fileID: 7642399719152706105, guid: fb1664e303f842649974e2b83a76942f, type: 3}
 --- !u!114 &2827710277521792308
 MonoBehaviour:
   m_ObjectHideFlags: 0

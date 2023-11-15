@@ -79,8 +79,6 @@ public class NetworkController : MonoBehaviour, INetworkRunnerCallbacks
 
             _runner.SetPlayerObject(player, networkPlayerObject);
 
-            networkPlayerObject.GetComponent<Player>().InitiallySetStats();
-
             OnPlayerListChanged?.Invoke();
         }
     }
