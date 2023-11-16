@@ -89,13 +89,12 @@ public class Player : NetworkBehaviour
         currentHealth = maxHealth;
         OnStatsChanged?.Invoke();
         OnHealthChanged?.Invoke(currentHealth, maxHealth);
-
     }
 
 
     public override void FixedUpdateNetwork()
     {
-        if (GetInput(out NetworkInputData data) && LevelController.Instance.gameStarted)
+        if (GetInput(out NetworkInputData data) && LevelController.Instance.waveInProgress)
         {
             data.direction.Normalize();
             _nrb2d.Rigidbody.velocity = data.direction * movementSpeed;
@@ -104,12 +103,14 @@ public class Player : NetworkBehaviour
             float tilt = data.direction.x * -tiltAmount;
             transform.rotation = Quaternion.Euler(0, 0, tilt);
 
-
             // float clampedX = Mathf.Clamp(transform.position.x, minX + width / 2, maxX - width / 2);
             // float clampedY = Mathf.Clamp(transform.position.y, minY + height / 2, maxY - height / 2);
             // transform.position = new Vector2(clampedX, clampedY);
         }
-
+        else
+        {
+            _nrb2d.Rigidbody.velocity = new Vector2(0, 0);
+        }
     }
 
     private void Fire(NetworkObject target)
@@ -203,8 +204,8 @@ public class Player : NetworkBehaviour
             {
                 List<NetworkObject> players = new List<NetworkObject>(Runner.ActivePlayers.Select(player => Runner.GetPlayerObject(player)));
                 NetworkObject selectedPlayer = players.FirstOrDefault(player => player.GetComponent<Player>().isAlive);
-                
-                if(selectedPlayer != null)
+
+                if (selectedPlayer != null)
                 {
                     UIController.Instance.ShowUIElement(UIElement.Spectator);
                     Camera.main.GetComponent<CameraScript>().target = selectedPlayer;
@@ -214,7 +215,7 @@ public class Player : NetworkBehaviour
                     UIController.Instance.ShowUIElement(UIElement.Endscreen);
                 }
             }
-            
+
         }
     }
 

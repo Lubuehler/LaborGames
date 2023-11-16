@@ -103,7 +103,6 @@ public class LevelController : NetworkBehaviour
     [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
     private void RpcStartWave()
     {
-        print("starting wave no: " + currentWave);
         waveInProgress = true;
         currentWave++;
         StartCoroutine(WaveRoutine(waveDuration));
@@ -151,7 +150,6 @@ public class LevelController : NetworkBehaviour
         {
             EnemySpawner.Instance.UpdateEnemySpawnRate(EnemyType.Jet, 2);
             EnemySpawner.Instance.UpdateEnemySpawnRate(EnemyType.Drone, 3);
-
         }
     }
 
@@ -166,7 +164,6 @@ public class LevelController : NetworkBehaviour
 
     public void StartLevel()
     {
-        print("baum");
         StartNextWave();
         this.gameStarted = true;
     }

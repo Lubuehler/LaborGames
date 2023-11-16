@@ -20,7 +20,7 @@ public class UIController : MonoBehaviour
 
     public Dictionary<UIElement, GameObject> canvasDict = new Dictionary<UIElement, GameObject>();
 
-    void Awake()
+    void Start()
     {
         if (Instance == null)
         {
@@ -58,7 +58,6 @@ public class UIController : MonoBehaviour
     {
         foreach (var canvas in canvasDict)
         {
-
             if (canvas.Key == uIElement)
             {
                 canvas.Value.SetActive(true);
@@ -74,13 +73,11 @@ public class UIController : MonoBehaviour
     public void ShowDialog(UIElement uIElement)
     {
         canvasDict[uIElement].SetActive(true);
-
     }
 
     public void HideDialog(UIElement uIElement)
     {
         canvasDict[uIElement].SetActive(false);
-
     }
 }
 

@@ -7,6 +7,10 @@ using TMPro;
 
 public class MenuButton : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
 {
+    public void OnEnable()
+    {
+        gameObject.GetComponentInChildren<TMP_Text>().color = Color.white;
+    }
     public void OnPointerEnter(PointerEventData eventData)
     {
         if (gameObject.GetComponent<Button>().interactable)

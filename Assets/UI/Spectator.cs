@@ -9,12 +9,12 @@ public class Spectator : MonoBehaviour
 {
     public TMP_Text waveCounter;
     public TMP_Text waveTimer;
-    public GameObject camera;
+    //public GameObject camera;
     public TMP_Text playerName;
 
     private void OnEnable()
     {
-        string name = camera.GetComponent<CameraScript>().target.GetComponent<Player>().playerName;
+        string name = Camera.main.GetComponent<CameraScript>().target.GetComponent<Player>().playerName;
         this.playerName.text = "You are spectating " + name;
     }
 
