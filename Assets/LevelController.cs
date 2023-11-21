@@ -27,8 +27,9 @@ public class LevelController : NetworkBehaviour
     public float RemainingWaveTime { get; private set; }
 
     public Player localPlayer;
-    private List<Player> livingPlayers;
-    
+    public List<Player> livingPlayers = new List<Player>();
+    public List<Player> deadPlayers = new List<Player>();
+
 
     private void Awake()
     {
@@ -85,15 +86,6 @@ public class LevelController : NetworkBehaviour
                 {
                     StartNextWave();
                 }
-
-                livingPlayers = new List<Player>();
-                foreach (PlayerRef playerRef in players)
-                {
-                    Player player = Runner.GetPlayerObject(playerRef).GetComponent<Player>();
-                    player.ready = false;
-                    livingPlayers.Add(player);
-                }
-
             }
         }
     }
@@ -113,7 +105,6 @@ public class LevelController : NetworkBehaviour
     {
         waveInProgress = false;
         EnemySpawner.Instance.RPC_DespawnEverything();
-        EnterShoppingPhase();
     }
 
 
@@ -125,7 +116,7 @@ public class LevelController : NetworkBehaviour
 
         RemainingWaveTime = duration;
 
-        while (RemainingWaveTime > 0)
+        while (RemainingWaveTime > 0 && waveInProgress)
         {
             // Assuming the game is not paused and you're counting down
             RemainingWaveTime -= 1;
@@ -135,11 +126,16 @@ public class LevelController : NetworkBehaviour
         }
 
         RpcEndWave();
+
+        if (livingPlayers.Count > 0)
+        {
+            RpcEnterShoppingPhase();
+        }
     }
 
 
-
-    private void EnterShoppingPhase()
+    [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
+    private void RpcEnterShoppingPhase()
     {
         UIController.Instance.ShowUIElement(UIElement.Shop);
     }
@@ -168,12 +164,44 @@ public class LevelController : NetworkBehaviour
         this.gameStarted = true;
     }
 
-    public void PlayerDowned(Player player)
+    [Rpc(RpcSources.All, RpcTargets.All)]
+    public void RpcPlayerSpawned(Player player)
     {
-        livingPlayers.Remove(player);
-        if (livingPlayers.Count == 0)
+        livingPlayers.Add(player);
+    }
+
+    [Rpc(RpcSources.All, RpcTargets.All)]
+    public void RpcPlayerDowned(Player player)
+    {
+        print(livingPlayers);
+        if (livingPlayers.Contains(player))
         {
-            RpcPauseGame();
+            livingPlayers.Remove(player);
+            deadPlayers.Add(player);
+            if (livingPlayers.Count == 0)
+            {
+                RpcEndWave();
+                UIController.Instance.ShowUIElement(UIElement.Endscreen);
+            }
+            else if (localPlayer == player)
+            {
+                Player selectedPlayer = livingPlayers.FirstOrDefault(player => player.GetComponent<Player>().isAlive);
+
+                UIController.Instance.ShowUIElement(UIElement.Spectator);
+                Camera.main.GetComponent<CameraScript>().target = selectedPlayer.GetComponent<NetworkObject>();
+            }
+        } else
+        {
+            print("Cant remove Player from 'Living Players list' as does not exist");
+        }
+        
+    }
+
+    public void RessurectPlayers()
+    {
+        foreach (Player player in deadPlayers)
+        {
+            player.RpcRessurect();
         }
     }
 
@@ -184,17 +212,5 @@ public class LevelController : NetworkBehaviour
         {
             UIController.Instance.ShowUIElement(UIElement.Game);
         }
-    }
-
-    [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
-    public void RpcPauseGame()
-    {
-        Time.timeScale = 0;
-    }
-
-    [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
-    public void RpcUnpauseGame()
-    {
-        Time.timeScale = 1;
     }
 }

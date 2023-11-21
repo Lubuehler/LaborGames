@@ -13,6 +13,7 @@ public class ShopMenu : MonoBehaviour
     public TMP_Text coins;
 
     public Button goButton;
+    [SerializeField] private Button ressurectButton;
 
 
     private Player player;
@@ -50,6 +51,16 @@ public class ShopMenu : MonoBehaviour
         }
         this.wave.text = "Shop (Wave " + LevelController.Instance.currentWave.ToString() + ")";
         this.coins.text = player.coins.ToString();
+
+        switch (LevelController.Instance.deadPlayers.Count)
+        {
+            case 0:
+                ressurectButton.enabled = false; break;
+            case 1:
+                ressurectButton.GetComponentInChildren<TMP_Text>().text = "Ressurect Ally"; break;
+            default:
+                ressurectButton.GetComponentInChildren<TMP_Text>().text = "Ressurect Allies"; break;
+        }
     }
 
     private void OnEnable()
@@ -97,5 +108,11 @@ public class ShopMenu : MonoBehaviour
     {
         goButton.interactable = false;
         LevelController.Instance.RPC_Ready(NetworkController.Instance.GetLocalPlayerObject(), true);
+    }
+
+    public void onRessurectClicked()
+    {
+        ressurectButton.interactable = false;
+        LevelController.Instance.RessurectPlayers();
     }
 }

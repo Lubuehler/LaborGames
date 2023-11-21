@@ -9,20 +9,18 @@ using System.Linq;
 
 public class Player : NetworkBehaviour
 {
-
     [SerializeField] private GameObject deathExplosionPrefab;
     [SerializeField] private LayerMask enemyMask;
     [SerializeField] private LayerMask coinMask;
     [SerializeField] public Projectile _projectilePrefab;
     [SerializeField] private float tiltAmount = 15.0f;
+    [SerializeField] private GameObject background;
 
     private NetworkRigidbody2D _nrb2d;
     private float currentTime;
     public bool isShooting = false;
 
     [Networked] public bool isAlive { get; set; }
-
-
     [Networked(OnChanged = nameof(PlayerInfoChanged))]
     public string playerName { get; set; }
 
@@ -61,6 +59,7 @@ public class Player : NetworkBehaviour
             Camera.main.GetComponent<CameraScript>().target = this.gameObject.GetComponent<NetworkObject>();
             RPC_Configure(DataController.Instance.playerData.playerName);
             LevelController.Instance.localPlayer = this;
+            LevelController.Instance.RpcPlayerSpawned(this);
         }
     }
 
@@ -103,7 +102,7 @@ public class Player : NetworkBehaviour
             float tilt = data.direction.x * -tiltAmount;
             transform.rotation = Quaternion.Euler(0, 0, tilt);
 
-            // float clampedX = Mathf.Clamp(transform.position.x, minX + width / 2, maxX - width / 2);
+            //float clampedX = Mathf.Clamp(transform.position.x, minX + width / 2, maxX - width / 2);
             // float clampedY = Mathf.Clamp(transform.position.y, minY + height / 2, maxY - height / 2);
             // transform.position = new Vector2(clampedX, clampedY);
         }
@@ -200,21 +199,7 @@ public class Player : NetworkBehaviour
         if (currentHealth <= 0)
         {
             RpcDie();
-            if (HasInputAuthority)
-            {
-                List<NetworkObject> players = new List<NetworkObject>(Runner.ActivePlayers.Select(player => Runner.GetPlayerObject(player)));
-                NetworkObject selectedPlayer = players.FirstOrDefault(player => player.GetComponent<Player>().isAlive);
-
-                if (selectedPlayer != null)
-                {
-                    UIController.Instance.ShowUIElement(UIElement.Spectator);
-                    Camera.main.GetComponent<CameraScript>().target = selectedPlayer;
-                }
-                else
-                {
-                    UIController.Instance.ShowUIElement(UIElement.Endscreen);
-                }
-            }
+            
 
         }
     }
@@ -237,10 +222,18 @@ public class Player : NetworkBehaviour
     [Rpc(RpcSources.All, RpcTargets.All)]
     public void RpcDie()
     {
-        this.isAlive = false;
+        isAlive = false;
         Runner.Spawn(deathExplosionPrefab, transform.position, transform.rotation);
         gameObject.SetActive(false);
-        // LevelController.Instance.PlayerDowned(this);
+        LevelController.Instance.RpcPlayerDowned(this);
+    }
+
+    [Rpc(RpcSources.All, RpcTargets.All)]
+    public void RpcRessurect()
+    {
+        isAlive = true;
+        gameObject.SetActive(true);
+        Heal(maxHealth);
     }
 
     public void printStats()
