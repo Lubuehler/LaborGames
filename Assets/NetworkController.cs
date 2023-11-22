@@ -68,7 +68,7 @@ public class NetworkController : MonoBehaviour, INetworkRunnerCallbacks
         return result;
     }
 
-    
+    private int playerCounter = 0;
 
     public void OnPlayerJoined(NetworkRunner runner, PlayerRef player)
     {
@@ -76,6 +76,7 @@ public class NetworkController : MonoBehaviour, INetworkRunnerCallbacks
         {
             Vector2 spawnPosition = new Vector2(0, 0);
             NetworkObject networkPlayerObject = runner.Spawn(_playerPrefab, spawnPosition, Quaternion.identity, player);
+            networkPlayerObject.GetComponent<Player>().lobbyNo = playerCounter++;
 
             _runner.SetPlayerObject(player, networkPlayerObject);
 

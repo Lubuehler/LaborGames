@@ -147,8 +147,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _interpolationDataSource: 0
-  speed: 2
-  health: 100
+  speed: 4
+  health: 3
   viewingDistance: 20
   enemyLayerMask:
     serializedVersion: 2
@@ -160,7 +160,6 @@ MonoBehaviour:
   explosionRange: 1
   explosionDamage: 40
   deathExplosionPrefab: {fileID: 7726421982602285071, guid: cc38b5938cf4f7947a6710d03457cb5f, type: 3}
-  coin: {fileID: 7642399719152706105, guid: fb1664e303f842649974e2b83a76942f, type: 3}
 --- !u!114 &2827710277521792308
 MonoBehaviour:
   m_ObjectHideFlags: 0

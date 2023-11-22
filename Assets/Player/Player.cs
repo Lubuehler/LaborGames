@@ -26,6 +26,7 @@ public class Player : NetworkBehaviour
 
     [Networked(OnChanged = nameof(PlayerInfoChanged))]
     public bool ready { get; set; }
+    public int lobbyNo;
 
 
     // Player Stats
@@ -68,6 +69,8 @@ public class Player : NetworkBehaviour
     {
         this.playerName = playerName;
         this.isAlive = true;
+        int margin = 10;
+        _nrb2d.TeleportToPosition(new Vector2((GetComponentInChildren<SpriteRenderer>().size.x + margin) * lobbyNo, 0));
         InitiallySetStats();
     }
 
@@ -234,6 +237,13 @@ public class Player : NetworkBehaviour
         isAlive = true;
         gameObject.SetActive(true);
         Heal(maxHealth);
+    }
+
+    [Rpc(RpcSources.All, RpcTargets.All)]
+
+    public void RpcReset()
+    {
+        RPC_Configure(playerName);
     }
 
     public void printStats()
