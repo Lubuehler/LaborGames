@@ -7,6 +7,8 @@ public class MainMenu : MonoBehaviour
 {
     public Button multiplayerBtn;
 
+    public Toast toast;
+
     void OnEnable()
     {
         multiplayerBtn.interactable = true;
@@ -19,6 +21,11 @@ public class MainMenu : MonoBehaviour
         await NetworkController.Instance.JoinLobby();
         UIController.Instance.ShowUIElement(UIElement.Multiplayer);
 
+    }
+
+    public void TestClick()
+    {
+        toast.Show();
     }
 
 

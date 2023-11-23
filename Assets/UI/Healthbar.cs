@@ -9,6 +9,7 @@ public class HealthBar : MonoBehaviour
     private float initialWidth = 400;
 
     private bool subscribed = false;
+    public bool meanwhileRespawned = false;
 
     private void Awake()
     {
@@ -23,11 +24,11 @@ public class HealthBar : MonoBehaviour
 
         // Adjust the fill amount based on the current health
         fillImage.fillAmount = currentHealth / maxHealth;
-        print("updated healthbar: " + currentHealth);
     }
 
     private void OnDisable()
     {
+        print("Healthbar disabled");
         if (LevelController.Instance.localPlayer != null)
         {
             LevelController.Instance.localPlayer.OnHealthChanged -= UpdateHealthBar;
@@ -41,6 +42,14 @@ public class HealthBar : MonoBehaviour
         {
             LevelController.Instance.localPlayer.OnHealthChanged += UpdateHealthBar;
             subscribed = true;
+        }
+    }
+
+    public void OnEnable()
+    {
+        if (LevelController.Instance != null && LevelController.Instance.localPlayer != null)
+        {
+            UpdateHealthBar(LevelController.Instance.localPlayer.currentHealth, LevelController.Instance.localPlayer.maxHealth);
         }
     }
 }

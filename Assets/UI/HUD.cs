@@ -14,8 +14,11 @@ public class HUD : MonoBehaviour
 
     private void Update()
     {
-        if (LevelController.Instance != null)
+        print("running");
+        print("1st: "+ LevelController.Instance != null);
+        if (LevelController.Instance != null && LevelController.Instance.initialized)
         {
+            print("true");
             waveCounter.text = "WAVE " + LevelController.Instance.currentWave.ToString();
             waveTimer.text = LevelController.Instance.RemainingWaveTime.ToString("F0");
         }

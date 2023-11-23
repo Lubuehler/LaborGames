@@ -11,7 +11,8 @@ public class LevelController : NetworkBehaviour
 
 
     [Networked]
-    public bool gameStarted { get; set; }
+    public bool gameRunning { get; set; }
+    public bool initialized { get; set; } = false;
 
     [Networked]
     public int currentWave { get; set; }
@@ -27,8 +28,8 @@ public class LevelController : NetworkBehaviour
     public float RemainingWaveTime { get; private set; }
 
     public Player localPlayer;
-    public List<Player> livingPlayers = new List<Player>();
-    public List<Player> deadPlayers = new List<Player>();
+
+    public List<Player> players = new List<Player>();
 
 
     private void Awake()
@@ -45,26 +46,31 @@ public class LevelController : NetworkBehaviour
 
     public override void Spawned()
     {
-        this.gameStarted = false;
+        this.gameRunning = false;
         this.waveInProgress = false;
+        initialized = true;
         if (!Runner.IsServer) return;
-
         EnemySpawner.Instance.UpdateEnemySpawnRate(EnemyType.Drone, 1);
+        
 
-    }
-
-    public IEnumerator DelayedStartRoutine()
-    {
-        yield return new WaitForSeconds(.5f);
-        StartNextWave();
+        List<PlayerRef> playerRefs = new List<PlayerRef>(Runner.ActivePlayers);
+        foreach (PlayerRef player in playerRefs)
+        {
+            players.Add(Runner.GetPlayerObject(player).GetComponent<Player>());
+        }
     }
 
     [Rpc]
     public void RPC_Ready(NetworkObject networkObject, bool ready)
     {
+        if (!gameRunning)
+        {
+            networkObject.GetComponent<Player>().RpcReset();
+        }
         if (Runner.IsServer)
         {
             networkObject.GetComponent<Player>().ready = ready;
+            
 
             bool allPlayersReady = true;
             List<PlayerRef> players = new List<PlayerRef>(Runner.ActivePlayers);
@@ -74,13 +80,21 @@ public class LevelController : NetworkBehaviour
                 {
                     allPlayersReady = false;
                 }
+                
             }
             if (allPlayersReady)
             {
-                if (!gameStarted)
+                if (!gameRunning)
                 {
+                    
                     StartLevel();
                     Runner.SessionInfo.IsVisible = false;
+
+                    foreach (PlayerRef player in players)
+                    {
+                        Runner.GetPlayerObject(player).GetComponent<Player>().ready = false;
+                        
+                    }
                 }
                 else
                 {
@@ -126,9 +140,10 @@ public class LevelController : NetworkBehaviour
         }
 
         RpcEndWave();
-
-        if (livingPlayers.Count > 0)
+        print("wave ended");
+        if (gameRunning)
         {
+            print("shopping now");
             RpcEnterShoppingPhase();
         }
     }
@@ -161,47 +176,67 @@ public class LevelController : NetworkBehaviour
     public void StartLevel()
     {
         StartNextWave();
-        this.gameStarted = true;
+        this.gameRunning = true;
     }
 
     [Rpc(RpcSources.All, RpcTargets.All)]
     public void RpcPlayerSpawned(Player player)
     {
-        livingPlayers.Add(player);
+        if (!players.Contains(player))
+        {
+            players.Add(player);
+
+        }
     }
 
     [Rpc(RpcSources.All, RpcTargets.All)]
     public void RpcPlayerDowned(Player player)
     {
-        print(livingPlayers);
-        if (livingPlayers.Contains(player))
+        if (GetLivingPlayers().Count == 0)
         {
-            livingPlayers.Remove(player);
-            deadPlayers.Add(player);
-            if (livingPlayers.Count == 0)
-            {
-                RpcEndWave();
-                UIController.Instance.ShowUIElement(UIElement.Endscreen);
-            }
-            else if (localPlayer == player)
-            {
-                Player selectedPlayer = livingPlayers.FirstOrDefault(player => player.GetComponent<Player>().isAlive);
-
-                UIController.Instance.ShowUIElement(UIElement.Spectator);
-                Camera.main.GetComponent<CameraScript>().target = selectedPlayer.GetComponent<NetworkObject>();
-            }
-        } else
-        {
-            print("Cant remove Player from 'Living Players list' as does not exist");
+            RpcGameOver();
         }
-        
+        else if (localPlayer == player)
+        {
+           StartSpectator();
+        }
+    }
+
+    [Rpc(RpcSources.All, RpcTargets.All)]
+    public void RpcGameOver()
+    {
+        RpcEndWave();
+        UIController.Instance.ShowUIElement(UIElement.Endscreen);
+        print("Game Over");
+        StopGame();
+    }
+
+    public void StartSpectator()
+    {
+        Player selectedPlayer = players.FirstOrDefault(player => player.GetComponent<Player>().isAlive);
+
+        UIController.Instance.ShowUIElement(UIElement.Spectator);
+        Camera.main.GetComponent<CameraScript>().target = selectedPlayer.GetComponent<NetworkObject>();
+        print("Spectating");
+    }
+
+    public void StopGame()
+    {
+        foreach (var player in players)
+        {
+            player.RpcReset();
+        }
+        gameRunning = false;
     }
 
     public void RessurectPlayers()
     {
-        foreach (Player player in deadPlayers)
+        foreach (Player player in players)
         {
-            player.RpcRessurect();
+            if (!player.isAlive)
+            {
+                player.RpcRessurect();
+            }
         }
     }
 
@@ -210,7 +245,43 @@ public class LevelController : NetworkBehaviour
     {
         if (changed.Behaviour.waveInProgress)
         {
-            UIController.Instance.ShowUIElement(UIElement.Game);
+            if (NetworkController.Instance.GetLocalPlayerObject().GetComponent<Player>().isAlive)
+            {
+                UIController.Instance.ShowUIElement(UIElement.Game);
+            }
+            else
+            {
+                LevelController.Instance.StartSpectator();
+            }
         }
     }
+
+    public List<Player> GetLivingPlayers()
+    {
+        List<Player> livingPlayers = new List<Player>();
+        foreach (Player p in players)
+        {
+            if ( p.isAlive )
+
+            {
+                livingPlayers.Add((Player)p);
+            }
+        }
+        return livingPlayers;
+    }
+
+    public List<Player> GetDeadPlayers()
+    {
+        List<Player> deadPlayers = new List<Player>();
+        foreach (Player p in players)
+        {
+            if (!p.isAlive)
+
+            {
+                deadPlayers.Add((Player)p);
+            }
+        }
+        return deadPlayers;
+    }
+
 }

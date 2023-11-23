@@ -17,6 +17,8 @@ public class Player : NetworkBehaviour
     [SerializeField] private GameObject background;
 
     private NetworkRigidbody2D _nrb2d;
+    private SpriteRenderer _spriteRenderer;
+    private CapsuleCollider2D _capsuleCollider;
     private float currentTime;
     public bool isShooting = false;
 
@@ -27,6 +29,7 @@ public class Player : NetworkBehaviour
     [Networked(OnChanged = nameof(PlayerInfoChanged))]
     public bool ready { get; set; }
     public int lobbyNo;
+    public static Player localPlayer;
 
 
     // Player Stats
@@ -51,25 +54,28 @@ public class Player : NetworkBehaviour
     private void Awake()
     {
         _nrb2d = GetComponent<NetworkRigidbody2D>();
+        _spriteRenderer = GetComponentInChildren<SpriteRenderer>();
+        _capsuleCollider = GetComponent<CapsuleCollider2D>();
     }
 
     public override void Spawned()
     {
+        this.isAlive = true;
         if (HasInputAuthority)
         {
             Camera.main.GetComponent<CameraScript>().target = this.gameObject.GetComponent<NetworkObject>();
             RPC_Configure(DataController.Instance.playerData.playerName);
             LevelController.Instance.localPlayer = this;
-            LevelController.Instance.RpcPlayerSpawned(this);
         }
+        LevelController.Instance.RpcPlayerSpawned(this);
     }
 
     [Rpc(sources: RpcSources.InputAuthority, targets: RpcTargets.StateAuthority)]
     public void RPC_Configure(string playerName)
     {
         this.playerName = playerName;
-        this.isAlive = true;
-        int margin = 10;
+       
+        int margin = 2;
         _nrb2d.TeleportToPosition(new Vector2((GetComponentInChildren<SpriteRenderer>().size.x + margin) * lobbyNo, 0));
         InitiallySetStats();
     }
@@ -96,7 +102,7 @@ public class Player : NetworkBehaviour
 
     public override void FixedUpdateNetwork()
     {
-        if (GetInput(out NetworkInputData data) && LevelController.Instance.waveInProgress)
+        if (GetInput(out NetworkInputData data) && LevelController.Instance.waveInProgress && isAlive)
         {
             data.direction.Normalize();
             _nrb2d.Rigidbody.velocity = data.direction * movementSpeed;
@@ -150,7 +156,7 @@ public class Player : NetworkBehaviour
 
     public override void Render()
     {
-        if (isShooting)
+        if (isShooting && isAlive)
         {
             currentTime += Time.deltaTime;
             if (currentTime >= 1f / attackSpeed)
@@ -159,6 +165,8 @@ public class Player : NetworkBehaviour
                 currentTime = 0f;
             }
         }
+        _spriteRenderer.enabled = isAlive;
+        _capsuleCollider.enabled = isAlive;
 
     }
 
@@ -199,12 +207,21 @@ public class Player : NetworkBehaviour
         currentHealth = Mathf.Clamp(currentHealth, 0, maxHealth);
         OnHealthChanged?.Invoke(currentHealth, maxHealth);
 
-        if (currentHealth <= 0)
+        if (currentHealth <= 0 && isAlive)
         {
             RpcDie();
-            
-
+            if (HasInputAuthority)
+            {
+                StartCoroutine(DelayedDeath());            }
         }
+    }
+
+    IEnumerator DelayedDeath()
+    {
+        
+        yield return new WaitForSeconds(2f);
+
+        LevelController.Instance.RpcPlayerDowned(this);
     }
 
     public void Heal(float amount)
@@ -227,23 +244,26 @@ public class Player : NetworkBehaviour
     {
         isAlive = false;
         Runner.Spawn(deathExplosionPrefab, transform.position, transform.rotation);
-        gameObject.SetActive(false);
-        LevelController.Instance.RpcPlayerDowned(this);
     }
 
     [Rpc(RpcSources.All, RpcTargets.All)]
     public void RpcRessurect()
     {
         isAlive = true;
-        gameObject.SetActive(true);
         Heal(maxHealth);
+
+        if (HasInputAuthority)
+        {
+            Camera.main.GetComponent<CameraScript>().target = GetComponent<NetworkObject>();
+        }
     }
 
     [Rpc(RpcSources.All, RpcTargets.All)]
-
     public void RpcReset()
     {
         RPC_Configure(playerName);
+        RpcRessurect();
+        ready = false;
     }
 
     public void printStats()
@@ -259,5 +279,23 @@ public class Player : NetworkBehaviour
         print("armor: " + armor);
         print("range: " + range);
         print("Current Health : " + currentHealth);
+    }
+
+    [Rpc(RpcSources.All, RpcTargets.InputAuthority)]
+    public void RpcRegisterLocalPlayer()
+    {
+        localPlayer = this;
+        print("NAME . "+name + " " + localPlayer.name);
+    }
+
+    public bool SpendCoins(int amount)
+    {
+        if(coins >= amount)
+        {
+            coins -= amount;
+            OnCoinsChanged?.Invoke(coins);
+            return true;
+        }
+        return false;
     }
 }

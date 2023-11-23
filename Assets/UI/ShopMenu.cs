@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
 using UnityEngine.UI;
+using Fusion;
 
 public class ShopMenu : MonoBehaviour
 {
@@ -15,6 +16,9 @@ public class ShopMenu : MonoBehaviour
     public Button goButton;
     [SerializeField] private Button ressurectButton;
 
+    [SerializeField] private CanvasGroup Toast;
+    private Animator animator;
+
 
     private Player player;
 
@@ -23,6 +27,7 @@ public class ShopMenu : MonoBehaviour
 
     private void Awake()
     {
+        animator = GetComponent<Animator>();
         player = NetworkController.Instance.GetLocalPlayerObject().GetComponent<Player>();
         if (player == null)
         {
@@ -52,15 +57,7 @@ public class ShopMenu : MonoBehaviour
         this.wave.text = "Shop (Wave " + LevelController.Instance.currentWave.ToString() + ")";
         this.coins.text = player.coins.ToString();
 
-        switch (LevelController.Instance.deadPlayers.Count)
-        {
-            case 0:
-                ressurectButton.enabled = false; break;
-            case 1:
-                ressurectButton.GetComponentInChildren<TMP_Text>().text = "Ressurect Ally"; break;
-            default:
-                ressurectButton.GetComponentInChildren<TMP_Text>().text = "Ressurect Allies"; break;
-        }
+
     }
 
     private void OnEnable()
@@ -73,6 +70,30 @@ public class ShopMenu : MonoBehaviour
         }
         this.wave.text = "Shop (Wave " + LevelController.Instance.currentWave.ToString() + ")";
         this.coins.text = player.coins.ToString();
+
+    }
+
+    private void Update()
+    {
+        Player localPlayer = NetworkController.Instance.GetLocalPlayerObject().GetComponent<Player>();
+        if (localPlayer.isAlive)
+        {
+            switch (LevelController.Instance.GetDeadPlayers().Count)
+            {
+                case 0:
+                    ressurectButton.gameObject.SetActive(false); break;
+                case 1:
+                    ressurectButton.gameObject.SetActive(true);
+                    ressurectButton.GetComponentInChildren<TMP_Text>().text = "Ressurect Ally"; break;
+                default:
+                    ressurectButton.gameObject.SetActive(true);
+                    ressurectButton.GetComponentInChildren<TMP_Text>().text = "Ressurect Allies"; break;
+            }
+        }
+        else
+        {
+            ressurectButton.gameObject.SetActive(false);
+        }
     }
 
     private void OnDisable()
@@ -112,7 +133,15 @@ public class ShopMenu : MonoBehaviour
 
     public void onRessurectClicked()
     {
-        ressurectButton.interactable = false;
-        LevelController.Instance.RessurectPlayers();
+        print("RESPAWN CLICKED");
+        if (NetworkController.Instance.GetLocalPlayerObject().GetComponent<Player>().SpendCoins(20)) {
+            LevelController.Instance.RessurectPlayers();
+        } else
+        {
+            print("NO MONEY");
+            Toast.alpha = 1;
+            animator.SetTrigger("FadeOut");
+        }
     }
+
 }
