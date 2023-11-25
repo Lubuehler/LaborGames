@@ -63,10 +63,12 @@ public class LevelController : NetworkBehaviour
     [Rpc]
     public void RPC_Ready(NetworkObject networkObject, bool ready)
     {
-        if (!gameRunning)
-        {
-            networkObject.GetComponent<Player>().RpcReset();
-        }
+        //if (!gameRunning)
+        //{
+        //    networkObject.GetComponent<Player>().RpcReset();
+        //    networkObject.GetComponent<Player>().ready = ready;
+
+        //}
         if (Runner.IsServer)
         {
             networkObject.GetComponent<Player>().ready = ready;

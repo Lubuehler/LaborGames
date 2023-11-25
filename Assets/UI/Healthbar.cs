@@ -28,7 +28,6 @@ public class HealthBar : MonoBehaviour
 
     private void OnDisable()
     {
-        print("Healthbar disabled");
         if (LevelController.Instance.localPlayer != null)
         {
             LevelController.Instance.localPlayer.OnHealthChanged -= UpdateHealthBar;
