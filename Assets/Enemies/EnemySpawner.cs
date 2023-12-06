@@ -42,11 +42,11 @@ public class EnemySpawner : NetworkBehaviour
 
     public void SpawnEnemy()
     {
+        // if(_spawnedEnemies.Count >= 1)
+        // {
+        //     return;
+        // }
         EnemyType enemyType = SelectEnemyTypeBasedOnSpawnRate();
-        if (Runner == null)
-        {
-            print("runner is null in spawn enemy");
-        }
         Vector2 position;
         NetworkObject spawnedEnemy;
         switch (enemyType)

@@ -10,19 +10,21 @@ public enum EnemyType
 
 public class Enemy : NetworkBehaviour
 {
-    [SerializeField] private float speed = 3f;
-    [SerializeField] private int health = 100;
-    [SerializeField] private double viewingDistance = 20d;
-    [SerializeField] private LayerMask enemyLayerMask;
-    [SerializeField] private LayerMask playerLayerMask;
-    [SerializeField] private float separationRadius = 5f;
-    [SerializeField] private float explosionRange = 1f;
-    [SerializeField] private float explosionDamage = 40f;
-    [SerializeField] private GameObject deathExplosionPrefab;
+    [SerializeField] protected float speed = 3f;
+    [SerializeField] protected int health = 100;
+    [SerializeField] protected double viewingDistance = 20d;
+    [SerializeField] protected LayerMask enemyLayerMask;
+    [SerializeField] protected LayerMask playerLayerMask;
+    [SerializeField] protected float separationRadius = 5f;
+    [SerializeField] protected float explosionRange = 1f;
+    [SerializeField] protected float explosionDamage = 40f;
+    [SerializeField] protected GameObject deathExplosionPrefab;
 
 
     protected NetworkRigidbody2D networkRigidbody2D;
     protected NetworkObject currentTarget;
+
+    protected float movementSmoothing = .5f;
 
 
     public override void Spawned()
@@ -35,8 +37,6 @@ public class Enemy : NetworkBehaviour
 
         UpdateTarget();
     }
-
-    private float movementSmoothing = .5f;
 
 
     protected virtual void Move()

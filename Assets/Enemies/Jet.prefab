@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 186824261282344461}
   - component: {fileID: 1994029329870135258}
-  - component: {fileID: 3270572236083424333}
+  - component: {fileID: 3898442653115564758}
   m_Layer: 6
   m_Name: Jet
   m_TagString: Untagged
@@ -85,7 +85,7 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
---- !u!114 &3270572236083424333
+--- !u!114 &3898442653115564758
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -94,7 +94,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 4168867986580171487}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a702239daf62649448fcd67ebe2c541f, type: 3}
+  m_Script: {fileID: 11500000, guid: 18e17b683dc06994a945e0f27e006588, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!1 &8933241707471840372
@@ -148,7 +148,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _interpolationDataSource: 0
   speed: 4
-  health: 3
+  health: 100
   viewingDistance: 20
   enemyLayerMask:
     serializedVersion: 2
@@ -160,6 +160,14 @@ MonoBehaviour:
   explosionRange: 1
   explosionDamage: 40
   deathExplosionPrefab: {fileID: 7726421982602285071, guid: cc38b5938cf4f7947a6710d03457cb5f, type: 3}
+  projectilePrefab: {fileID: 7345909911863687230, guid: ab92a0ed00bd5b344b3db50dd766d0d8, type: 3}
+  anchorPrefab: {fileID: 4560163527768058828, guid: d31ccedf1064af04cbdc15102ef89076, type: 3}
+  rotationCenter: {x: 0, y: 0}
+  rotationRadius: 2
+  angularSpeed: 2
+  playerLayer:
+    serializedVersion: 2
+    m_Bits: 128
 --- !u!114 &2827710277521792308
 MonoBehaviour:
   m_ObjectHideFlags: 0

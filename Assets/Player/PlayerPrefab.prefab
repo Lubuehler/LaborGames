@@ -200,9 +200,10 @@ MonoBehaviour:
   _projectilePrefab: {fileID: 1350390008315525890, guid: 95fb6b4a33b3a6543bcec83d35c8c1bf, type: 3}
   tiltAmount: 15
   isShooting: 1
-  isAlive: 1
+  _isAlive: 0
   _playerName: 
   _ready: 0
+  _coins: 0
   _maxHealth: 0
   _attackDamage: 0
   _attackSpeed: 0
