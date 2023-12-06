@@ -1,0 +1,41 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a646f049b4a9ca64d84aeafb94525950, type: 3}
+  m_Name: itemDatabase
+  m_EditorClassIdentifier: 
+  items:
+  - itemName: Long Sword
+    price: 3
+    modifiers:
+    - statName: Attack Damage
+      value: 10
+  - itemName: Dagger
+    price: 3
+    modifiers:
+    - statName: Attack Speed
+      value: 10
+  - itemName: Recurve Bow
+    price: 10
+    modifiers:
+    - statName: Attack Damage
+      value: 20
+    - statName: Attack Speed
+      value: 20
+  - itemName: asdf
+    price: 10
+    modifiers:
+    - statName: Attack Damage
+      value: 20
+    - statName: Attack Speed
+      value: 20
+    - statName: Movement Speed
+      value: 20

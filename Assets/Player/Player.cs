@@ -39,12 +39,14 @@ public class Player : NetworkBehaviour
     [Networked] public float attackSpeed { get; set; } // Schüsse pro Sekunde
     [Networked] public float critChance { get; set; }
     [Networked] public float critDamageMultiplier { get; set; }
-    [Networked] public float dodgeProbability { get; set; }
+    [Networked] public float dodgeChance { get; set; }
     [Networked] public float movementSpeed { get; set; }
     [Networked] public float luck { get; set; }
     [Networked] public float armor { get; set; }
     [Networked] public float range { get; set; }
     [Networked] public float currentHealth { get; set; }
+
+    //[Networked, Capacity(100)] public NetworkArray<Item> items { get; set; }
 
     // Actions
     public event Action OnStatsChanged;
@@ -82,13 +84,13 @@ public class Player : NetworkBehaviour
 
     public void InitiallySetStats()
     {
-        coins = 0;
+        coins = 200;
         maxHealth = 100;
         attackDamage = 20;
         attackSpeed = 1;
         critChance = 0;
         critDamageMultiplier = 1;
-        dodgeProbability = 0;
+        dodgeChance = 0;
         movementSpeed = 5;
         luck = 0;
         armor = 0;
@@ -266,36 +268,33 @@ public class Player : NetworkBehaviour
         ready = false;
     }
 
-    public void printStats()
+    public void ModifyStat(StatModifier modifier)
     {
-        print("maxHealth: " + maxHealth);
-        print("attackDamage: " + attackDamage);
-        print("attackSpeed: " + attackSpeed);
-        print("critChance: " + critChance);
-        print("critDamageMultiplier: " + critDamageMultiplier);
-        print("dodgeProbability: " + dodgeProbability);
-        print("movementSpeed: " + movementSpeed);
-        print("luck: " + luck);
-        print("armor: " + armor);
-        print("range: " + range);
-        print("Current Health : " + currentHealth);
-    }
-
-    [Rpc(RpcSources.All, RpcTargets.InputAuthority)]
-    public void RpcRegisterLocalPlayer()
-    {
-        localPlayer = this;
-        print("NAME . "+name + " " + localPlayer.name);
-    }
-
-    public bool SpendCoins(int amount)
-    {
-        if(coins >= amount)
+        switch (modifier.statName)
         {
-            coins -= amount;
-            OnCoinsChanged?.Invoke(coins);
-            return true;
+            case "Max Health":
+                maxHealth += modifier.value; break;
+            case "Attack Damage":
+                attackDamage += modifier.value; break;
+            case "Attack Speed":
+                attackSpeed += modifier.value; break;
+            case "Crit Chance":
+                critChance += modifier.value; break;
+            case "Crit Damage":
+                critDamageMultiplier += modifier.value; break;
+            case "Movement Speed":
+                movementSpeed += modifier.value; break;
+            case "Luck":
+                luck += modifier.value; break;
+            case "Armor":
+                armor += modifier.value; break;
+            case "Range":
+                range += modifier.value; break;
+            default:
+                Debug.LogError("Unknown Stat Modifier Name: Check the Item Description for Spelling"); break;
+
         }
-        return false;
+        OnStatsChanged?.Invoke();
     }
+
 }

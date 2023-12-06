@@ -4,6 +4,7 @@ using UnityEngine;
 using TMPro;
 using UnityEngine.UI;
 using Fusion;
+using Unity.VisualScripting;
 
 public class ShopMenu : MonoBehaviour
 {
@@ -16,22 +17,22 @@ public class ShopMenu : MonoBehaviour
     public Button goButton;
     [SerializeField] private Button ressurectButton;
 
-    [SerializeField] private CanvasGroup Toast;
-    private Animator animator;
-
-
     private Player player;
 
     private Dictionary<string, Func<Player, string>> statMappings;
     private Dictionary<string, StatRow> statRows;
 
+    private List<Item> itemList = new List<Item>();
+    [SerializeField] private ItemDatabase itemDatabase;
+    [SerializeField] private LayoutGroup itemGroup;
+    [SerializeField] private GameObject shopItemPrefab; 
+
     private void Awake()
     {
-        animator = GetComponent<Animator>();
         player = NetworkController.Instance.GetLocalPlayerObject().GetComponent<Player>();
         if (player == null)
         {
-            print("wrong order; player not initialised in ShopMenu Awake");
+            Debug.Log("wrong order; player not initialised in ShopMenu Awake");
             return;
         }
         statMappings = new Dictionary<string, Func<Player, string>>
@@ -41,7 +42,7 @@ public class ShopMenu : MonoBehaviour
             { "Attack Speed", p => p.attackSpeed.ToString("F2") },
             { "Crit Chance", p=> p.critChance.ToString("F2") },
             { "Crit Damage Multiplier", p=> p.critDamageMultiplier.ToString("F2") },
-            { "Dodge Chance", p=> p.dodgeProbability.ToString("F2") },
+            { "Dodge Chance", p=> p.dodgeChance.ToString("F2") },
             { "Movement Speed", p => p.movementSpeed.ToString("F2") },
             { "Armor", p => p.armor.ToString("F2")  },
             { "Range", p => p.range.ToString()  }
@@ -57,7 +58,7 @@ public class ShopMenu : MonoBehaviour
         this.wave.text = "Shop (Wave " + LevelController.Instance.currentWave.ToString() + ")";
         this.coins.text = player.coins.ToString();
 
-
+        RandomizeShop();
     }
 
     private void OnEnable()
@@ -71,6 +72,7 @@ public class ShopMenu : MonoBehaviour
         this.wave.text = "Shop (Wave " + LevelController.Instance.currentWave.ToString() + ")";
         this.coins.text = player.coins.ToString();
 
+        RandomizeShop();
     }
 
     private void Update()
@@ -94,6 +96,8 @@ public class ShopMenu : MonoBehaviour
         {
             ressurectButton.gameObject.SetActive(false);
         }
+
+
     }
 
     private void OnDisable()
@@ -123,6 +127,8 @@ public class ShopMenu : MonoBehaviour
                 statRows[propertyName].SetStat(propertyName, getStatValue(player));
             }
         }
+        coins.text = player.coins.ToString();
+
     }
 
     public void OnGoClick()
@@ -134,14 +140,35 @@ public class ShopMenu : MonoBehaviour
     public void onRessurectClicked()
     {
         print("RESPAWN CLICKED");
-        if (NetworkController.Instance.GetLocalPlayerObject().GetComponent<Player>().SpendCoins(20)) {
+        if (ShopSystem.Instance.CanAfford(20)) {
             LevelController.Instance.RessurectPlayers();
         } else
         {
             print("NO MONEY");
-            Toast.alpha = 1;
-            animator.SetTrigger("FadeOut");
         }
     }
 
+    public void UpdateDisplayedItems()
+    {
+        for (int i = itemGroup.transform.childCount - 1; i >= 0; i--)
+        {
+            Destroy(itemGroup.transform.GetChild(i).gameObject);
+        }
+        foreach (Item item in itemList)
+        {
+            GameObject itemVis = Instantiate(shopItemPrefab);
+            itemVis.transform.SetParent(itemGroup.transform, false);
+            itemVis.GetComponent<ShopItem>().SetItem(item);
+        }
+    }
+
+    public void RandomizeShop()
+    {
+        itemList.Clear();
+        for(int i = 0; i< 3; i++)
+        {
+            itemList.Add(itemDatabase.items[UnityEngine.Random.Range(0, itemDatabase.items.Count)]);
+        }
+        UpdateDisplayedItems();
+    }
 }
