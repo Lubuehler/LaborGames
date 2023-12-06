@@ -38,4 +38,4 @@ MonoBehaviour:
     - statName: Attack Speed
       value: 20
     - statName: Movement Speed
-      value: 20
+      value: 1
