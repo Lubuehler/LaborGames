@@ -16,7 +16,7 @@ public class LevelController : NetworkBehaviour
 
     [Networked]
     public int currentWave { get; set; }
-    private float waveDuration = 30f;
+    private float waveDuration = 20f;
     private float waveDurationIncrease = 2f;
 
     private float waveEndTime; // Time when the current wave will end

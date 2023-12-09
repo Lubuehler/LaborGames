@@ -15,27 +15,37 @@ MonoBehaviour:
   items:
   - itemName: Long Sword
     price: 3
+    description: 
+    color: {r: 1, g: 1, b: 1, a: 0.4}
     modifiers:
     - statName: Attack Damage
       value: 10
+    itemType: 0
   - itemName: Dagger
     price: 3
+    description: 
+    color: {r: 1, g: 1, b: 1, a: 0.4}
     modifiers:
     - statName: Attack Speed
       value: 10
+    itemType: 0
   - itemName: Recurve Bow
     price: 10
+    description: 
+    color: {r: 1, g: 1, b: 1, a: 0.4}
     modifiers:
     - statName: Attack Damage
       value: 20
     - statName: Attack Speed
       value: 20
-  - itemName: asdf
-    price: 10
+    itemType: 0
+  - itemName: EMP
+    price: 30
+    description: EMP
+    color: {r: 0.58265877, g: 0, b: 1, a: 0.4}
     modifiers:
     - statName: Attack Damage
       value: 20
     - statName: Attack Speed
       value: 20
-    - statName: Movement Speed
-      value: 1
+    itemType: 1

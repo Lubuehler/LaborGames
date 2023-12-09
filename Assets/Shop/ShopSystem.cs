@@ -1,9 +1,15 @@
 using System.Linq;
 using UnityEngine;
+using System.Collections.Generic;
+using System;
 
 public class ShopSystem : MonoBehaviour
 {
-    public ItemDatabase itemDatabase;
+
+    public List<Item> items;
+    [SerializeField] private ItemDatabase itemDatabase;
+
+    public event Action OnSpecialAbilitiesChanged;
 
     public static ShopSystem Instance;
 
@@ -17,6 +23,7 @@ public class ShopSystem : MonoBehaviour
         {
             Destroy(this.gameObject);
         }
+        this.items.AddRange(itemDatabase.items);
     }
 
     public void BuyItem(Item item)
@@ -24,10 +31,13 @@ public class ShopSystem : MonoBehaviour
         if (CanAfford(item.price))
         {
             LevelController.Instance.localPlayer.coins -= item.price;
-            //LevelController.Instance.localPlayer.items.Set(LevelController.Instance.localPlayer.items.Count() + 1, item);
-            ApplyItemEffects(item);
+            LevelController.Instance.localPlayer.RPC_ApplyItem(item.id);
+            OnSpecialAbilitiesChanged.Invoke();
+            if (item.itemType == ItemType.SpecialAttack)
+            {
+                items.Remove(item);
+            }
         }
-
     }
 
     public bool CanAfford(int price)
@@ -35,12 +45,8 @@ public class ShopSystem : MonoBehaviour
         return LevelController.Instance.localPlayer.coins >= price;
     }
 
-    private void ApplyItemEffects(Item item)
+    public void ResetItemPool()
     {
-        foreach(StatModifier modifier in item.modifiers)
-        {
-
-            LevelController.Instance.localPlayer.ModifyStat(modifier);
-        }
+        this.items.AddRange(itemDatabase.items);
     }
 }

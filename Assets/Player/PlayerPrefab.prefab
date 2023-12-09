@@ -71,8 +71,8 @@ SpriteRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
-  m_SortingLayerID: 0
-  m_SortingLayer: 0
+  m_SortingLayerID: 1794861019
+  m_SortingLayer: -1
   m_SortingOrder: 0
   m_Sprite: {fileID: 21300000, guid: 438af40dc26225d49a9c94157fd7fbe1, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
@@ -199,17 +199,20 @@ MonoBehaviour:
     m_Bits: 256
   _projectilePrefab: {fileID: 1350390008315525890, guid: 95fb6b4a33b3a6543bcec83d35c8c1bf, type: 3}
   tiltAmount: 15
+  background: {fileID: 0}
+  empPrefab: {fileID: 1329845292236604, guid: 87914b4f3f298e541968506f49f26089, type: 3}
   isShooting: 1
   _isAlive: 0
   _playerName: 
   _ready: 0
+  lobbyNo: 0
   _coins: 0
   _maxHealth: 0
   _attackDamage: 0
   _attackSpeed: 0
   _critChance: 0
   _critDamageMultiplier: 0
-  _dodgeProbability: 0
+  _dodgeChance: 0
   _movementSpeed: 0
   _luck: 0
   _armor: 0

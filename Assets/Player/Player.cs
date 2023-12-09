@@ -15,6 +15,7 @@ public class Player : NetworkBehaviour
     [SerializeField] public Projectile _projectilePrefab;
     [SerializeField] private float tiltAmount = 15.0f;
     [SerializeField] private GameObject background;
+    [SerializeField] private GameObject empPrefab;
 
     private NetworkRigidbody2D _nrb2d;
     private SpriteRenderer _spriteRenderer;
@@ -46,7 +47,11 @@ public class Player : NetworkBehaviour
     [Networked] public float range { get; set; }
     [Networked] public float currentHealth { get; set; }
 
-    //[Networked, Capacity(100)] public NetworkArray<Item> items { get; set; }
+    //Items & SpecialAttacks
+    [Networked] public NetworkLinkedList<Guid> items { get; }
+
+    [Networked] public NetworkLinkedList<Guid> specialAttacks { get; }
+    [Networked] public Guid selectedSpecialAttack { get; set; }
 
     // Actions
     public event Action OnStatsChanged;
@@ -76,7 +81,8 @@ public class Player : NetworkBehaviour
     public void RPC_Configure(string playerName)
     {
         this.playerName = playerName;
-       
+        selectedSpecialAttack = Guid.Empty;
+
         int margin = 2;
         _nrb2d.TeleportToPosition(new Vector2((GetComponentInChildren<SpriteRenderer>().size.x + margin) * lobbyNo, 0));
         InitiallySetStats();
@@ -214,13 +220,14 @@ public class Player : NetworkBehaviour
             RpcDie();
             if (HasInputAuthority)
             {
-                StartCoroutine(DelayedDeath());            }
+                StartCoroutine(DelayedDeath());
+            }
         }
     }
 
     IEnumerator DelayedDeath()
     {
-        
+
         yield return new WaitForSeconds(2f);
 
         LevelController.Instance.RpcPlayerDowned(this);
@@ -266,35 +273,63 @@ public class Player : NetworkBehaviour
         RPC_Configure(playerName);
         RpcRessurect();
         ready = false;
+
+        //Special attacks
+        selectedSpecialAttack = Guid.Empty;
+        specialAttacks.Clear();
     }
 
-    public void ModifyStat(StatModifier modifier)
+    [Rpc(sources: RpcSources.InputAuthority, targets: RpcTargets.StateAuthority)]
+    public void RPC_ApplyItem(Guid id)
     {
-        switch (modifier.statName)
+        Item item = ShopSystem.Instance.items.FirstOrDefault(item => item.id == id);
+        print(item);
+        if (item.itemType == ItemType.SpecialAttack)
         {
-            case "Max Health":
-                maxHealth += modifier.value; break;
-            case "Attack Damage":
-                attackDamage += modifier.value; break;
-            case "Attack Speed":
-                attackSpeed += modifier.value; break;
-            case "Crit Chance":
-                critChance += modifier.value; break;
-            case "Crit Damage":
-                critDamageMultiplier += modifier.value; break;
-            case "Movement Speed":
-                movementSpeed += modifier.value; break;
-            case "Luck":
-                luck += modifier.value; break;
-            case "Armor":
-                armor += modifier.value; break;
-            case "Range":
-                range += modifier.value; break;
-            default:
-                Debug.LogError("Unknown Stat Modifier Name: Check the Item Description for Spelling"); break;
-
+            specialAttacks.Add(item.id);
         }
-        OnStatsChanged?.Invoke();
+        else if (item.itemType == ItemType.Item)
+        {
+            foreach (StatModifier modifier in item.modifiers)
+            {
+                switch (modifier.statName)
+                {
+                    case "Max Health":
+                        this.maxHealth += modifier.value; break;
+                    case "Attack Damage":
+                        this.attackDamage += modifier.value; break;
+                    case "Attack Speed":
+                        this.attackSpeed += modifier.value; break;
+                    case "Crit Chance":
+                        this.critChance += modifier.value; break;
+                    case "Crit Damage":
+                        this.critDamageMultiplier += modifier.value; break;
+                    case "Movement Speed":
+                        this.movementSpeed += modifier.value; break;
+                    case "Luck":
+                        this.luck += modifier.value; break;
+                    case "Armor":
+                        this.armor += modifier.value; break;
+                    case "Range":
+                        this.range += modifier.value; break;
+                    default:
+                        Debug.LogError("Unknown Stat Modifier Name: Check the Item Description for Spelling"); break;
+
+                }
+            }
+            OnStatsChanged?.Invoke();
+        }
     }
 
+    [Rpc(sources: RpcSources.InputAuthority, targets: RpcTargets.StateAuthority)]
+    public void RPC_SetSelectedSpecialAttack(Guid id)
+    {
+        this.selectedSpecialAttack = id;
+        Debug.Log(this.selectedSpecialAttack);
+    }
+
+    public void DeployEMP()
+    {
+        Runner.Spawn(empPrefab, transform.position, transform.rotation);
+    }
 }
