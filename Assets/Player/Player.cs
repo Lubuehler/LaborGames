@@ -98,7 +98,8 @@ public class Player : NetworkBehaviour
 
         currentHealth = maxHealth;
         OnStatsChanged?.Invoke();
-        OnHealthChanged?.Invoke(currentHealth, maxHealth);
+        RpcHealthChanged();
+
     }
 
 
@@ -207,7 +208,7 @@ public class Player : NetworkBehaviour
         float prev = currentHealth;
         currentHealth -= damage;
         currentHealth = Mathf.Clamp(currentHealth, 0, maxHealth);
-        OnHealthChanged?.Invoke(currentHealth, maxHealth);
+        RpcHealthChanged();
 
         if (currentHealth <= 0 && isAlive)
         {
@@ -231,14 +232,15 @@ public class Player : NetworkBehaviour
         currentHealth += amount;
         currentHealth = Mathf.Clamp(currentHealth, 0, maxHealth);
 
-        OnHealthChanged?.Invoke(currentHealth, maxHealth);
+        RpcHealthChanged();
     }
 
     public void IncreaseMaxHealth(float amount)
     {
         maxHealth += amount;
         Heal(amount);
-        OnHealthChanged?.Invoke(currentHealth, maxHealth);
+        RpcHealthChanged();
+
     }
 
     [Rpc(RpcSources.All, RpcTargets.All)]
@@ -295,6 +297,12 @@ public class Player : NetworkBehaviour
 
         }
         OnStatsChanged?.Invoke();
+    }
+
+    [Rpc(RpcSources.All, RpcTargets.All)]
+    public void RpcHealthChanged()
+    {
+        OnHealthChanged?.Invoke(currentHealth, maxHealth);
     }
 
 }

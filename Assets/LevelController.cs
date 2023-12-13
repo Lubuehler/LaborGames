@@ -29,7 +29,9 @@ public class LevelController : NetworkBehaviour
 
     public Player localPlayer;
 
-    public List<Player> players = new List<Player>();
+    public List<Player> players {get; private set; } = new List<Player>();
+
+    public event Action OnPlayerListChanged;
 
 
     private void Awake()
@@ -56,8 +58,11 @@ public class LevelController : NetworkBehaviour
         List<PlayerRef> playerRefs = new List<PlayerRef>(Runner.ActivePlayers);
         foreach (PlayerRef player in playerRefs)
         {
+            if (Runner.GetPlayerObject(player) == null) {  continue; }
             players.Add(Runner.GetPlayerObject(player).GetComponent<Player>());
         }
+        OnPlayerListChanged?.Invoke();
+
     }
 
     [Rpc]
@@ -188,7 +193,7 @@ public class LevelController : NetworkBehaviour
         if (!players.Contains(player))
         {
             players.Add(player);
-
+            OnPlayerListChanged?.Invoke();
         }
     }
 
@@ -286,5 +291,7 @@ public class LevelController : NetworkBehaviour
         }
         return deadPlayers;
     }
+
+
 
 }
