@@ -17,88 +17,91 @@ public class Jet : Enemy
 
     protected override void Move()
     {
-        if (currentTarget == null || !currentTarget.GetComponent<Player>().isAlive)
+        if (!movementDisabled)
         {
-            networkRigidbody2D.Rigidbody.velocity = Vector2.Lerp(networkRigidbody2D.Rigidbody.velocity, Vector2.zero, Runner.DeltaTime * movementSmoothing);
-            return;
-        }
-
-        Vector2 currentPosition = new Vector2(transform.position.x, transform.position.y);
-        Vector2 playerPosition = new Vector2(currentTarget.transform.position.x, currentTarget.transform.position.y);
-
-        float distanceToTarget = Vector2.Distance(currentPosition, playerPosition);
-
-        if (distanceToTarget < 10 && !loopingStarted)
-        {
-            if (!this.maneuverStarted)
+            if (currentTarget == null || !currentTarget.GetComponent<Player>().isAlive)
             {
-                this.lockedPosition = playerPosition;
-                Vector2 toTarget = (lockedPosition - currentPosition);
-                this.desiredVelocity = toTarget.normalized * speed * 2;
-
-                this.maneuverStarted = true;
-            }
-            if (!fired)
-            {
-                Fire();
-                fired = true;
+                networkRigidbody2D.Rigidbody.velocity = Vector2.Lerp(networkRigidbody2D.Rigidbody.velocity, Vector2.zero, Runner.DeltaTime * movementSmoothing);
+                return;
             }
 
-            networkRigidbody2D.Rigidbody.velocity = Vector2.Lerp(networkRigidbody2D.Rigidbody.velocity, desiredVelocity, Runner.DeltaTime * movementSmoothing);
-        }
-        else
-        {
-            if (maneuverStarted)
+            Vector2 currentPosition = new Vector2(transform.position.x, transform.position.y);
+            Vector2 playerPosition = new Vector2(currentTarget.transform.position.x, currentTarget.transform.position.y);
+
+            float distanceToTarget = Vector2.Distance(currentPosition, playerPosition);
+
+            if (distanceToTarget < 10 && !loopingStarted)
             {
-                loopingStarted = true;
-
-                if (!centerSet)
+                if (!this.maneuverStarted)
                 {
-                    Vector2 perpendicularVector1 = new Vector2(-networkRigidbody2D.Rigidbody.velocity.y, networkRigidbody2D.Rigidbody.velocity.x).normalized;
-                    Vector2 perpendicularVector2 = new Vector2(networkRigidbody2D.Rigidbody.velocity.y, -networkRigidbody2D.Rigidbody.velocity.x).normalized;
-                    Vector2 selectedPerpendicularVector = (perpendicularVector1.y > perpendicularVector2.y) ? perpendicularVector1 : perpendicularVector2;
-                    Vector2 perpendicularVector = selectedPerpendicularVector * 2f;
+                    this.lockedPosition = playerPosition;
+                    Vector2 toTarget = (lockedPosition - currentPosition);
+                    this.desiredVelocity = toTarget.normalized * speed * 2;
 
-                    this.rotationCenter = new Vector2(gameObject.transform.position.x, gameObject.transform.position.y) + perpendicularVector;
-                    centerSet = true;
+                    this.maneuverStarted = true;
+                }
+                if (!fired)
+                {
+                    Fire();
+                    fired = true;
                 }
 
-                var magnitude = networkRigidbody2D.Rigidbody.velocity.magnitude;
-
-                // get vector center <- obj
-                Vector2 gravityVector = this.rotationCenter - networkRigidbody2D.Rigidbody.position;
-
-                // check whether left or right of target
-                bool left = Vector2.SignedAngle(networkRigidbody2D.Rigidbody.velocity, gravityVector) > 0;
-
-                // get new vector which is 90° on gravityDirection and world Z (since 2D game) normalize so it has magnitude = 1
-                Vector3 newDirection = Vector3.Cross(gravityVector, Vector3.forward).normalized;
-
-                // invert the newDirection in case user is touching right of movement direction
-                if (!left) newDirection *= -1;
-
-                // set new direction but keep speed(previously stored magnitude)
-                networkRigidbody2D.Rigidbody.velocity = newDirection * magnitude;
-
-                // Find end of looping motion
-                RaycastHit2D hit = Physics2D.Raycast(transform.position, networkRigidbody2D.Rigidbody.velocity, Mathf.Infinity, playerLayerMask);
-                if (hit.collider != null)
-                {
-                    Invoke("FlipJet", 0.1f);
-
-                    loopingStarted = false;
-                    maneuverStarted = false;
-                    fired = false;
-                    centerSet = false;
-                }
+                networkRigidbody2D.Rigidbody.velocity = Vector2.Lerp(networkRigidbody2D.Rigidbody.velocity, desiredVelocity, Runner.DeltaTime * movementSmoothing);
             }
             else
             {
-                Vector2 toTarget = (currentTarget.transform.position - transform.position);
-                Vector2 separationForce = CalculateSeparationForce();
+                if (maneuverStarted)
+                {
+                    loopingStarted = true;
 
-                Vector2 desiredVelocity = (toTarget.normalized + separationForce).normalized * speed;
-                networkRigidbody2D.Rigidbody.velocity = Vector2.Lerp(networkRigidbody2D.Rigidbody.velocity, desiredVelocity, Runner.DeltaTime * movementSmoothing);
+                    if (!centerSet)
+                    {
+                        Vector2 perpendicularVector1 = new Vector2(-networkRigidbody2D.Rigidbody.velocity.y, networkRigidbody2D.Rigidbody.velocity.x).normalized;
+                        Vector2 perpendicularVector2 = new Vector2(networkRigidbody2D.Rigidbody.velocity.y, -networkRigidbody2D.Rigidbody.velocity.x).normalized;
+                        Vector2 selectedPerpendicularVector = (perpendicularVector1.y > perpendicularVector2.y) ? perpendicularVector1 : perpendicularVector2;
+                        Vector2 perpendicularVector = selectedPerpendicularVector * 2f;
+
+                        this.rotationCenter = new Vector2(gameObject.transform.position.x, gameObject.transform.position.y) + perpendicularVector;
+                        centerSet = true;
+                    }
+
+                    var magnitude = networkRigidbody2D.Rigidbody.velocity.magnitude;
+
+                    // get vector center <- obj
+                    Vector2 gravityVector = this.rotationCenter - networkRigidbody2D.Rigidbody.position;
+
+                    // check whether left or right of target
+                    bool left = Vector2.SignedAngle(networkRigidbody2D.Rigidbody.velocity, gravityVector) > 0;
+
+                    // get new vector which is 90° on gravityDirection and world Z (since 2D game) normalize so it has magnitude = 1
+                    Vector3 newDirection = Vector3.Cross(gravityVector, Vector3.forward).normalized;
+
+                    // invert the newDirection in case user is touching right of movement direction
+                    if (!left) newDirection *= -1;
+
+                    // set new direction but keep speed(previously stored magnitude)
+                    networkRigidbody2D.Rigidbody.velocity = newDirection * magnitude;
+
+                    // Find end of looping motion
+                    RaycastHit2D hit = Physics2D.Raycast(transform.position, networkRigidbody2D.Rigidbody.velocity, Mathf.Infinity, playerLayerMask);
+                    if (hit.collider != null)
+                    {
+                        Invoke("FlipJet", 0.1f);
+
+                        loopingStarted = false;
+                        maneuverStarted = false;
+                        fired = false;
+                        centerSet = false;
+                    }
+                }
+                else
+                {
+                    Vector2 toTarget = (currentTarget.transform.position - transform.position);
+                    Vector2 separationForce = CalculateSeparationForce();
+
+                    Vector2 desiredVelocity = (toTarget.normalized + separationForce).normalized * speed;
+                    networkRigidbody2D.Rigidbody.velocity = Vector2.Lerp(networkRigidbody2D.Rigidbody.velocity, desiredVelocity, Runner.DeltaTime * movementSmoothing);
+                }
             }
         }
     }

@@ -10,12 +10,13 @@ public class ShopItem : MonoBehaviour
     [SerializeField] private Image image;
     [SerializeField] private TMP_Text soldField;
     [SerializeField] private GameObject collection;
+    [SerializeField] private Image background;
 
     private Item item;
 
     private void Update()
     {
-        if(item == null)
+        if (item == null)
         {
             Debug.Log("Item Visual displayed but no Item assigned!");
         }
@@ -23,15 +24,30 @@ public class ShopItem : MonoBehaviour
 
     public void SetItem(Item item)
     {
+        // Common fields
         this.item = item;
         nameField.text = item.itemName;
-        string description = "";
-        foreach (StatModifier modifier in item.modifiers)
-        {
-            description += modifier.statName.ToString() + ": " + modifier.value.ToString() + "\n";
-        }
-        descriptionField.text = description;
         priceField.text = item.price.ToString();
+        background.color = item.color;
+
+
+        // differences
+        if (item.itemType == ItemType.Item)
+        {
+
+            string description = "";
+            foreach (StatModifier modifier in item.modifiers)
+            {
+                description += modifier.statName.ToString() + ": " + modifier.value.ToString() + "\n";
+            }
+            descriptionField.text = description;
+
+        }
+        else if (item.itemType == ItemType.SpecialAttack)
+        {
+            descriptionField.text = item.description;
+        }
+
     }
 
     public void OnClick()
@@ -46,7 +62,6 @@ public class ShopItem : MonoBehaviour
     public void Sell()
     {
         soldField.enabled = true;
-
         collection.SetActive(false);
     }
 }

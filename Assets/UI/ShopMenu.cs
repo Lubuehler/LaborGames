@@ -5,6 +5,8 @@ using TMPro;
 using UnityEngine.UI;
 using Fusion;
 using Unity.VisualScripting;
+using ExitGames.Client.Photon.StructWrapping;
+using System.Linq;
 
 public class ShopMenu : MonoBehaviour
 {
@@ -23,46 +25,86 @@ public class ShopMenu : MonoBehaviour
     private Dictionary<string, StatRow> statRows;
 
     private List<Item> itemList = new List<Item>();
-    [SerializeField] private ItemDatabase itemDatabase;
     [SerializeField] private LayoutGroup itemGroup;
-    [SerializeField] private GameObject shopItemPrefab; 
+    [SerializeField] private GameObject shopItemPrefab;
 
-    private void Awake()
-    {
-        player = NetworkController.Instance.GetLocalPlayerObject().GetComponent<Player>();
-        if (player == null)
-        {
-            Debug.Log("wrong order; player not initialised in ShopMenu Awake");
-            return;
-        }
-        statMappings = new Dictionary<string, Func<Player, string>>
-        {
-            { "Max Health", p => p.maxHealth.ToString() },
-            { "Attack Damage", p => p.attackDamage.ToString("F2") },
-            { "Attack Speed", p => p.attackSpeed.ToString("F2") },
-            { "Crit Chance", p=> p.critChance.ToString("F2") },
-            { "Crit Damage Multiplier", p=> p.critDamageMultiplier.ToString("F2") },
-            { "Dodge Chance", p=> p.dodgeChance.ToString("F2") },
-            { "Movement Speed", p => p.movementSpeed.ToString("F2") },
-            { "Armor", p => p.armor.ToString("F2")  },
-            { "Range", p => p.range.ToString()  }
 
-        };
+    [SerializeField] private LayoutGroup specialAttackGroup;
+    [SerializeField] private GameObject specialAttackPrefab;
 
-        statRows = new Dictionary<string, StatRow>();
+    // private void Start()
+    // {
+    //     player = NetworkController.Instance.GetLocalPlayerObject().GetComponent<Player>();
+    //     if (player == null)
+    //     {
+    //         Debug.Log("wrong order; player not initialised in ShopMenu Awake");
+    //         return;
+    //     }
+    //     statMappings = new Dictionary<string, Func<Player, string>>
+    //     {
+    //         { "Max Health", p => p.maxHealth.ToString() },
+    //         { "Attack Damage", p => p.attackDamage.ToString("F2") },
+    //         { "Attack Speed", p => p.attackSpeed.ToString("F2") },
+    //         { "Crit Chance", p=> p.critChance.ToString("F2") },
+    //         { "Crit Damage Multiplier", p=> p.critDamageMultiplier.ToString("F2") },
+    //         { "Dodge Chance", p=> p.dodgeChance.ToString("F2") },
+    //         { "Movement Speed", p => p.movementSpeed.ToString("F2") },
+    //         { "Armor", p => p.armor.ToString("F2")  },
+    //         { "Range", p => p.range.ToString()  }
 
-        foreach (var mapping in statMappings)
-        {
-            InstantiateStatRow(mapping.Key);
-        }
-        this.wave.text = "Shop (Wave " + LevelController.Instance.currentWave.ToString() + ")";
-        this.coins.text = player.coins.ToString();
+    //     };
 
-        RandomizeShop();
-    }
+    //     statRows = new Dictionary<string, StatRow>();
+
+    //     foreach (var mapping in statMappings)
+    //     {
+    //         InstantiateStatRow(mapping.Key);
+    //     }
+    //     this.wave.text = "Shop (Wave " + LevelController.Instance.currentWave.ToString() + ")";
+    //     this.coins.text = player.coins.ToString();
+
+    //     RandomizeShop();
+    // }
+
+    private bool initialised = false;
 
     private void OnEnable()
     {
+        if (!initialised)
+        {
+            player = NetworkController.Instance.GetLocalPlayerObject().GetComponent<Player>();
+            if (player == null)
+            {
+                Debug.Log("wrong order; player not initialised in ShopMenu Awake");
+                return;
+            }
+            statMappings = new Dictionary<string, Func<Player, string>>
+            {
+                { "Max Health", p => p.maxHealth.ToString() },
+                { "Attack Damage", p => p.attackDamage.ToString("F2") },
+                { "Attack Speed", p => p.attackSpeed.ToString("F2") },
+                { "Crit Chance", p=> p.critChance.ToString("F2") },
+                { "Crit Damage Multiplier", p=> p.critDamageMultiplier.ToString("F2") },
+                { "Dodge Chance", p=> p.dodgeChance.ToString("F2") },
+                { "Movement Speed", p => p.movementSpeed.ToString("F2") },
+                { "Armor", p => p.armor.ToString("F2")  },
+                { "Range", p => p.range.ToString()  }
+            };
+
+            statRows = new Dictionary<string, StatRow>();
+
+            foreach (var mapping in statMappings)
+            {
+                InstantiateStatRow(mapping.Key);
+            }
+            initialised = true;
+        }
+        
+        // new
+
+        ShopSystem.Instance.OnSpecialAbilitiesChanged += UpdateSpecialAbilities;
+
+
         goButton.interactable = true;
         if (player != null)
         {
@@ -96,8 +138,6 @@ public class ShopMenu : MonoBehaviour
         {
             ressurectButton.gameObject.SetActive(false);
         }
-
-
     }
 
     private void OnDisable()
@@ -106,6 +146,7 @@ public class ShopMenu : MonoBehaviour
         {
             player.OnStatsChanged -= UpdateStats;
         }
+        ShopSystem.Instance.OnSpecialAbilitiesChanged -= UpdateSpecialAbilities;
     }
 
     private void InstantiateStatRow(string propertyName)
@@ -137,12 +178,14 @@ public class ShopMenu : MonoBehaviour
         LevelController.Instance.RPC_Ready(NetworkController.Instance.GetLocalPlayerObject(), true);
     }
 
-    public void onRessurectClicked()
+    public void OnRessurectClicked()
     {
         print("RESPAWN CLICKED");
-        if (ShopSystem.Instance.CanAfford(20)) {
+        if (ShopSystem.Instance.CanAfford(20))
+        {
             LevelController.Instance.RessurectPlayers();
-        } else
+        }
+        else
         {
             print("NO MONEY");
         }
@@ -165,10 +208,29 @@ public class ShopMenu : MonoBehaviour
     public void RandomizeShop()
     {
         itemList.Clear();
-        for(int i = 0; i< 3; i++)
+
+        List<Item> itemPool = new();
+        itemPool.AddRange(ShopSystem.Instance.items);
+
+        for (int i = 0; i < 3; i++)
         {
-            itemList.Add(itemDatabase.items[UnityEngine.Random.Range(0, itemDatabase.items.Count)]);
+            Item item = itemPool[UnityEngine.Random.Range(0, itemPool.Count)];
+            itemList.Add(item);
+            itemPool.Remove(item);
         }
         UpdateDisplayedItems();
+    }
+
+    public void UpdateSpecialAbilities()
+    {
+        Player localPlayer = NetworkController.Instance.GetLocalPlayerObject().GetComponent<Player>();
+        foreach(Guid id in localPlayer.specialAttacks)
+        {
+            Item item = ShopSystem.Instance.items.FirstOrDefault(item => item.id == id);
+            GameObject itemVis = Instantiate(specialAttackPrefab);
+            itemVis.transform.SetParent(specialAttackGroup.transform, false);
+            itemVis.GetComponent<SpecialAttackItem>().Initialize(item);
+            itemVis.GetComponentInChildren<TMP_Text>().text = item.itemName;
+        }
     }
 }

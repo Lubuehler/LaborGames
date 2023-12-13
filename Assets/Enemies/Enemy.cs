@@ -1,6 +1,7 @@
 using Fusion;
 using UnityEngine;
 using System.Collections.Generic;
+using System.Collections;
 
 public enum EnemyType
 {
@@ -26,6 +27,8 @@ public class Enemy : NetworkBehaviour
 
     protected float movementSmoothing = .5f;
 
+    protected bool movementDisabled = false;
+
 
     public override void Spawned()
     {
@@ -41,17 +44,19 @@ public class Enemy : NetworkBehaviour
 
     protected virtual void Move()
     {
-        if (currentTarget == null || !currentTarget.GetComponent<Player>().isAlive)
+        if (!movementDisabled)
         {
-            networkRigidbody2D.Rigidbody.velocity = Vector2.Lerp(networkRigidbody2D.Rigidbody.velocity, Vector2.zero, Runner.DeltaTime * movementSmoothing);
-            return;
+            if (currentTarget == null || !currentTarget.GetComponent<Player>().isAlive)
+            {
+                networkRigidbody2D.Rigidbody.velocity = Vector2.Lerp(networkRigidbody2D.Rigidbody.velocity, Vector2.zero, Runner.DeltaTime * movementSmoothing);
+                return;
+            }
+            Vector2 toTarget = (currentTarget.transform.position - transform.position);
+            Vector2 separationForce = CalculateSeparationForce();
+
+            Vector2 desiredVelocity = (toTarget.normalized + separationForce).normalized * speed;
+            networkRigidbody2D.Rigidbody.velocity = Vector2.Lerp(networkRigidbody2D.Rigidbody.velocity, desiredVelocity, Runner.DeltaTime * movementSmoothing);
         }
-        Vector2 toTarget = (currentTarget.transform.position - transform.position);
-        Vector2 separationForce = CalculateSeparationForce();
-
-        Vector2 desiredVelocity = (toTarget.normalized + separationForce).normalized * speed;
-        networkRigidbody2D.Rigidbody.velocity = Vector2.Lerp(networkRigidbody2D.Rigidbody.velocity, desiredVelocity, Runner.DeltaTime * movementSmoothing);
-
     }
 
 
@@ -162,5 +167,18 @@ public class Enemy : NetworkBehaviour
     protected virtual void Die()
     {
         EnemySpawner.Instance.EnemyDefeated(this, transform.position);
+    }
+
+    public void EMPHit()
+    {
+        movementDisabled = true;
+        networkRigidbody2D.Rigidbody.velocity = Vector2.Lerp(networkRigidbody2D.Rigidbody.velocity, Vector2.zero, Runner.DeltaTime * movementSmoothing);
+        StartCoroutine(EnableMovementAfterDelay(5f));
+    }
+
+    private IEnumerator EnableMovementAfterDelay(float delay)
+    {
+        yield return new WaitForSeconds(delay);
+        movementDisabled = false;
     }
 }
