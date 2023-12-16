@@ -168,7 +168,7 @@ public class HUD : MonoBehaviour
             }
         }
         var deadPlayers = LevelController.Instance.GetDeadPlayers();
-        foreach (var player in players)
+        foreach (var player in deadPlayers)
         {
             if (offScreenArrows.ContainsKey(player))
             {
@@ -180,11 +180,9 @@ public class HUD : MonoBehaviour
 
     private void PositionArrow(GameObject arrow, Vector3 screenPos)
     {
-        // Convert screen position from viewport space (0-1) to screen space
         screenPos.x *= Screen.width;
         screenPos.y *= Screen.height;
 
-        // Calculate center of the screen
         Vector3 screenCenter = new Vector3(Screen.width / 2, Screen.height / 2, 0);
 
         // Calculate direction from the center of the screen to the player
@@ -193,12 +191,13 @@ public class HUD : MonoBehaviour
         // Normalize the direction
         direction = direction.normalized;
 
-        float padding = 20;
+        float padding = 0;
 
         // Calculate the edge position
         float max = Mathf.Max(Screen.width, Screen.height);
         Vector3 edgePos = screenCenter + direction * max / 2;
         edgePos = new Vector3(Mathf.Clamp(edgePos.x, padding, Screen.width - padding), Mathf.Clamp(edgePos.y, padding, Screen.height - padding), 0);
+        edgePos *= 0.95f;
 
         // Set the position of the arrow
         arrow.transform.position = edgePos;

@@ -65,6 +65,8 @@ public class AllyHealthbar : MonoBehaviour
             player.OnHealthChanged += UpdateHealthBar;
             subscribed = true;
             UpdateHealthBar(player.currentHealth, player.maxHealth);
+        } else if (player != null && playerName.text == "") {
+            playerName.text = player.playerName;
         }
     }
 }
