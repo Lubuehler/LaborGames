@@ -224,9 +224,9 @@ public class ShopMenu : MonoBehaviour
     public void UpdateSpecialAbilities()
     {
         Player localPlayer = NetworkController.Instance.GetLocalPlayerObject().GetComponent<Player>();
-        foreach(Guid id in localPlayer.specialAttacks)
+        foreach(int id in localPlayer.specialAttacks)
         {
-            Item item = ShopSystem.Instance.items.FirstOrDefault(item => item.id == id);
+            Item item = ShopSystem.Instance.items.FirstOrDefault(item => item.itemID == id);
             GameObject itemVis = Instantiate(specialAttackPrefab);
             itemVis.transform.SetParent(specialAttackGroup.transform, false);
             itemVis.GetComponent<SpecialAttackItem>().Initialize(item);

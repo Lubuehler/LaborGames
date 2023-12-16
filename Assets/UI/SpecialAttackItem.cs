@@ -14,6 +14,6 @@ public class SpecialAttackItem : MonoBehaviour
     public void SetItem()
     {
         Player localPlayer = NetworkController.Instance.GetLocalPlayerObject().GetComponent<Player>();
-        localPlayer.RPC_SetSelectedSpecialAttack(item.id);
+        localPlayer.RPC_SetSelectedSpecialAttack(item.itemID);
     }
 }

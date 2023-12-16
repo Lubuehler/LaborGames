@@ -38,7 +38,7 @@ public class HUD : MonoBehaviour
             initialized = true;
         }
         
-        if (LevelController.Instance.localPlayer.selectedSpecialAttack != Guid.Empty)
+        if (LevelController.Instance.localPlayer.selectedSpecialAttack != int.MinValue)
         {
             specialAttack.SetActive(true);
             ResetLoadingAnimation();

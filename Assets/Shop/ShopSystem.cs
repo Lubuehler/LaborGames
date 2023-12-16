@@ -31,7 +31,7 @@ public class ShopSystem : MonoBehaviour
         if (CanAfford(item.price))
         {
             LevelController.Instance.localPlayer.coins -= item.price;
-            LevelController.Instance.localPlayer.RPC_ApplyItem(item.id);
+            LevelController.Instance.localPlayer.RPC_ApplyItem(item.itemID);
             OnSpecialAbilitiesChanged.Invoke();
             if (item.itemType == ItemType.SpecialAttack)
             {

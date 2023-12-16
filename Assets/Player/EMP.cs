@@ -12,11 +12,9 @@ public class EMP : NetworkBehaviour
         RaycastHit2D[] hits = Physics2D.CircleCastAll(transform.position, 40f, Vector2.zero, Mathf.Infinity, enemyLayer);
         if (hits.Length > 0)
         {
-            Debug.Log(hits.Length);
             foreach (var hit in hits)
             {
                 hit.collider.gameObject.GetComponent<Enemy>().EMPHit();
-                Debug.Log("Hit object: " + hit.collider.gameObject.name);
             }
         }
     }

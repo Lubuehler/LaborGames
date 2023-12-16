@@ -48,10 +48,10 @@ public class Player : NetworkBehaviour
     [Networked] public float currentHealth { get; set; }
 
     //Items & SpecialAttacks
-    [Networked] public NetworkLinkedList<Guid> items { get; }
+    [Networked] public NetworkLinkedList<int> items { get; }
 
-    [Networked] public NetworkLinkedList<Guid> specialAttacks { get; }
-    [Networked] public Guid selectedSpecialAttack { get; set; }
+    [Networked] public NetworkLinkedList<int> specialAttacks { get; }
+    [Networked] public int selectedSpecialAttack { get; set; }
 
     // Actions
     public event Action OnStatsChanged;
@@ -81,7 +81,7 @@ public class Player : NetworkBehaviour
     public void RPC_Configure(string playerName)
     {
         this.playerName = playerName;
-        selectedSpecialAttack = Guid.Empty;
+        selectedSpecialAttack = int.MinValue;
 
         int margin = 2;
         _nrb2d.TeleportToPosition(new Vector2((GetComponentInChildren<SpriteRenderer>().size.x + margin) * lobbyNo, 0));
@@ -277,18 +277,23 @@ public class Player : NetworkBehaviour
         ready = false;
 
         //Special attacks
-        selectedSpecialAttack = Guid.Empty;
+        selectedSpecialAttack = int.MinValue;
         specialAttacks.Clear();
     }
 
-    [Rpc(sources: RpcSources.InputAuthority, targets: RpcTargets.StateAuthority)]
-    public void RPC_ApplyItem(Guid id)
+    [Rpc(sources: RpcSources.InputAuthority, targets: RpcTargets.All)]
+    public void RPC_ApplyItem(int id)
     {
-        Item item = ShopSystem.Instance.items.FirstOrDefault(item => item.id == id);
+        print("Selected: "+id);
+        Item item = ShopSystem.Instance.items.FirstOrDefault(item => item.itemID == id);
+        foreach (Item test in ShopSystem.Instance.items) 
+        {
+            print(test.itemID);
+        }
         print(item);
         if (item.itemType == ItemType.SpecialAttack)
         {
-            specialAttacks.Add(item.id);
+            specialAttacks.Add(item.itemID);
         }
         else if (item.itemType == ItemType.Item)
         {
@@ -324,7 +329,7 @@ public class Player : NetworkBehaviour
     }
 
     [Rpc(sources: RpcSources.InputAuthority, targets: RpcTargets.StateAuthority)]
-    public void RPC_SetSelectedSpecialAttack(Guid id)
+    public void RPC_SetSelectedSpecialAttack(int id)
     {
         this.selectedSpecialAttack = id;
         Debug.Log(this.selectedSpecialAttack);
