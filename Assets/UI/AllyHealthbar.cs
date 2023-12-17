@@ -59,7 +59,6 @@ public class AllyHealthbar : MonoBehaviour
             {
                 standardWidth = allyBarInitialWidth;
                 playerName.text = player.playerName;
-                print("player name: "+ playerName.text);
             }
 
             player.OnHealthChanged += UpdateHealthBar;

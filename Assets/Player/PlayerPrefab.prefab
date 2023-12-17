@@ -112,6 +112,7 @@ GameObject:
   - component: {fileID: 4367411694323758693}
   - component: {fileID: 2754143876365907347}
   - component: {fileID: 2734766463685694589}
+  - component: {fileID: 890382369318792739}
   m_Layer: 7
   m_Name: PlayerPrefab
   m_TagString: Untagged
@@ -176,6 +177,7 @@ MonoBehaviour:
   - {fileID: 6722568458623865022}
   - {fileID: 8103653053424819092}
   - {fileID: 2754143876365907347}
+  - {fileID: 890382369318792739}
   SimulationBehaviours: []
 --- !u!114 &8103653053424819092
 MonoBehaviour:
@@ -191,17 +193,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _interpolationDataSource: 0
   deathExplosionPrefab: {fileID: 1121192042590650, guid: 1338e286d1686e247aa85314408fe635, type: 3}
-  enemyMask:
-    serializedVersion: 2
-    m_Bits: 64
   coinMask:
     serializedVersion: 2
     m_Bits: 256
-  _projectilePrefab: {fileID: 1350390008315525890, guid: 95fb6b4a33b3a6543bcec83d35c8c1bf, type: 3}
   tiltAmount: 15
   background: {fileID: 0}
-  empPrefab: {fileID: 1329845292236604, guid: 87914b4f3f298e541968506f49f26089, type: 3}
-  isShooting: 1
   _isAlive: 0
   _playerName: 
   _ready: 0
@@ -218,6 +214,7 @@ MonoBehaviour:
   _armor: 0
   _range: 0
   _currentHealth: 0
+  _items: 
 --- !u!50 &4367411694323758693
 Rigidbody2D:
   serializedVersion: 4
@@ -308,3 +305,23 @@ CapsuleCollider2D:
   m_Offset: {x: 0.026425494, y: 0.07794852}
   m_Size: {x: 1.8876116, y: 0.86227536}
   m_Direction: 1
+--- !u!114 &890382369318792739
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8443049997164568140}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7756947002340984e9f6738693cf4e2f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _interpolationDataSource: 0
+  _projectilePrefab: {fileID: 1350390008315525890, guid: 95fb6b4a33b3a6543bcec83d35c8c1bf, type: 3}
+  enemyMask:
+    serializedVersion: 2
+    m_Bits: 64
+  empPrefab: {fileID: 1329845292236604, guid: 87914b4f3f298e541968506f49f26089, type: 3}
+  _specialAttacks: 
+  _selectedSpecialAttack: 0

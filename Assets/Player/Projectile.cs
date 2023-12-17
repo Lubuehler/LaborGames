@@ -13,6 +13,15 @@ public class Projectile : NetworkBehaviour
     public void Fire(Vector2 direction)
     {
         _rigidbody.Rigidbody.velocity = direction * speed;
+
+        StartCoroutine(DestroyAfterTime());
+    }
+
+
+    IEnumerator DestroyAfterTime()
+    {
+        yield return new WaitForSeconds(5);
+        Runner.Despawn(this.GetComponent<NetworkObject>());
     }
 
     protected void Awake()

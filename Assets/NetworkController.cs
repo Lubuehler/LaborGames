@@ -17,7 +17,7 @@ public class NetworkController : MonoBehaviour, INetworkRunnerCallbacks
     // Session stuff
     public List<SessionInfo> sessionList;
     public SessionInfo currentSession;
-    
+
     // Actions
     public event Action OnSessionListChanged;
     public event Action OnPlayerListChanged;
@@ -64,7 +64,7 @@ public class NetworkController : MonoBehaviour, INetworkRunnerCallbacks
             PlayerCount = 4
         });
 
-        this.currentSession = _runner.SessionInfo;
+        currentSession = _runner.SessionInfo;
         return result;
     }
 
@@ -104,6 +104,8 @@ public class NetworkController : MonoBehaviour, INetworkRunnerCallbacks
 
         if (Input.GetKey(KeyCode.D))
             data.direction += Vector2.right;
+
+        data.buttons.Set(MyButtons.SpecialAttack, Input.GetKey(KeyCode.Space));
 
         input.Set(data);
     }
@@ -163,4 +165,9 @@ public class NetworkController : MonoBehaviour, INetworkRunnerCallbacks
 public struct NetworkInputData : INetworkInput
 {
     public Vector2 direction;
+    public NetworkButtons buttons;
+}
+
+enum MyButtons {
+    SpecialAttack = 0,
 }

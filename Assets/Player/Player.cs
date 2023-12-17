@@ -5,23 +5,16 @@ using System.Collections.Generic;
 using System;
 using System.Linq;
 
-
-
 public class Player : NetworkBehaviour
 {
     [SerializeField] private GameObject deathExplosionPrefab;
-    [SerializeField] private LayerMask enemyMask;
     [SerializeField] private LayerMask coinMask;
-    [SerializeField] public Projectile _projectilePrefab;
     [SerializeField] private float tiltAmount = 15.0f;
     [SerializeField] private GameObject background;
-    [SerializeField] private GameObject empPrefab;
 
     private NetworkRigidbody2D _nrb2d;
     private SpriteRenderer _spriteRenderer;
     private CapsuleCollider2D _capsuleCollider;
-    private float currentTime;
-    public bool isShooting = false;
 
     [Networked] public bool isAlive { get; set; }
     [Networked(OnChanged = nameof(PlayerInfoChanged))]
@@ -47,16 +40,14 @@ public class Player : NetworkBehaviour
     [Networked] public float range { get; set; }
     [Networked] public float currentHealth { get; set; }
 
-    //Items & SpecialAttacks
-    [Networked] public NetworkLinkedList<int> items { get; }
-
-    [Networked] public NetworkLinkedList<int> specialAttacks { get; }
-    [Networked] public int selectedSpecialAttack { get; set; }
+    //Items
+    [Networked, Capacity(20)] public NetworkLinkedList<int> items { get; }
 
     // Actions
     public event Action OnStatsChanged;
     public event Action<float, float> OnHealthChanged;
     public event Action<int> OnCoinsChanged;
+
 
     private void Awake()
     {
@@ -67,10 +58,10 @@ public class Player : NetworkBehaviour
 
     public override void Spawned()
     {
-        this.isAlive = true;
+        isAlive = true;
         if (HasInputAuthority)
         {
-            Camera.main.GetComponent<CameraScript>().target = this.gameObject.GetComponent<NetworkObject>();
+            Camera.main.GetComponent<CameraScript>().target = gameObject.GetComponent<NetworkObject>();
             RPC_Configure(DataController.Instance.playerData.playerName);
             LevelController.Instance.localPlayer = this;
         }
@@ -81,7 +72,8 @@ public class Player : NetworkBehaviour
     public void RPC_Configure(string playerName)
     {
         this.playerName = playerName;
-        selectedSpecialAttack = int.MinValue;
+
+        GetBehaviour<Weapon>().selectedSpecialAttack = int.MinValue;
 
         int margin = 2;
         _nrb2d.TeleportToPosition(new Vector2((GetComponentInChildren<SpriteRenderer>().size.x + margin) * lobbyNo, 0));
@@ -120,30 +112,13 @@ public class Player : NetworkBehaviour
             float tilt = data.direction.x * -tiltAmount;
             transform.rotation = Quaternion.Euler(0, 0, tilt);
 
-            //float clampedX = Mathf.Clamp(transform.position.x, minX + width / 2, maxX - width / 2);
+            // float clampedX = Mathf.Clamp(transform.position.x, minX + width / 2, maxX - width / 2);
             // float clampedY = Mathf.Clamp(transform.position.y, minY + height / 2, maxY - height / 2);
             // transform.position = new Vector2(clampedX, clampedY);
         }
         else
         {
             _nrb2d.Rigidbody.velocity = new Vector2(0, 0);
-        }
-    }
-
-    private void Fire(NetworkObject target)
-    {
-        if (target != null)
-        {
-            Vector3 direction = target.transform.position - _nrb2d.transform.position;
-
-            Quaternion rotation = Quaternion.LookRotation(Vector3.forward, direction);
-
-            var projectile = Runner.Spawn(_projectilePrefab, _nrb2d.transform.position, rotation, Object.InputAuthority);
-
-            if (projectile != null)
-            {
-                projectile.Fire(direction.normalized);
-            }
         }
     }
 
@@ -165,52 +140,14 @@ public class Player : NetworkBehaviour
 
     public override void Render()
     {
-        if (isShooting && isAlive)
-        {
-            currentTime += Time.deltaTime;
-            if (currentTime >= 1f / attackSpeed)
-            {
-                Fire(findNearestEnemy());
-                currentTime = 0f;
-            }
-        }
         _spriteRenderer.enabled = isAlive;
         _capsuleCollider.enabled = isAlive;
 
     }
 
-    private NetworkObject findNearestEnemy()
-    {
-        // Calculate the bounds of the camera's view
-        float height = 2f * Camera.main.orthographicSize;
-        float width = height * Camera.main.aspect;
-        Vector2 boxSize = new Vector2(width, height);
-        Vector2 boxCenter = transform.position;
-
-        // Get all colliders within the camera's view
-        Collider2D[] hitColliders = Physics2D.OverlapBoxAll(boxCenter, boxSize, Camera.main.transform.eulerAngles.z, enemyMask);
-
-        float minDistance = float.MaxValue;
-        NetworkObject closestEnemy = null;
-        foreach (var enemy in hitColliders)
-        {
-            if (enemy != null)
-            {
-                Vector3 direction = enemy.transform.position - _nrb2d.transform.position;
-                float distance = direction.magnitude;
-
-                if (distance < minDistance)
-                {
-                    minDistance = distance;
-                    closestEnemy = enemy.GetComponent<NetworkObject>();
-                }
-            }
-        }
-        return closestEnemy;
-    }
-
     public void TakeDamage(float damage)
     {
+        damage = 0;
         float prev = currentHealth;
         currentHealth -= damage;
         currentHealth = Mathf.Clamp(currentHealth, 0, maxHealth);
@@ -277,67 +214,46 @@ public class Player : NetworkBehaviour
         ready = false;
 
         //Special attacks
-        selectedSpecialAttack = int.MinValue;
-        specialAttacks.Clear();
+        //selectedSpecialAttack = int.MinValue;
+        //specialAttacks.Clear();
     }
 
     [Rpc(sources: RpcSources.InputAuthority, targets: RpcTargets.All)]
     public void RPC_ApplyItem(int id)
     {
-        print("Selected: "+id);
-        Item item = ShopSystem.Instance.items.FirstOrDefault(item => item.itemID == id);
-        foreach (Item test in ShopSystem.Instance.items) 
-        {
-            print(test.itemID);
-        }
-        print(item);
-        if (item.itemType == ItemType.SpecialAttack)
-        {
-            specialAttacks.Add(item.itemID);
-        }
-        else if (item.itemType == ItemType.Item)
+        Item item = ShopSystem.Instance.allItems.FirstOrDefault(item => item.itemID == id);
+        if (item != null)
         {
             foreach (StatModifier modifier in item.modifiers)
             {
                 switch (modifier.statName)
                 {
                     case "Max Health":
-                        this.maxHealth += modifier.value; break;
+                        maxHealth += modifier.value; break;
                     case "Attack Damage":
-                        this.attackDamage += modifier.value; break;
+                        attackDamage += modifier.value; break;
                     case "Attack Speed":
-                        this.attackSpeed += modifier.value; break;
+                        attackSpeed += modifier.value; break;
                     case "Crit Chance":
-                        this.critChance += modifier.value; break;
+                        critChance += modifier.value; break;
                     case "Crit Damage":
-                        this.critDamageMultiplier += modifier.value; break;
+                        critDamageMultiplier += modifier.value; break;
                     case "Movement Speed":
-                        this.movementSpeed += modifier.value; break;
+                        movementSpeed += modifier.value; break;
                     case "Luck":
-                        this.luck += modifier.value; break;
+                        luck += modifier.value; break;
                     case "Armor":
-                        this.armor += modifier.value; break;
+                        armor += modifier.value; break;
                     case "Range":
-                        this.range += modifier.value; break;
+                        range += modifier.value; break;
                     default:
                         Debug.LogError("Unknown Stat Modifier Name: Check the Item Description for Spelling"); break;
 
                 }
             }
+            items.Add(item.itemID);
             OnStatsChanged?.Invoke();
         }
-    }
-
-    [Rpc(sources: RpcSources.InputAuthority, targets: RpcTargets.StateAuthority)]
-    public void RPC_SetSelectedSpecialAttack(int id)
-    {
-        this.selectedSpecialAttack = id;
-        Debug.Log(this.selectedSpecialAttack);
-    }
-
-    public void DeployEMP()
-    {
-        Runner.Spawn(empPrefab, transform.position, transform.rotation);
     }
 
     [Rpc(RpcSources.All, RpcTargets.All)]

@@ -4820,8 +4820,8 @@ GameObject:
   - component: {fileID: 198856239026640498}
   - component: {fileID: 199756426985724656}
   - component: {fileID: -5685511407878507400}
-  - component: {fileID: 7087702022249878401}
   - component: {fileID: 4635942137855183454}
+  - component: {fileID: 7714772006602470925}
   m_Layer: 9
   m_Name: EMP
   m_TagString: Untagged
@@ -4837,8 +4837,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1329845292236604}
   serializedVersion: 2
-  m_LocalRotation: {x: -0.7071068, y: -0, z: -0, w: 0.7071068}
-  m_LocalPosition: {x: -14.178918, y: -5.477441, z: -20.589817}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 15, y: 15, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -4846,7 +4846,7 @@ Transform:
   - {fileID: 4194869439727390}
   - {fileID: 4496030710472106}
   m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: -90, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!198 &198856239026640498
 ParticleSystem:
   m_ObjectHideFlags: 0
@@ -4857,7 +4857,7 @@ ParticleSystem:
   serializedVersion: 8
   lengthInSec: 2
   simulationSpeed: 0.75
-  stopAction: 2
+  stopAction: 3
   cullingMode: 3
   ringBufferMode: 0
   ringBufferLoopRange: {x: 0, y: 1}
@@ -9761,10 +9761,26 @@ MonoBehaviour:
     RawGuidValue: 87914b4f3f298e541968506f49f26089
   NestedObjects: []
   NetworkedBehaviours:
-  - {fileID: 7087702022249878401}
   - {fileID: 4635942137855183454}
+  - {fileID: 7714772006602470925}
   SimulationBehaviours: []
---- !u!114 &7087702022249878401
+--- !u!114 &4635942137855183454
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1329845292236604}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 19ab39fa62b7a134e9330638ea303497, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _interpolationDataSource: 0
+  enemyLayer:
+    serializedVersion: 2
+    m_Bits: 64
+--- !u!114 &7714772006602470925
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -9792,22 +9808,6 @@ MonoBehaviour:
     RotTeleportRadians: 1.5
   UseLegacySharedModeInterpolation: 0
   TargetInterpolationDelay: 0.03
---- !u!114 &4635942137855183454
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1329845292236604}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 19ab39fa62b7a134e9330638ea303497, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _interpolationDataSource: 0
-  enemyLayer:
-    serializedVersion: 2
-    m_Bits: 64
 --- !u!1 &1367458547200666
 GameObject:
   m_ObjectHideFlags: 0
