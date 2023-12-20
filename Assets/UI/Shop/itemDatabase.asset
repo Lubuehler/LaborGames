@@ -13,7 +13,8 @@ MonoBehaviour:
   m_Name: itemDatabase
   m_EditorClassIdentifier: 
   items:
-  - itemName: Long Sword
+  - itemID: 0
+    itemName: Long Sword
     price: 3
     description: 
     color: {r: 1, g: 1, b: 1, a: 0.4}
@@ -21,15 +22,17 @@ MonoBehaviour:
     - statName: Attack Damage
       value: 10
     itemType: 0
-  - itemName: Dagger
+  - itemID: 1
+    itemName: Dagger
     price: 3
     description: 
     color: {r: 1, g: 1, b: 1, a: 0.4}
     modifiers:
     - statName: Attack Speed
-      value: 10
+      value: 0
     itemType: 0
-  - itemName: Recurve Bow
+  - itemID: 2
+    itemName: Recurve Bow
     price: 10
     description: 
     color: {r: 1, g: 1, b: 1, a: 0.4}
@@ -39,7 +42,8 @@ MonoBehaviour:
     - statName: Attack Speed
       value: 20
     itemType: 0
-  - itemName: EMP
+  - itemID: 3
+    itemName: EMP
     price: 30
     description: EMP
     color: {r: 0.58265877, g: 0, b: 1, a: 0.4}

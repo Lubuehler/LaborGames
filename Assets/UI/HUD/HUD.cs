@@ -42,6 +42,8 @@ public class HUD : MonoBehaviour
         {
             specialAttack.SetActive(true);
         }
+
+        OnPlayerListChanged();
     }
 
     private void Update()

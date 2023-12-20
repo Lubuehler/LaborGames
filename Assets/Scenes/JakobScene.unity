@@ -17492,7 +17492,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 189319974}
         m_TargetAssemblyTypeName: ShopMenu, Assembly-CSharp
-        m_MethodName: onRessurectClicked
+        m_MethodName: OnRessurectClicked
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}

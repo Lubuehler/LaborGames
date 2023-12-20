@@ -200,6 +200,8 @@ public class Player : NetworkBehaviour
     [Rpc(RpcSources.All, RpcTargets.All)]
     public void RpcRessurect()
     {
+        print("ressurected " + playerName);
+
         isAlive = true;
         Heal(maxHealth);
 
@@ -212,6 +214,7 @@ public class Player : NetworkBehaviour
     [Rpc(RpcSources.All, RpcTargets.All)]
     public void RpcReset()
     {
+        print("reset " + playerName);
         RPC_Configure(playerName);
         RpcRessurect();
         lobbyReady = false;
@@ -222,10 +225,16 @@ public class Player : NetworkBehaviour
         //specialAttacks.Clear();
     }
 
-    [Rpc(sources: RpcSources.InputAuthority, targets: RpcTargets.All)]
+    [Rpc(sources: RpcSources.All, targets: RpcTargets.All)]
     public void RPC_ApplyItem(int id)
     {
+        print("applied item " + id);
+        foreach ( Item item1 in ShopSystem.Instance.allItems)
+        {
+            print("allitems: id " + item1.itemID);
+        }
         Item item = ShopSystem.Instance.allItems.FirstOrDefault(item => item.itemID == id);
+        print("item id" + item.itemID);
         if (item != null)
         {
             foreach (StatModifier modifier in item.modifiers)

@@ -18,7 +18,7 @@ public class LobbyMenu : MonoBehaviour
     void OnEnable()
     {
         ready = false;
-        LevelController.Instance.localPlayer.lobbyReady = false;
+        //LevelController.Instance.localPlayer.lobbyReady = false;
         readyButton.GetComponent<Button>().interactable = true;
         readyButton.transform.GetChild(0).GetComponent<TMP_Text>().text = "Ready";
 
