@@ -175,7 +175,7 @@ public class ShopMenu : MonoBehaviour
     public void OnGoClick()
     {
         goButton.interactable = false;
-        LevelController.Instance.RPC_Ready(NetworkController.Instance.GetLocalPlayerObject(), true);
+        LevelController.Instance.RPC_ShopReady(NetworkController.Instance.GetLocalPlayerObject(), true);
     }
 
     public void OnRessurectClicked()

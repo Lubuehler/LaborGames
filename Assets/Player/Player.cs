@@ -27,10 +27,17 @@ public class Player : NetworkBehaviour
     [Networked(OnChanged = nameof(PlayerInfoChanged))]
     public string playerName { get; set; }
 
+
+
     [Networked(OnChanged = nameof(PlayerInfoChanged))]
-    public bool ready { get; set; }
+    public bool lobbyReady { get; set; }
+
+
     public int lobbyNo;
     public static Player localPlayer;
+
+    [Networked]
+    public bool shopReady { get; set; }
 
 
     // Player Stats
@@ -48,9 +55,9 @@ public class Player : NetworkBehaviour
     [Networked] public float currentHealth { get; set; }
 
     //Items & SpecialAttacks
-    [Networked] public NetworkLinkedList<int> items { get; }
+    [Networked, Capacity(20)] public NetworkLinkedList<int> items { get; }
 
-    [Networked] public NetworkLinkedList<int> specialAttacks { get; }
+    [Networked, Capacity(20)] public NetworkLinkedList<int> specialAttacks { get; }
     [Networked] public int selectedSpecialAttack { get; set; }
 
     // Actions
@@ -77,7 +84,7 @@ public class Player : NetworkBehaviour
         LevelController.Instance.RpcPlayerSpawned(this);
     }
 
-    [Rpc(sources: RpcSources.InputAuthority, targets: RpcTargets.StateAuthority)]
+    [Rpc(sources: RpcSources.All, targets: RpcTargets.StateAuthority)]
     public void RPC_Configure(string playerName)
     {
         this.playerName = playerName;
@@ -274,7 +281,8 @@ public class Player : NetworkBehaviour
     {
         RPC_Configure(playerName);
         RpcRessurect();
-        ready = false;
+        lobbyReady = false;
+        shopReady = false;
 
         //Special attacks
         selectedSpecialAttack = int.MinValue;
@@ -324,6 +332,7 @@ public class Player : NetworkBehaviour
 
                 }
             }
+            items.Add(item.itemID);
             OnStatsChanged?.Invoke();
         }
     }

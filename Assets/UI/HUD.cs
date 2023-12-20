@@ -207,4 +207,9 @@ public class HUD : MonoBehaviour
         arrow.transform.rotation = Quaternion.Euler(new Vector3(0, 0, angle + 90)); // Adjusting by -90 degrees if arrow graphic points up
     }
 
+    public void OnDebugDieClick()
+    {
+        LevelController.Instance.localPlayer.TakeDamage(1000);
+    }
+
 }

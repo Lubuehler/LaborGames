@@ -18,11 +18,13 @@ public class LobbyMenu : MonoBehaviour
     void OnEnable()
     {
         ready = false;
+        LevelController.Instance.localPlayer.lobbyReady = false;
         readyButton.GetComponent<Button>().interactable = true;
         readyButton.transform.GetChild(0).GetComponent<TMP_Text>().text = "Ready";
 
         header.text = NetworkController.Instance.currentSession.Name;
         NetworkController.Instance.OnPlayerListChanged += UpdatePlayerList;
+        buttonEnabled = true;
         UpdatePlayerList();
     }
 
@@ -48,7 +50,7 @@ public class LobbyMenu : MonoBehaviour
             NetworkObject networkObject = _runner.GetPlayerObject(player);
             GameObject g = Instantiate(row, elementParent);
             g.transform.GetChild(0).GetComponent<TMP_Text>().text = networkObject.GetComponent<Player>().playerName;
-            if (networkObject.GetComponent<Player>().ready)
+            if (networkObject.GetComponent<Player>().lobbyReady)
             {
                 g.transform.GetChild(1).gameObject.SetActive(true);
             }
@@ -75,8 +77,9 @@ public class LobbyMenu : MonoBehaviour
                 ready = true;
                 readyButton.transform.GetChild(0).GetComponent<TMP_Text>().text = "Unready";
             }
-            LevelController.Instance.RPC_Ready(NetworkController.Instance.GetLocalPlayerObject(), ready);
             StartCoroutine(EnableButtonAfterDelay(1.0f));
+            LevelController.Instance.RPC_Ready(NetworkController.Instance.GetLocalPlayerObject(), ready);
+            
         }
     }
 

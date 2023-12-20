@@ -16,12 +16,13 @@ public class LevelController : NetworkBehaviour
 
     [Networked]
     public int currentWave { get; set; }
-    private float waveDuration = 10f;
+    private float waveDuration = 5f;
     private float waveDurationIncrease = 2f;
 
     private float waveEndTime; // Time when the current wave will end
 
-    [Networked(OnChanged = nameof(ShowGame))]
+    //[Networked(OnChanged = nameof(ShowGame))]
+    [Networked]
     public bool waveInProgress { get; set; }
 
     [Networked]
@@ -32,6 +33,9 @@ public class LevelController : NetworkBehaviour
     public List<Player> players {get; private set; } = new List<Player>();
 
     public event Action OnPlayerListChanged;
+
+    [Networked]
+    public bool isShopping { get; private set; }
 
 
     private void Awake()
@@ -75,39 +79,69 @@ public class LevelController : NetworkBehaviour
         //}
         if (Runner.IsServer)
         {
-            networkObject.GetComponent<Player>().ready = ready;
+            networkObject.GetComponent<Player>().lobbyReady = ready;
             
 
             bool allPlayersReady = true;
-            List<PlayerRef> players = new List<PlayerRef>(Runner.ActivePlayers);
-            foreach (PlayerRef player in players)
+            foreach (Player player in players)
             {
-                if (!Runner.GetPlayerObject(player).GetComponent<Player>().ready)
+                if (!player.lobbyReady)
                 {
                     allPlayersReady = false;
                 }
                 
             }
             if (allPlayersReady)
-            {
-                if (!gameRunning)
+            {                  
+                StartLevel();
+                RpcShowGame();
+                Runner.SessionInfo.IsVisible = false;
+                foreach (Player player in players)
                 {
-                    
-                    StartLevel();
-                    Runner.SessionInfo.IsVisible = false;
+                    player.lobbyReady = false;
 
-                    foreach (PlayerRef player in players)
-                    {
-                        Runner.GetPlayerObject(player).GetComponent<Player>().ready = false;
-                        
-                    }
                 }
-                else
-                {
-                    StartNextWave();
-                }
+
             }
         }
+    }
+
+    [Rpc(RpcSources.All, RpcTargets.StateAuthority)]
+    public void RPC_ShopReady(NetworkObject playerObject, bool ready)
+    {
+        playerObject.GetComponent<Player>().shopReady = ready;
+
+
+        bool allPlayersReady = true;
+        foreach (Player player in players)
+        {
+            if (!player.shopReady)
+            {
+                allPlayersReady = false;
+            }
+
+        }
+        if (allPlayersReady)
+        {
+            RpcEndShoppingPhase();
+
+            StartNextWave();
+            foreach (Player player in players)
+            {
+                player.shopReady = false;
+
+            }
+        }
+    }
+
+    [Rpc(RpcSources.All, RpcTargets.All)]
+    private void RpcEndShoppingPhase ()
+    {
+
+        RpcShowGame();
+        
+        isShopping = false;
+
     }
 
 
@@ -120,7 +154,7 @@ public class LevelController : NetworkBehaviour
         StartCoroutine(WaveRoutine(waveDuration));
     }
 
-    [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
+    [Rpc(RpcSources.All, RpcTargets.All)]
     private void RpcEndWave()
     {
         waveInProgress = false;
@@ -147,7 +181,7 @@ public class LevelController : NetworkBehaviour
 
         RpcEndWave();
         print("wave ended");
-        if (gameRunning)
+        if (gameRunning && GetLivingPlayers().Count() != 0)
         {
             print("shopping now");
             RpcEnterShoppingPhase();
@@ -158,6 +192,7 @@ public class LevelController : NetworkBehaviour
     [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
     private void RpcEnterShoppingPhase()
     {
+        isShopping = true;
         UIController.Instance.ShowUIElement(UIElement.Shop);
     }
 
@@ -202,14 +237,16 @@ public class LevelController : NetworkBehaviour
         if (GetLivingPlayers().Count == 0)
         {
             RpcGameOver();
+
+      
         }
-        else if (localPlayer == player)
+        else if (localPlayer == player && !isShopping && gameRunning)
         {
            StartSpectator();
         }
     }
 
-    [Rpc(RpcSources.All, RpcTargets.All)]
+    [Rpc]
     public void RpcGameOver()
     {
         RpcEndWave();
@@ -248,19 +285,19 @@ public class LevelController : NetworkBehaviour
     }
 
 
-    private static void ShowGame(Changed<LevelController> changed)
+    [Rpc]
+    private void RpcShowGame()
     {
-        if (changed.Behaviour.waveInProgress)
+
+        if (NetworkController.Instance.GetLocalPlayerObject().GetComponent<Player>().isAlive)
         {
-            if (NetworkController.Instance.GetLocalPlayerObject().GetComponent<Player>().isAlive)
-            {
-                UIController.Instance.ShowUIElement(UIElement.Game);
-            }
-            else
-            {
-                LevelController.Instance.StartSpectator();
-            }
+            UIController.Instance.ShowUIElement(UIElement.Game);
         }
+        else
+        {
+            StartSpectator();
+        }
+        
     }
 
     public List<Player> GetLivingPlayers()
