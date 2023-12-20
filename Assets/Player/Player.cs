@@ -152,8 +152,6 @@ public class Player : NetworkBehaviour
 
     public void TakeDamage(float damage)
     {
-        damage = 0;
-        float prev = currentHealth;
         currentHealth -= damage;
         currentHealth = Mathf.Clamp(currentHealth, 0, maxHealth);
         RpcHealthChanged();

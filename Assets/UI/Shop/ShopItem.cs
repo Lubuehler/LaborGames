@@ -50,7 +50,6 @@ public class ShopItem : MonoBehaviour
 
     public void OnClick()
     {
-        print("CLICK");
         if (ShopSystem.Instance.CanAfford(item.price))
         {
             ShopSystem.Instance.BuyItem(item);
