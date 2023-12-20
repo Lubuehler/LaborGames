@@ -84,7 +84,7 @@ public class Jet : Enemy
 
                     // Find end of looping motion
                     RaycastHit2D hit = Physics2D.Raycast(transform.position, networkRigidbody2D.Rigidbody.velocity, Mathf.Infinity, playerLayerMask);
-                    if (hit.collider != null)
+                    if (hit.collider != null && hit.transform.gameObject.GetComponent<NetworkObject>().NetworkGuid == currentTarget.NetworkGuid)
                     {
                         Invoke("FlipJet", 0.1f);
 

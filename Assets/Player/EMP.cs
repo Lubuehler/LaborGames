@@ -18,4 +18,9 @@ public class EMP : NetworkBehaviour
             }
         }
     }
+
+    void OnParticleSystemStopped()
+    {
+        Runner.Despawn(GetComponent<NetworkObject>());
+    }
 }

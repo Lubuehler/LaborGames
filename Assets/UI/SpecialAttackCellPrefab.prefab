@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 2960599162738332191}
   - component: {fileID: -5758958977131947810}
   m_Layer: 0
-  m_Name: SpecialAttackItem
+  m_Name: SpecialAttackCellPrefab
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

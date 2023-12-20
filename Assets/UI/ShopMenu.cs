@@ -29,48 +29,16 @@ public class ShopMenu : MonoBehaviour
     [SerializeField] private GameObject shopItemPrefab;
 
 
-    [SerializeField] private LayoutGroup specialAttackGroup;
-    [SerializeField] private GameObject specialAttackPrefab;
+    [SerializeField] private LayoutGroup specialAttackCellGroup;
+    [SerializeField] private GameObject specialAttackCellPrefab;
 
-    // private void Start()
-    // {
-    //     player = NetworkController.Instance.GetLocalPlayerObject().GetComponent<Player>();
-    //     if (player == null)
-    //     {
-    //         Debug.Log("wrong order; player not initialised in ShopMenu Awake");
-    //         return;
-    //     }
-    //     statMappings = new Dictionary<string, Func<Player, string>>
-    //     {
-    //         { "Max Health", p => p.maxHealth.ToString() },
-    //         { "Attack Damage", p => p.attackDamage.ToString("F2") },
-    //         { "Attack Speed", p => p.attackSpeed.ToString("F2") },
-    //         { "Crit Chance", p=> p.critChance.ToString("F2") },
-    //         { "Crit Damage Multiplier", p=> p.critDamageMultiplier.ToString("F2") },
-    //         { "Dodge Chance", p=> p.dodgeChance.ToString("F2") },
-    //         { "Movement Speed", p => p.movementSpeed.ToString("F2") },
-    //         { "Armor", p => p.armor.ToString("F2")  },
-    //         { "Range", p => p.range.ToString()  }
-
-    //     };
-
-    //     statRows = new Dictionary<string, StatRow>();
-
-    //     foreach (var mapping in statMappings)
-    //     {
-    //         InstantiateStatRow(mapping.Key);
-    //     }
-    //     this.wave.text = "Shop (Wave " + LevelController.Instance.currentWave.ToString() + ")";
-    //     this.coins.text = player.coins.ToString();
-
-    //     RandomizeShop();
-    // }
-
-    private bool initialised = false;
+    [SerializeField] private LayoutGroup itemCellGroup;
+    [SerializeField] private GameObject itemCellPrefab;
+    private bool initialized = false;
 
     private void OnEnable()
     {
-        if (!initialised)
+        if (!initialized)
         {
             player = NetworkController.Instance.GetLocalPlayerObject().GetComponent<Player>();
             if (player == null)
@@ -97,13 +65,10 @@ public class ShopMenu : MonoBehaviour
             {
                 InstantiateStatRow(mapping.Key);
             }
-            initialised = true;
+            initialized = true;
         }
-        
-        // new
 
-        ShopSystem.Instance.OnSpecialAbilitiesChanged += UpdateSpecialAbilities;
-
+        ShopSystem.Instance.OnSpecialAttacksChanged += UpdateSpecialAttacks;
 
         goButton.interactable = true;
         if (player != null)
@@ -146,7 +111,7 @@ public class ShopMenu : MonoBehaviour
         {
             player.OnStatsChanged -= UpdateStats;
         }
-        ShopSystem.Instance.OnSpecialAbilitiesChanged -= UpdateSpecialAbilities;
+        ShopSystem.Instance.OnSpecialAttacksChanged -= UpdateSpecialAttacks;
     }
 
     private void InstantiateStatRow(string propertyName)
@@ -201,7 +166,7 @@ public class ShopMenu : MonoBehaviour
         {
             GameObject itemVis = Instantiate(shopItemPrefab);
             itemVis.transform.SetParent(itemGroup.transform, false);
-            itemVis.GetComponent<ShopItem>().SetItem(item);
+            itemVis.GetComponentInChildren<ShopItem>().SetItem(item);
         }
     }
 
@@ -210,7 +175,7 @@ public class ShopMenu : MonoBehaviour
         itemList.Clear();
 
         List<Item> itemPool = new();
-        itemPool.AddRange(ShopSystem.Instance.items);
+        itemPool.AddRange(ShopSystem.Instance.availableItems);
 
         for (int i = 0; i < 3; i++)
         {
@@ -221,16 +186,23 @@ public class ShopMenu : MonoBehaviour
         UpdateDisplayedItems();
     }
 
-    public void UpdateSpecialAbilities()
+    public void UpdateSpecialAttacks(int itemID)
     {
-        Player localPlayer = NetworkController.Instance.GetLocalPlayerObject().GetComponent<Player>();
-        foreach(int id in localPlayer.specialAttacks)
+        Item item = ShopSystem.Instance.allItems.FirstOrDefault(item => item.itemID == itemID);
+        if (item != null)
         {
-            Item item = ShopSystem.Instance.items.FirstOrDefault(item => item.itemID == id);
-            GameObject itemVis = Instantiate(specialAttackPrefab);
-            itemVis.transform.SetParent(specialAttackGroup.transform, false);
-            itemVis.GetComponent<SpecialAttackItem>().Initialize(item);
-            itemVis.GetComponentInChildren<TMP_Text>().text = item.itemName;
+            if (item.itemType == ItemType.SpecialAttack)
+            {
+                GameObject itemVis = Instantiate(specialAttackCellPrefab);
+                itemVis.transform.SetParent(specialAttackCellGroup.transform, false);
+                itemVis.GetComponent<SpecialAttackCell>().Initialize(item);
+            }
+            else if(item.itemType == ItemType.Item)
+            {
+                GameObject itemVis = Instantiate(itemCellPrefab);
+                itemVis.transform.SetParent(itemCellGroup.transform, false);
+                itemVis.GetComponent<ItemCell>().Initialize(item);
+            }
         }
     }
 }

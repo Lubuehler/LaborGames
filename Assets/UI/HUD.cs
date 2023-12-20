@@ -22,29 +22,26 @@ public class HUD : MonoBehaviour
 
     private bool playerListSubscribed = false;
 
-
     private bool initialized = false;
 
-    private float animationDuration = 2f;
     private float initialHeight;
-    private float specialAttackTimer;
-    private bool specialAttackAvailable;
+
+    private Weapon weapon;
 
     public void OnEnable()
     {
-        if(!initialized) 
+        if (!initialized)
         {
             initialHeight = loadingOverlay.GetComponent<RectTransform>().rect.height;
             initialized = true;
         }
-        
-        if (LevelController.Instance.localPlayer.selectedSpecialAttack != int.MinValue)
+
+        weapon = LevelController.Instance.localPlayer.GetBehaviour<Weapon>();
+
+        if (weapon.selectedSpecialAttack != int.MinValue)
         {
             specialAttack.SetActive(true);
-            ResetLoadingAnimation();
         }
-        specialAttackAvailable = false;
-        Debug.Log("OnEnable");
     }
 
     private void Update()
@@ -61,23 +58,8 @@ public class HUD : MonoBehaviour
 
         if (specialAttack.activeSelf)
         {
-            if (Input.GetKeyDown(KeyCode.Space) && specialAttackAvailable)
-            {
-                UseSpecialAttack();
-            }
-
-            if (!specialAttackAvailable)
-            {
-                specialAttackTimer -= Time.deltaTime;
-
-                float newHeight = Mathf.Lerp(0, initialHeight, specialAttackTimer / animationDuration);
-                SetImageHeight(newHeight);
-
-                if (specialAttackTimer <= 0)
-                {
-                    specialAttackAvailable = true;
-                }
-            }
+            float newHeight = Mathf.Lerp(0, initialHeight, weapon.specialAttackTimer / weapon.animationDuration);
+            SetImageHeight(newHeight);
         }
 
         UpdateOffScreenArrows();
@@ -93,19 +75,6 @@ public class HUD : MonoBehaviour
     {
         LevelController.Instance.OnPlayerListChanged -= OnPlayerListChanged;
         playerListSubscribed = false;
-    }
-
-    public void UseSpecialAttack()
-    {
-        LevelController.Instance.localPlayer.DeployEMP();
-        ResetLoadingAnimation();
-    }
-
-    private void ResetLoadingAnimation()
-    {
-        specialAttackAvailable = false;
-        specialAttackTimer = animationDuration;
-        SetImageHeight(initialHeight);
     }
 
     private void SetImageHeight(float height)

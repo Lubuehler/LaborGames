@@ -30,7 +30,6 @@ public class ShopItem : MonoBehaviour
         priceField.text = item.price.ToString();
         background.color = item.color;
 
-
         // differences
         if (item.itemType == ItemType.Item)
         {
@@ -47,7 +46,6 @@ public class ShopItem : MonoBehaviour
         {
             descriptionField.text = item.description;
         }
-
     }
 
     public void OnClick()
@@ -63,6 +61,6 @@ public class ShopItem : MonoBehaviour
     public void Sell()
     {
         soldField.enabled = true;
-        collection.SetActive(false);
+        gameObject.SetActive(false);
     }
 }

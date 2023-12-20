@@ -5,11 +5,11 @@ using System;
 
 public class ShopSystem : MonoBehaviour
 {
-
-    public List<Item> items;
+    public List<Item> allItems;
+    public List<Item> availableItems;
     [SerializeField] private ItemDatabase itemDatabase;
 
-    public event Action OnSpecialAbilitiesChanged;
+    public event Action<int> OnSpecialAttacksChanged;
 
     public static ShopSystem Instance;
 
@@ -23,7 +23,8 @@ public class ShopSystem : MonoBehaviour
         {
             Destroy(this.gameObject);
         }
-        this.items.AddRange(itemDatabase.items);
+        allItems.AddRange(itemDatabase.items);
+        availableItems.AddRange(itemDatabase.items);
     }
 
     public void BuyItem(Item item)
@@ -31,12 +32,16 @@ public class ShopSystem : MonoBehaviour
         if (CanAfford(item.price))
         {
             LevelController.Instance.localPlayer.coins -= item.price;
-            LevelController.Instance.localPlayer.RPC_ApplyItem(item.itemID);
-            OnSpecialAbilitiesChanged.Invoke();
             if (item.itemType == ItemType.SpecialAttack)
             {
-                items.Remove(item);
+                LevelController.Instance.localPlayer.GetBehaviour<Weapon>().RPC_AddSpecialAttack(item.itemID);
+                availableItems.Remove(item);
             }
+            else if (item.itemType == ItemType.Item)
+            {
+                LevelController.Instance.localPlayer.RPC_ApplyItem(item.itemID);
+            }
+            OnSpecialAttacksChanged.Invoke(item.itemID);
         }
     }
 
@@ -47,6 +52,7 @@ public class ShopSystem : MonoBehaviour
 
     public void ResetItemPool()
     {
-        this.items.AddRange(itemDatabase.items);
+        allItems.AddRange(itemDatabase.items);
+        availableItems.AddRange(itemDatabase.items);
     }
 }

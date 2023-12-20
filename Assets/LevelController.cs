@@ -327,7 +327,4 @@ public class LevelController : NetworkBehaviour
         }
         return deadPlayers;
     }
-
-
-
 }
