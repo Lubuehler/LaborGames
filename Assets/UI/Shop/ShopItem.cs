@@ -29,6 +29,7 @@ public class ShopItem : MonoBehaviour
         nameField.text = item.itemName;
         priceField.text = item.price.ToString();
         background.color = item.color;
+        image.sprite = item.icon;
 
         // differences
         if (item.itemType == ItemType.Item)

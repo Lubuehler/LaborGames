@@ -6006,7 +6006,7 @@ GameObject:
   - component: {fileID: 722436581}
   - component: {fileID: 722436580}
   m_Layer: 5
-  m_Name: DebugHostBtn
+  m_Name: DebugDieBtn
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -6027,11 +6027,11 @@ RectTransform:
   - {fileID: 103271552}
   m_Father: {fileID: 1429899543}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 1, y: 0}
-  m_AnchorMax: {x: 1, y: 0}
-  m_AnchoredPosition: {x: -140, y: 30}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 20, y: 20}
   m_SizeDelta: {x: 100, y: 50}
-  m_Pivot: {x: 1, y: 0}
+  m_Pivot: {x: 0, y: 0}
 --- !u!114 &722436580
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -17492,7 +17492,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 189319974}
         m_TargetAssemblyTypeName: ShopMenu, Assembly-CSharp
-        m_MethodName: onRessurectClicked
+        m_MethodName: OnRessurectClicked
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}

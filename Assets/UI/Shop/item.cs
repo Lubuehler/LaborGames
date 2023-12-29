@@ -5,7 +5,7 @@ using UnityEngine;
 
 
 [System.Serializable]
-public class StatModifier : INetworkStruct
+public class StatModifier
 {
     public string statName;
     public int value;
@@ -19,17 +19,16 @@ public enum ItemType
 }
 
 [System.Serializable]
-public class Item : INetworkStruct
+public class Item
 {
-    public int itemID = counter++;
+    public int itemID;
     public string itemName;
-    //public Sprite icon;
+    public Sprite icon;
     public int price;
     public string description;
     public Color color;
     public List<StatModifier> modifiers;
     public ItemType itemType;
-
 
     public static int counter = 0;
 }

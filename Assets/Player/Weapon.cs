@@ -9,6 +9,8 @@ public class Weapon : NetworkBehaviour
     [SerializeField] private Projectile _projectilePrefab;
     [SerializeField] private LayerMask enemyMask;
     [SerializeField] private GameObject empPrefab;
+    [SerializeField] private GameObject teleportPrefab;
+
 
     private NetworkRigidbody2D _nrb2d;
     private Player player;
@@ -21,6 +23,15 @@ public class Weapon : NetworkBehaviour
     public bool specialAttackAvailable;
     public float specialAttackTimer;
     public float animationDuration = 2f;
+
+
+
+    // Teleport
+    private static int maxLength = 8; // 4 times per second -> 2 seconds
+    private Queue<Vector3> positions = new Queue<Vector3>(maxLength + 1);
+    private Queue<Quaternion> rotations = new Queue<Quaternion>(maxLength + 1);
+    private float positionTimer = 0f;
+    private float interval = 0.25f;
 
     private void Awake()
     {
@@ -39,9 +50,9 @@ public class Weapon : NetworkBehaviour
 
     public override void FixedUpdateNetwork()
     {
-        if(GetInput<NetworkInputData>(out var data) == false) return;
+        if (GetInput<NetworkInputData>(out var data) == false) return;
 
-        if(LevelController.Instance.waveInProgress && player.isAlive)
+        if (LevelController.Instance.waveInProgress && player.isAlive)
         {
             // compute pressed/released state
             var pressed = data.buttons.GetPressed(ButtonsPrevious);
@@ -54,7 +65,15 @@ public class Weapon : NetworkBehaviour
             {
                 if (pressed.IsSet(MyButtons.SpecialAttack) && !released.IsSet(MyButtons.SpecialAttack))
                 {
-                    DeployEMP();
+                    if (selectedSpecialAttack == 3)
+                    {
+                        DeployEMP();
+                    }
+                    else if (selectedSpecialAttack == 4)
+                    {
+                        Teleport();
+                    }
+                    ResetTimer();
                 }
             }
         }
@@ -63,7 +82,25 @@ public class Weapon : NetworkBehaviour
     private void DeployEMP()
     {
         Runner.Spawn(empPrefab, _nrb2d.transform.position, transform.rotation);
-        ResetTimer();
+    }
+
+    void StorePosition()
+    {
+        positions.Enqueue(_nrb2d.transform.position);
+        rotations.Enqueue(_nrb2d.transform.rotation);
+        if (positions.Count > maxLength)
+        {
+            positions.Dequeue();
+            rotations.Dequeue();
+        }
+    }
+
+    void Teleport()
+    {
+        Runner.Spawn(teleportPrefab, _nrb2d.transform.position);
+        _nrb2d.TeleportToPosition(positions.Peek());
+        _nrb2d.TeleportToRotation(rotations.Peek());
+        Runner.Spawn(teleportPrefab, _nrb2d.transform.position);
     }
 
     public override void Render()
@@ -86,6 +123,17 @@ public class Weapon : NetworkBehaviour
                 {
                     Fire(findNearestEnemy());
                     currentTime = 0f;
+                }
+            }
+
+            if (selectedSpecialAttack == 4)
+            {
+                positionTimer += Time.deltaTime;
+
+                if (positionTimer >= interval)
+                {
+                    StorePosition();
+                    positionTimer = 0f;
                 }
             }
         }

@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using TMPro;
 using UnityEngine;
@@ -41,7 +42,13 @@ public class HUD : MonoBehaviour
         if (weapon.selectedSpecialAttack != int.MinValue)
         {
             specialAttack.SetActive(true);
+
+            Item selectedItem = ShopSystem.Instance.allItems.FirstOrDefault(item => item.itemID == weapon.selectedSpecialAttack);
+            specialAttack.GetComponentInChildren<TMP_Text>().text = selectedItem?.itemName;
         }
+
+        UpdateCoinsCounter();
+        OnPlayerListChanged();
     }
 
     private void Update()
@@ -101,9 +108,9 @@ public class HUD : MonoBehaviour
         }
     }
 
-    public void UpdateCoinsCounter(int coins)
+    public void UpdateCoinsCounter()
     {
-        this.coins.text = coins.ToString();
+        this.coins.text = LevelController.Instance.localPlayer.coins.ToString();
     }
 
     private void UpdateOffScreenArrows()
