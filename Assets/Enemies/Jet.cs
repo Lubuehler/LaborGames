@@ -5,7 +5,7 @@ public class Jet : Enemy
 {
     [SerializeField] private ProjectileJet projectilePrefab;
 
-    private bool maneuverStarted = false;
+    public bool maneuverStarted = false;
     private Vector2 lockedPosition;
     private Vector2 desiredVelocity;
     private bool fired = false;
@@ -86,8 +86,6 @@ public class Jet : Enemy
                     RaycastHit2D hit = Physics2D.Raycast(transform.position, networkRigidbody2D.Rigidbody.velocity, Mathf.Infinity, playerLayerMask);
                     if (hit.collider != null && hit.transform.gameObject.GetComponent<NetworkObject>().NetworkGuid == currentTarget.NetworkGuid)
                     {
-                        Invoke("FlipJet", 0.1f);
-
                         loopingStarted = false;
                         maneuverStarted = false;
                         fired = false;
@@ -104,11 +102,6 @@ public class Jet : Enemy
                 }
             }
         }
-    }
-
-    private void FlipJet()
-    {
-        GetComponentInChildren<JetAnimation>().Flip();
     }
 
     private void Fire()

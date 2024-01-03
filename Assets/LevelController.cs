@@ -16,7 +16,7 @@ public class LevelController : NetworkBehaviour
 
     [Networked]
     public int currentWave { get; set; }
-    private float waveDuration = 5f;
+    private float waveDuration = 30f;
     private float waveDurationIncrease = 2f;
 
     private float waveEndTime; // Time when the current wave will end
@@ -46,14 +46,14 @@ public class LevelController : NetworkBehaviour
         }
         else
         {
-            Destroy(this.gameObject);
+            Destroy(gameObject);
         }
     }
 
     public override void Spawned()
     {
-        this.gameRunning = false;
-        this.waveInProgress = false;
+        gameRunning = false;
+        waveInProgress = false;
         initialized = true;
         if (!Runner.IsServer) return;
         EnemySpawner.Instance.UpdateEnemySpawnRate(EnemyType.Drone, 1);

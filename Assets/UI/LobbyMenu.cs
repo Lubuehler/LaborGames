@@ -79,7 +79,6 @@ public class LobbyMenu : MonoBehaviour
             }
             StartCoroutine(EnableButtonAfterDelay(1.0f));
             LevelController.Instance.RPC_Ready(NetworkController.Instance.GetLocalPlayerObject(), ready);
-            
         }
     }
 
@@ -92,6 +91,7 @@ public class LobbyMenu : MonoBehaviour
 
     public void OnBackClick()
     {
-        UIController.Instance.ShowUIElement(UIElement.Multiplayer);
+        Debug.Log("Back pressed");
+        UIController.Instance.ShowUIElement(UIElement.Main);
     }
 }
