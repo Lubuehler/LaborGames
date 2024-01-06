@@ -3,7 +3,6 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-
 [System.Serializable]
 public class StatModifier
 {
@@ -23,10 +22,13 @@ public class Item
 {
     public int itemID;
     public string itemName;
-    //public Sprite icon;
+    public Sprite icon;
     public int price;
     public string description;
-    public Color color;
     public List<StatModifier> modifiers;
     public ItemType itemType;
+    public int tier;
+    public Color color = Color.black;
+
+    // public static int counter = 0;
 }

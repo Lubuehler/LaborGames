@@ -6,11 +6,24 @@ using UnityEngine.UI;
 
 public class ItemCell : MonoBehaviour
 {
+    [SerializeField]
+    private Image icon;
+
+    [SerializeField]
+    private Image background;
     private Item item;
 
     public void Initialize(Item item)
     {
         this.item = item;
-        GetComponentInChildren<TMP_Text>().text = item.itemName;
+        if (item.icon == null)
+        {
+            GetComponentInChildren<TMP_Text>().text = item.itemName;
+        }
+        else
+        {
+            icon.sprite = item.icon;
+        }
+        background.color = item.color;
     }
 }
