@@ -3,7 +3,6 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-
 [System.Serializable]
 public class StatModifier : INetworkStruct
 {
@@ -21,15 +20,15 @@ public enum ItemType
 [System.Serializable]
 public class Item : INetworkStruct
 {
-    public int itemID = counter++;
+    public int itemID; // = counter++;
     public string itemName;
-    //public Sprite icon;
+    public Sprite icon;
     public int price;
     public string description;
-    public Color color;
     public List<StatModifier> modifiers;
     public ItemType itemType;
+    public int tier;
+    public Color color = Color.black;
 
-
-    public static int counter = 0;
+    // public static int counter = 0;
 }

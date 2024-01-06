@@ -4,13 +4,26 @@ using UnityEngine.UI;
 
 public class ShopItem : MonoBehaviour
 {
-    [SerializeField] private TMP_Text nameField;
-    [SerializeField] private TMP_Text descriptionField;
-    [SerializeField] private TMP_Text priceField;
-    [SerializeField] private Image image;
-    [SerializeField] private TMP_Text soldField;
-    [SerializeField] private GameObject collection;
-    [SerializeField] private Image background;
+    [SerializeField]
+    private TMP_Text nameField;
+
+    [SerializeField]
+    private TMP_Text descriptionField;
+
+    [SerializeField]
+    private TMP_Text priceField;
+
+    [SerializeField]
+    private Image image;
+
+    [SerializeField]
+    private TMP_Text soldField;
+
+    [SerializeField]
+    private GameObject collection;
+
+    [SerializeField]
+    private Image background;
 
     private Item item;
 
@@ -28,24 +41,24 @@ public class ShopItem : MonoBehaviour
         this.item = item;
         nameField.text = item.itemName;
         priceField.text = item.price.ToString();
-        background.color = item.color;
+        image.sprite = item.icon;
 
         // differences
         if (item.itemType == ItemType.Item)
         {
-
             string description = "";
             foreach (StatModifier modifier in item.modifiers)
             {
-                description += modifier.statName.ToString() + ": " + modifier.value.ToString() + "\n";
+                description +=
+                    modifier.statName.ToString() + ": " + modifier.value.ToString() + "\n";
             }
             descriptionField.text = description;
-
         }
         else if (item.itemType == ItemType.SpecialAttack)
         {
             descriptionField.text = item.description;
         }
+        background.color = item.color;
     }
 
     public void OnClick()

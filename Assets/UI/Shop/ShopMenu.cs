@@ -51,7 +51,7 @@ public class ShopMenu : MonoBehaviour
                 { "Max Health", p => p.maxHealth.ToString() },
                 { "Attack Damage", p => p.attackDamage.ToString("F2") },
                 { "Attack Speed", p => p.attackSpeed.ToString("F2") },
-                { "Crit Chance", p=> p.critChance.ToString("F2") },
+                { "Critical Strike Chance", p=> p.critChance.ToString("F2") },
                 { "Crit Damage Multiplier", p=> p.critDamageMultiplier.ToString("F2") },
                 { "Dodge Chance", p=> p.dodgeChance.ToString("F2") },
                 { "Movement Speed", p => p.movementSpeed.ToString("F2") },
