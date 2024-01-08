@@ -12,7 +12,6 @@ public class NetworkController : MonoBehaviour, INetworkRunnerCallbacks
     private NetworkRunner _runner;
     [SerializeField] private NetworkPrefabRef _playerPrefab;
 
-
     // Session stuff
     public List<SessionInfo> sessionList;
     public SessionInfo currentSession;

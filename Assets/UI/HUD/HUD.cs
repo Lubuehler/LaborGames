@@ -12,8 +12,11 @@ public class HUD : MonoBehaviour
     [SerializeField] private TMP_Text coins;
     [SerializeField] private TMP_Text waveCounter;
     [SerializeField] private TMP_Text waveTimer;
+
+    // Special attack
     [SerializeField] private GameObject specialAttack;
     [SerializeField] private GameObject loadingOverlay;
+    [SerializeField] private Image specialAttackIcon;
 
     [SerializeField] private VerticalLayoutGroup allyHealthBarPanel;
     [SerializeField] private VerticalLayoutGroup allyHealthBarPrefab;
@@ -45,6 +48,7 @@ public class HUD : MonoBehaviour
 
             Item selectedItem = ShopSystem.Instance.allItems.FirstOrDefault(item => item.itemID == weapon.selectedSpecialAttack);
             specialAttack.GetComponentInChildren<TMP_Text>().text = selectedItem?.itemName;
+            specialAttackIcon.sprite = selectedItem?.icon;
         }
 
         UpdateCoinsCounter();
@@ -110,7 +114,7 @@ public class HUD : MonoBehaviour
 
     public void UpdateCoinsCounter()
     {
-        this.coins.text = LevelController.Instance.localPlayer.coins.ToString();
+        coins.text = LevelController.Instance.localPlayer.coins.ToString();
     }
 
     private void UpdateOffScreenArrows()

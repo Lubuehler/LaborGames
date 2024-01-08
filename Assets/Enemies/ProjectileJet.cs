@@ -1,5 +1,4 @@
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using Fusion;
 
@@ -30,7 +29,6 @@ public class ProjectileJet : NetworkBehaviour
         _rigidbody = GetComponent<NetworkRigidbody2D>();
     }
 
-    // TODO change to OverlapBox
     void OnCollisionEnter2D(Collision2D collision)
     {
         // Check if the collision involves the specified layers.

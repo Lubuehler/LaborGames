@@ -146,11 +146,14 @@ public class Player : NetworkBehaviour
     {
         _spriteRenderer.enabled = isAlive;
         _capsuleCollider.enabled = isAlive;
-
     }
 
     public void TakeDamage(float damage)
     {
+        if(GetBehaviour<Weapon>().shieldActive)
+        {
+            damage = 0;
+        }
         currentHealth -= damage;
         currentHealth = Mathf.Clamp(currentHealth, 0, maxHealth);
         RpcHealthChanged();

@@ -52,11 +52,7 @@ MonoBehaviour:
     description: Electromagnetic pulse that disables movement of your enemies for
       a moment.
     color: {r: 0.58265877, g: 0, b: 1, a: 0.4}
-    modifiers:
-    - statName: Attack Damage
-      value: 20
-    - statName: Attack Speed
-      value: 20
+    modifiers: []
     itemType: 1
   - itemID: 4
     itemName: Teleporter
@@ -64,9 +60,21 @@ MonoBehaviour:
     price: 30
     description: Teleport to your position 5 seconds ago.
     color: {r: 0.58265877, g: 0, b: 1, a: 0.4}
-    modifiers:
-    - statName: Attack Damage
-      value: 20
-    - statName: Attack Speed
-      value: 20
+    modifiers: []
+    itemType: 1
+  - itemID: 5
+    itemName: Shield
+    icon: {fileID: 21300000, guid: 6892b627efe95144992f3d92ba5a11d6, type: 3}
+    price: 30
+    description: Use this shield to protect from enemy damage
+    color: {r: 0.58265877, g: 0, b: 1, a: 0.4}
+    modifiers: []
+    itemType: 1
+  - itemID: 6
+    itemName: Slowness
+    icon: {fileID: 21300000, guid: 76ce9d2532eef154f8385f00b5b24a3f, type: 3}
+    price: 30
+    description: Slow down enemies.
+    color: {r: 0.58265877, g: 0, b: 1, a: 0.4}
+    modifiers: []
     itemType: 1

@@ -1,22 +1,25 @@
 using Fusion;
 using UnityEngine;
-using System.Collections.Generic;
 public class Jet : Enemy
 {
     [SerializeField] private ProjectileJet projectilePrefab;
 
     public bool maneuverStarted = false;
+
+    // Speed & Fire
     private Vector2 lockedPosition;
     private Vector2 desiredVelocity;
     private bool fired = false;
 
-
+    // Looping
     private bool loopingStarted = false;
     private bool centerSet = false;
     private Vector2 rotationCenter;
 
     protected override void Move()
     {
+        var speed = EnemySpawner.Instance.speed;
+
         if (!movementDisabled)
         {
             if (currentTarget == null || !currentTarget.GetComponent<Player>().isAlive)
@@ -32,13 +35,17 @@ public class Jet : Enemy
 
             if (distanceToTarget < 10 && !loopingStarted)
             {
-                if (!this.maneuverStarted)
+                if (!maneuverStarted)
                 {
-                    this.lockedPosition = playerPosition;
-                    Vector2 toTarget = (lockedPosition - currentPosition);
-                    this.desiredVelocity = toTarget.normalized * speed * 2;
+                    lockedPosition = playerPosition;
+                    Vector2 toTarget = lockedPosition - currentPosition;
 
-                    this.maneuverStarted = true;
+
+                    
+
+                    desiredVelocity = toTarget.normalized * speed * 2;
+
+                    maneuverStarted = true;
                 }
                 if (!fired)
                 {
@@ -61,7 +68,7 @@ public class Jet : Enemy
                         Vector2 selectedPerpendicularVector = (perpendicularVector1.y > perpendicularVector2.y) ? perpendicularVector1 : perpendicularVector2;
                         Vector2 perpendicularVector = selectedPerpendicularVector * 2f;
 
-                        this.rotationCenter = new Vector2(gameObject.transform.position.x, gameObject.transform.position.y) + perpendicularVector;
+                        rotationCenter = new Vector2(gameObject.transform.position.x, gameObject.transform.position.y) + perpendicularVector;
                         centerSet = true;
                     }
 
@@ -94,8 +101,10 @@ public class Jet : Enemy
                 }
                 else
                 {
-                    Vector2 toTarget = (currentTarget.transform.position - transform.position);
+                    Vector2 toTarget = currentTarget.transform.position - transform.position;
                     Vector2 separationForce = CalculateSeparationForce();
+
+
 
                     Vector2 desiredVelocity = (toTarget.normalized + separationForce).normalized * speed;
                     networkRigidbody2D.Rigidbody.velocity = Vector2.Lerp(networkRigidbody2D.Rigidbody.velocity, desiredVelocity, Runner.DeltaTime * movementSmoothing);
@@ -107,12 +116,7 @@ public class Jet : Enemy
     private void Fire()
     {
         Quaternion rotation = Quaternion.LookRotation(Vector3.forward, networkRigidbody2D.Rigidbody.velocity);
-
         var projectile = Runner.Spawn(projectilePrefab, networkRigidbody2D.transform.position, rotation, Object.InputAuthority);
-
-        if (projectile != null)
-        {
-            projectile.Fire(networkRigidbody2D.Rigidbody.velocity.normalized);
-        }
+        projectile?.Fire(networkRigidbody2D.Rigidbody.velocity.normalized);
     }
 }

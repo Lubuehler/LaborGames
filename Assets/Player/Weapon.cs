@@ -10,6 +10,8 @@ public class Weapon : NetworkBehaviour
     [SerializeField] private LayerMask enemyMask;
     [SerializeField] private GameObject empPrefab;
     [SerializeField] private GameObject teleportPrefab;
+    [SerializeField] private GameObject shield;
+    [SerializeField] private Animator shieldAnimator;
 
 
     private NetworkRigidbody2D _nrb2d;
@@ -22,7 +24,7 @@ public class Weapon : NetworkBehaviour
     [Networked] public int selectedSpecialAttack { get; set; }
     public bool specialAttackAvailable;
     public float specialAttackTimer;
-    public float animationDuration = 2f;
+    public float animationDuration = 10f;
 
 
 
@@ -33,11 +35,22 @@ public class Weapon : NetworkBehaviour
     private float positionTimer = 0f;
     private float interval = 0.25f;
 
+    // Shield
+    private float shieldTime = 5.0f;
+    public bool shieldActive = false;
+    private bool animationTriggered = false;
+
+    // Slowness 
+
+    private float slownessTime = 5.0f;
+    public bool slownessActive = false;
+
+
     private void Awake()
     {
         _nrb2d = GetComponent<NetworkRigidbody2D>();
-
         specialAttackAvailable = false;
+        specialAttackTimer = animationDuration;
     }
 
     public override void Spawned()
@@ -65,13 +78,22 @@ public class Weapon : NetworkBehaviour
             {
                 if (pressed.IsSet(MyButtons.SpecialAttack) && !released.IsSet(MyButtons.SpecialAttack))
                 {
-                    if (selectedSpecialAttack == 3)
+                    switch (selectedSpecialAttack)
                     {
-                        DeployEMP();
-                    }
-                    else if (selectedSpecialAttack == 4)
-                    {
-                        Teleport();
+                        case 3:
+                            DeployEMP();
+                            break;
+                        case 4:
+                            Teleport();
+                            break;
+                        case 5:
+                            DeployShield();
+                            break;
+                        case 6:
+                            DeploySlowness();
+                            break;
+                        default:
+                            break;
                     }
                     ResetTimer();
                 }
@@ -82,6 +104,18 @@ public class Weapon : NetworkBehaviour
     private void DeployEMP()
     {
         Runner.Spawn(empPrefab, _nrb2d.transform.position, transform.rotation);
+    }
+
+    private void DeployShield()
+    {
+        shield.SetActive(true);
+        shieldActive = true;
+    }
+
+    private void DeploySlowness()
+    {
+        EnemySpawner.Instance.speed = 1.5f;
+        slownessActive = true;
     }
 
     void StorePosition()
@@ -107,15 +141,6 @@ public class Weapon : NetworkBehaviour
     {
         if (LevelController.Instance.waveInProgress)
         {
-            if (!specialAttackAvailable)
-            {
-                specialAttackTimer -= Time.deltaTime;
-                if (specialAttackTimer <= 0)
-                {
-                    specialAttackAvailable = true;
-                }
-            }
-
             if (player.isAlive)
             {
                 currentTime += Time.deltaTime;
@@ -123,6 +148,15 @@ public class Weapon : NetworkBehaviour
                 {
                     Fire(findNearestEnemy());
                     currentTime = 0f;
+                }
+            }
+
+            if (!specialAttackAvailable)
+            {
+                specialAttackTimer -= Time.deltaTime;
+                if (specialAttackTimer <= 0)
+                {
+                    specialAttackAvailable = true;
                 }
             }
 
@@ -134,6 +168,37 @@ public class Weapon : NetworkBehaviour
                 {
                     StorePosition();
                     positionTimer = 0f;
+                }
+            }
+
+            if (selectedSpecialAttack == 5 && shieldActive)
+            {
+                shieldTime -= Time.deltaTime;
+
+                if (shieldTime <= 2.0f && !animationTriggered)
+                {
+                    shieldAnimator.SetTrigger("ShieldEnd");
+                    animationTriggered = true;
+                }
+
+                if (shieldTime <= 0.0f)
+                {
+                    shieldActive = false;
+                    shield.SetActive(false);
+                    shieldTime = 5.0f;
+                    animationTriggered = false;
+                }
+            }
+
+            if (selectedSpecialAttack == 6 && slownessActive)
+            {
+                slownessTime -= Time.deltaTime;
+
+                if (slownessTime <= 0.0f)
+                {
+                    slownessActive = false;
+                    slownessTime = 5.0f;
+                    EnemySpawner.Instance.speed = 3;
                 }
             }
         }
