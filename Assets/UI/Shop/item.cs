@@ -7,7 +7,7 @@ using UnityEngine;
 public class StatModifier
 {
     public string statName;
-    public int value;
+    public float value;
 }
 
 [System.Serializable]

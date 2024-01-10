@@ -1,13 +1,14 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using Fusion;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class Weapon : NetworkBehaviour
 {
     [SerializeField] private Projectile _projectilePrefab;
-    [SerializeField] private LayerMask enemyMask;
     [SerializeField] private GameObject empPrefab;
 
     private NetworkRigidbody2D _nrb2d;
@@ -22,6 +23,8 @@ public class Weapon : NetworkBehaviour
     public float specialAttackTimer;
     public float animationDuration = 2f;
 
+    public event Action<Transform, Transform> OnAttack;
+    public event Action<Transform> OnHitTarget;
     private void Awake()
     {
         _nrb2d = GetComponent<NetworkRigidbody2D>();
@@ -84,56 +87,56 @@ public class Weapon : NetworkBehaviour
                 currentTime += Time.deltaTime;
                 if (currentTime >= 1f / player.attackSpeed)
                 {
-                    Fire(findNearestEnemy());
+                    Shoot(LevelController.Instance.FindClosestEnemies(transform, 1, 10f).FirstOrDefault());
                     currentTime = 0f;
                 }
             }
         }
     }
 
-    private void Fire(NetworkObject target)
+    private void Shoot(GameObject target)
     {
         if (target != null)
         {
-            Vector3 direction = target.transform.position - _nrb2d.transform.position;
+            ReleaseBullet(target.transform);
+            OnAttack?.Invoke(gameObject.transform, transform);
+        }
+    }
+
+    public void ReleaseBullet(Transform target)
+    {
+        if (target != null)
+        {
+            Vector3 direction = target.position - _nrb2d.transform.position;
 
             Quaternion rotation = Quaternion.LookRotation(Vector3.forward, direction);
 
             var projectile = Runner.Spawn(_projectilePrefab, _nrb2d.transform.position, rotation, Object.InputAuthority);
 
-            projectile?.Fire(direction.normalized);
+            projectile?.Fire(direction.normalized,  OnBulletHit);
         }
     }
 
-    private NetworkObject findNearestEnemy()
+    public bool OnBulletHit(GameObject gameObject)
     {
-        // Calculate the bounds of the camera's view
-        float height = 2f * Camera.main.orthographicSize;
-        float width = height * Camera.main.aspect;
-        Vector2 boxSize = new Vector2(width, height);
-        Vector2 boxCenter = transform.position;
-
-        // Get all colliders within the camera's view
-        Collider2D[] hitColliders = Physics2D.OverlapBoxAll(boxCenter, boxSize, Camera.main.transform.eulerAngles.z, enemyMask);
-
-        float minDistance = float.MaxValue;
-        NetworkObject closestEnemy = null;
-        foreach (var enemy in hitColliders)
-        {
-            if (enemy != null)
-            {
-                Vector3 direction = enemy.transform.position - _nrb2d.transform.position;
-                float distance = direction.magnitude;
-
-                if (distance < minDistance)
-                {
-                    minDistance = distance;
-                    closestEnemy = enemy.GetComponent<NetworkObject>();
-                }
-            }
-        }
-        return closestEnemy;
+        OnHitTarget?.Invoke(gameObject.transform);
+        gameObject.GetComponent<Enemy>().TakeDamage(CalculateDamage());
+        
+        return true;
     }
+
+    private int CalculateDamage()
+    {
+        double randomNumber = new System.Random().NextDouble();
+        if (randomNumber < player.critChance)
+        {
+            return (int)player.attackDamage;
+        }  else
+        {
+            return (int)(player.attackDamage * player.critDamageMultiplier);
+        }
+    }
+
 
     [Rpc(RpcSources.InputAuthority, RpcTargets.All)]
     public void RPC_SetSelectedSpecialAttack(int itemID)

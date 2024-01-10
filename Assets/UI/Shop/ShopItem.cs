@@ -41,6 +41,13 @@ public class ShopItem : MonoBehaviour
         this.item = item;
         nameField.text = item.itemName;
         priceField.text = item.price.ToString();
+        if (ShopSystem.Instance.CanAfford(item.price))
+        {
+            priceField.color = Color.white;
+        } else
+        {
+            priceField.color = Color.red;
+        }
         image.sprite = item.icon;
 
         // differences
@@ -59,6 +66,11 @@ public class ShopItem : MonoBehaviour
             descriptionField.text = item.description;
         }
         background.color = item.color;
+    }
+
+    public void Redraw()
+    {
+        SetItem(item);
     }
 
     public void OnClick()

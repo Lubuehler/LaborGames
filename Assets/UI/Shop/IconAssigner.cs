@@ -6,7 +6,7 @@ using System.IO;
 public class IconAssigner : MonoBehaviour
 {
     public ItemDatabase database;
-    public string iconsFolderPath = "Icons"; // Path to the folder with icons
+    public string iconsFolderPath = "Icons";
 
     [SerializeField]
     public Color tier1Color;
@@ -64,7 +64,6 @@ public class IconAssigner : MonoBehaviour
             {
                 item.color = specialAbilityColor;
             }
-            print(item.color);
         }
     }
 

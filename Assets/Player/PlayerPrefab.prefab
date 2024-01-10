@@ -130,8 +130,8 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
+  m_LocalScale: {x: 0.6032132, y: 0.6032132, z: 0.6032132}
+  m_ConstrainProportionsScale: 1
   m_Children:
   - {fileID: 8671176579313137741}
   m_Father: {fileID: 0}
@@ -198,10 +198,12 @@ MonoBehaviour:
     m_Bits: 256
   tiltAmount: 15
   background: {fileID: 0}
+  weapon: {fileID: 0}
   _isAlive: 0
   _playerName: 
-  _ready: 0
+  _lobbyReady: 0
   lobbyNo: 0
+  _shopReady: 0
   _coins: 0
   _maxHealth: 0
   _attackDamage: 0
@@ -319,9 +321,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _interpolationDataSource: 0
   _projectilePrefab: {fileID: 1350390008315525890, guid: 95fb6b4a33b3a6543bcec83d35c8c1bf, type: 3}
-  enemyMask:
-    serializedVersion: 2
-    m_Bits: 64
   empPrefab: {fileID: 1329845292236604, guid: 87914b4f3f298e541968506f49f26089, type: 3}
   _specialAttacks: 
   _selectedSpecialAttack: 0
+  specialAttackAvailable: 0
+  specialAttackTimer: 0
+  animationDuration: 2

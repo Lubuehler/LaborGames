@@ -19,6 +19,10 @@ public class ShopMenu : MonoBehaviour
     public Button goButton;
     [SerializeField] private Button ressurectButton;
 
+
+    [SerializeField] private TMP_Text ressurectButtonPriceText;
+    [SerializeField] private TMP_Text refreshButtonPriceText;
+
     private Player player;
 
     private Dictionary<string, Func<Player, string>> statMappings;
@@ -36,6 +40,16 @@ public class ShopMenu : MonoBehaviour
     [SerializeField] private GameObject itemCellPrefab;
     private bool initialized = false;
 
+    [SerializeField]
+    private int initialRefreshShopPrice;
+    [SerializeField]
+    private int refreshShopPriceIncreasePerWave;
+    [SerializeField]
+    private int initialRespawnPrice;
+    [SerializeField]
+    private int respawnPriceIncreasePerWave;
+
+
     private void OnEnable()
     {
         if (!initialized)
@@ -52,7 +66,7 @@ public class ShopMenu : MonoBehaviour
                 { "Attack Damage", p => p.attackDamage.ToString("F2") },
                 { "Attack Speed", p => p.attackSpeed.ToString("F2") },
                 { "Critical Strike Chance", p=> p.critChance.ToString("F2") },
-                { "Crit Damage Multiplier", p=> p.critDamageMultiplier.ToString("F2") },
+                { "Critical Strike Damage Factor", p=> p.critDamageMultiplier.ToString("F2") },
                 { "Dodge Chance", p=> p.dodgeChance.ToString("F2") },
                 { "Movement Speed", p => p.movementSpeed.ToString("F2") },
                 { "Armor", p => p.armor.ToString("F2")  },
@@ -79,6 +93,8 @@ public class ShopMenu : MonoBehaviour
         this.wave.text = "Shop (Wave " + LevelController.Instance.currentWave.ToString() + ")";
         this.coins.text = player.coins.ToString();
 
+        refreshButtonPriceText.text = (initialRefreshShopPrice + refreshShopPriceIncreasePerWave * LevelController.Instance.currentWave).ToString();
+        ressurectButtonPriceText.text = (initialRespawnPrice + respawnPriceIncreasePerWave * LevelController.Instance.currentWave).ToString();
         RandomizeShop();
     }
 
@@ -103,6 +119,8 @@ public class ShopMenu : MonoBehaviour
         {
             ressurectButton.gameObject.SetActive(false);
         }
+        coins.text = player.coins.ToString();
+
     }
 
     private void OnDisable()
@@ -133,8 +151,7 @@ public class ShopMenu : MonoBehaviour
                 statRows[propertyName].SetStat(propertyName, getStatValue(player));
             }
         }
-        coins.text = player.coins.ToString();
-
+        RedrawItems();
     }
 
     public void OnGoClick()
@@ -145,15 +162,19 @@ public class ShopMenu : MonoBehaviour
 
     public void OnRessurectClicked()
     {
-        print("RESPAWN CLICKED");
-        if (ShopSystem.Instance.CanAfford(20))
+        if (ShopSystem.Instance.BuyService(initialRespawnPrice + respawnPriceIncreasePerWave * LevelController.Instance.currentWave))
         {
             LevelController.Instance.RessurectPlayers();
         }
-        else
+    }
+
+    public void OnRefreshClicked ()
+    {
+        if (ShopSystem.Instance.BuyService(initialRefreshShopPrice + refreshShopPriceIncreasePerWave * LevelController.Instance.currentWave))
         {
-            print("NO MONEY");
+            RandomizeShop();
         }
+    
     }
 
     public void UpdateDisplayedItems()
@@ -167,6 +188,31 @@ public class ShopMenu : MonoBehaviour
             GameObject itemVis = Instantiate(shopItemPrefab);
             itemVis.transform.SetParent(itemGroup.transform, false);
             itemVis.GetComponentInChildren<ShopItem>().SetItem(item);
+        }
+    }
+
+    public void RedrawItems()
+    {
+        for (int i = itemGroup.transform.childCount - 1; i >= 0; i--)
+        {
+            if (itemGroup.transform.GetChild(i).gameObject.GetComponentInChildren<ShopItem>() != null) {
+                itemGroup.transform.GetChild(i).gameObject.GetComponentInChildren<ShopItem>().Redraw();
+            }
+        }
+        if (!ShopSystem.Instance.CanAfford(initialRespawnPrice + respawnPriceIncreasePerWave * LevelController.Instance.currentWave))
+        {
+            ressurectButtonPriceText.color = Color.red;
+        } else
+        {
+            ressurectButtonPriceText.color = Color.white;
+        }
+        if (!ShopSystem.Instance.CanAfford(initialRefreshShopPrice + refreshShopPriceIncreasePerWave * LevelController.Instance.currentWave))
+        {
+            refreshButtonPriceText.color = Color.red;
+        }
+        else
+        {
+            refreshButtonPriceText.color = Color.white;
         }
     }
 

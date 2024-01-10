@@ -5,12 +5,16 @@ using System.Collections.Generic;
 using System;
 using System.Linq;
 
+
 public class Player : NetworkBehaviour
 {
     [SerializeField] private GameObject deathExplosionPrefab;
     [SerializeField] private LayerMask coinMask;
     [SerializeField] private float tiltAmount = 15.0f;
     [SerializeField] private GameObject background;
+    [SerializeField] public Weapon weapon;
+
+    public PassiveItemEffectManager passiveItemEffectManager = new PassiveItemEffectManager();
 
     private NetworkRigidbody2D _nrb2d;
     private SpriteRenderer _spriteRenderer;
@@ -53,12 +57,13 @@ public class Player : NetworkBehaviour
     public event Action<float, float> OnHealthChanged;
     public event Action<int> OnCoinsChanged;
 
-
     private void Awake()
     {
         _nrb2d = GetComponent<NetworkRigidbody2D>();
         _spriteRenderer = GetComponentInChildren<SpriteRenderer>();
         _capsuleCollider = GetComponent<CapsuleCollider2D>();
+        this.weapon = GetComponent<Weapon>();
+
     }
 
     public override void Spawned()
@@ -152,6 +157,12 @@ public class Player : NetworkBehaviour
 
     public void TakeDamage(float damage)
     {
+        double randomNumber = new System.Random().NextDouble();
+        if (randomNumber > dodgeChance)
+        {
+            return;
+        }
+
         currentHealth -= damage;
         currentHealth = Mathf.Clamp(currentHealth, 0, maxHealth);
         RpcHealthChanged();
@@ -228,13 +239,8 @@ public class Player : NetworkBehaviour
     [Rpc(sources: RpcSources.All, targets: RpcTargets.All)]
     public void RPC_ApplyItem(int id)
     {
-        print("applied item " + id);
-        foreach ( Item item1 in ShopSystem.Instance.allItems)
-        {
-            print("allitems: id " + item1.itemID);
-        }
+
         Item item = ShopSystem.Instance.allItems.FirstOrDefault(item => item.itemID == id);
-        print("item id" + item.itemID);
         if (item != null)
         {
             foreach (StatModifier modifier in item.modifiers)
@@ -247,9 +253,9 @@ public class Player : NetworkBehaviour
                         attackDamage += modifier.value; break;
                     case "Attack Speed":
                         attackSpeed += modifier.value; break;
-                    case "Crit Chance":
+                    case "Critical Strike Chance":
                         critChance += modifier.value; break;
-                    case "Crit Damage":
+                    case "Critical Strike Damage Factor":
                         critDamageMultiplier += modifier.value; break;
                     case "Movement Speed":
                         movementSpeed += modifier.value; break;

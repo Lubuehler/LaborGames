@@ -16,7 +16,7 @@ public class LevelController : NetworkBehaviour
 
     [Networked]
     public int currentWave { get; set; }
-    private float waveDuration = 5f;
+    private float waveDuration = 10f;
     private float waveDurationIncrease = 2f;
 
     private float waveEndTime; // Time when the current wave will end
@@ -36,6 +36,9 @@ public class LevelController : NetworkBehaviour
 
     [Networked]
     public bool isShopping { get; private set; }
+
+    [SerializeField] private LayerMask enemyMask;
+
 
 
     private void Awake()
@@ -326,5 +329,15 @@ public class LevelController : NetworkBehaviour
             }
         }
         return deadPlayers;
+    }
+
+    public List<GameObject> FindClosestEnemies(Transform primaryTarget, int count, float maxRange)
+    {
+        return FindObjectsOfType<GameObject>()
+            .Where(t => (enemyMask.value & (1 << t.layer)) != 0 &&
+                        Vector3.Distance(t.transform.position, primaryTarget.position) <= maxRange)
+            .OrderBy(t => Vector3.Distance(t.transform.position, primaryTarget.position))
+            .Take(count)
+            .ToList();
     }
 }
