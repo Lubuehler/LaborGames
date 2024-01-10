@@ -20,6 +20,8 @@ public class EnemySpawner : NetworkBehaviour
     [SerializeField] private GameObject jetPrefab;
     [SerializeField] private GameObject background;
 
+    [SerializeField] public float speed = 3f;
+
 
     public enum SpawnLocation
     {
@@ -36,7 +38,7 @@ public class EnemySpawner : NetworkBehaviour
         }
         else
         {
-            Destroy(this.gameObject);
+            Destroy(gameObject);
         }
     }
 
@@ -50,7 +52,7 @@ public class EnemySpawner : NetworkBehaviour
         Vector2 position;
         NetworkObject spawnedEnemy;
         switch (enemyType)
-        {       
+        {
             case EnemyType.Jet:
                 position = GetRandomPosition(SpawnLocation.Sides);
                 spawnedEnemy = Runner.Spawn(jetPrefab, position, Quaternion.identity);

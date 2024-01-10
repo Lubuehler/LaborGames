@@ -16,7 +16,7 @@ public class LevelController : NetworkBehaviour
 
     [Networked]
     public int currentWave { get; set; }
-    private float waveDuration = 10f;
+    private float waveDuration = 30f;
     private float waveDurationIncrease = 2f;
 
     private float waveEndTime; // Time when the current wave will end
@@ -49,14 +49,14 @@ public class LevelController : NetworkBehaviour
         }
         else
         {
-            Destroy(this.gameObject);
+            Destroy(gameObject);
         }
     }
 
     public override void Spawned()
     {
-        this.gameRunning = false;
-        this.waveInProgress = false;
+        gameRunning = false;
+        waveInProgress = false;
         initialized = true;
         if (!Runner.IsServer) return;
         EnemySpawner.Instance.UpdateEnemySpawnRate(EnemyType.Drone, 1);
@@ -74,12 +74,6 @@ public class LevelController : NetworkBehaviour
     [Rpc]
     public void RPC_Ready(NetworkObject networkObject, bool ready)
     {
-        //if (!gameRunning)
-        //{
-        //    networkObject.GetComponent<Player>().RpcReset();
-        //    networkObject.GetComponent<Player>().ready = ready;
-
-        //}
         if (Runner.IsServer)
         {
             networkObject.GetComponent<Player>().lobbyReady = ready;
@@ -187,6 +181,7 @@ public class LevelController : NetworkBehaviour
         if (gameRunning && GetLivingPlayers().Count() != 0)
         {
             print("shopping now");
+            EnemySpawner.Instance.speed = 3f;
             RpcEnterShoppingPhase();
         }
     }

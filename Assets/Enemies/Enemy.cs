@@ -2,6 +2,7 @@ using Fusion;
 using UnityEngine;
 using System.Collections.Generic;
 using System.Collections;
+using UnityEngine.UIElements;
 
 public enum EnemyType
 {
@@ -11,7 +12,7 @@ public enum EnemyType
 
 public class Enemy : NetworkBehaviour
 {
-    [SerializeField] protected float speed = 3f;
+    //[SerializeField] protected float speed = 3f;
     [SerializeField] protected int health = 100;
     [SerializeField] protected double viewingDistance = 20d;
     [SerializeField] protected LayerMask enemyLayerMask;
@@ -51,8 +52,10 @@ public class Enemy : NetworkBehaviour
                 networkRigidbody2D.Rigidbody.velocity = Vector2.Lerp(networkRigidbody2D.Rigidbody.velocity, Vector2.zero, Runner.DeltaTime * movementSmoothing);
                 return;
             }
-            Vector2 toTarget = (currentTarget.transform.position - transform.position);
+            Vector2 toTarget = currentTarget.transform.position - transform.position;
             Vector2 separationForce = CalculateSeparationForce();
+
+            var speed = EnemySpawner.Instance.speed;
 
             Vector2 desiredVelocity = (toTarget.normalized + separationForce).normalized * speed;
             networkRigidbody2D.Rigidbody.velocity = Vector2.Lerp(networkRigidbody2D.Rigidbody.velocity, desiredVelocity, Runner.DeltaTime * movementSmoothing);

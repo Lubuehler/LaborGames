@@ -55,7 +55,7 @@ public class Player : NetworkBehaviour
     // Actions
     public event Action OnStatsChanged;
     public event Action<float, float> OnHealthChanged;
-    public event Action<int> OnCoinsChanged;
+    public event Action OnCoinsChanged;
 
     private void Awake()
     {
@@ -107,7 +107,6 @@ public class Player : NetworkBehaviour
         currentHealth = maxHealth;
         OnStatsChanged?.Invoke();
         RpcHealthChanged();
-
     }
 
 
@@ -138,7 +137,7 @@ public class Player : NetworkBehaviour
         {
             Runner.Despawn(collider.gameObject.GetComponent<NetworkObject>());
             coins++;
-            OnCoinsChanged?.Invoke(coins);
+            OnCoinsChanged?.Invoke();
         }
 
     }
@@ -152,11 +151,14 @@ public class Player : NetworkBehaviour
     {
         _spriteRenderer.enabled = isAlive;
         _capsuleCollider.enabled = isAlive;
-
     }
 
     public void TakeDamage(float damage)
     {
+        if(GetBehaviour<Weapon>().shieldActive)
+        {
+            damage = 0;
+        }
         double randomNumber = new System.Random().NextDouble();
         if (randomNumber > dodgeChance)
         {
@@ -241,6 +243,11 @@ public class Player : NetworkBehaviour
     {
 
         Item item = ShopSystem.Instance.allItems.FirstOrDefault(item => item.itemID == id);
+        foreach(Item test in ShopSystem.Instance.allItems)
+        {
+            print(test.itemID);
+        }
+        print("item id: " + item.itemID);
         if (item != null)
         {
             foreach (StatModifier modifier in item.modifiers)
@@ -267,7 +274,6 @@ public class Player : NetworkBehaviour
                         range += modifier.value; break;
                     default:
                         Debug.LogError("Unknown Stat Modifier Name: Check the Item Description for Spelling"); break;
-
                 }
             }
             items.Add(item.itemID);

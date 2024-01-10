@@ -12,8 +12,6 @@ public class JetAnimation : MonoBehaviour
     {
         _rb = GetComponentInParent<NetworkRigidbody2D>();
         _transform = GetComponentInParent<Transform>();
-
-        Flip();
     }
 
 
@@ -24,9 +22,14 @@ public class JetAnimation : MonoBehaviour
             float angle = Mathf.Atan2(_rb.Rigidbody.velocity.y, _rb.Rigidbody.velocity.x) * Mathf.Rad2Deg;
             _transform.rotation = Quaternion.AngleAxis(angle, Vector3.forward);
         }
+
+        if(!GetComponentInParent<Jet>().maneuverStarted)
+        {
+            Flip();
+        }
     }
 
-    public void Flip()
+    private void Flip()
     {
         Vector3 currentScale = _transform.localScale;
         currentScale.y = Mathf.Abs(currentScale.y) * (_rb.Rigidbody.velocity.x < 0 ? -1 : 1);

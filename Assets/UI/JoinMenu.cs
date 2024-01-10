@@ -7,10 +7,13 @@ using TMPro;
 
 public class JoinMenu : MonoBehaviour
 {
-    public string selectedSession = "";
-    public Transform elementParent;
-    public GameObject template;
-    public GameObject placeholder;
+    [SerializeField] private Transform elementParent;
+    [SerializeField] private GameObject template;
+    [SerializeField] private GameObject placeholder;
+
+    private string selectedSession = "";
+    private bool isDoubleClick = false;
+    private float doubleClickTime = 0.5f;
     void OnEnable()
     {
         NetworkController.Instance.OnSessionListChanged += UpdateSessionList;
@@ -52,20 +55,26 @@ public class JoinMenu : MonoBehaviour
         }
     }
 
-
     public void OnButtonClick(GameObject clickedButton)
     {
         selectedSession = clickedButton.name;
+        if (!isDoubleClick)
+        {
+            isDoubleClick = true;
+            Invoke(nameof(ResetDoubleClick), doubleClickTime);
+        }
+        else
+        {
+            JoinGame();
+        }
     }
 
-
-
-    public void OnDirectConnectClick()
+    private void ResetDoubleClick()
     {
-        UIController.Instance.ShowDialog(UIElement.DirectJoin);
+        isDoubleClick = false;
     }
 
-    public async void OnJoinGameClick()
+    private async void JoinGame()
     {
         if (!string.IsNullOrEmpty(selectedSession))
         {
@@ -75,6 +84,16 @@ public class JoinMenu : MonoBehaviour
                 UIController.Instance.ShowUIElement(UIElement.Lobby);
             }
         }
+    }
+
+    public void OnDirectConnectClick()
+    {
+        UIController.Instance.ShowDialog(UIElement.DirectJoin);
+    }
+
+    public void OnJoinGameClick()
+    {
+        JoinGame();
     }
 
     public void OnBackClick()

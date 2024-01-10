@@ -49,6 +49,7 @@ public class ShopItem : MonoBehaviour
             priceField.color = Color.red;
         }
         image.sprite = item.icon;
+        background.color = item.color;
 
         // differences
         if (item.itemType == ItemType.Item)
@@ -65,7 +66,7 @@ public class ShopItem : MonoBehaviour
         {
             descriptionField.text = item.description;
         }
-        background.color = item.color;
+        
     }
 
     public void Redraw()

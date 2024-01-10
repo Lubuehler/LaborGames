@@ -10,9 +10,7 @@ public class NetworkController : MonoBehaviour, INetworkRunnerCallbacks
 {
     public static NetworkController Instance;
     private NetworkRunner _runner;
-
     [SerializeField] private NetworkPrefabRef _playerPrefab;
-
 
     // Session stuff
     public List<SessionInfo> sessionList;
@@ -30,7 +28,7 @@ public class NetworkController : MonoBehaviour, INetworkRunnerCallbacks
         }
         else
         {
-            Destroy(this.gameObject);
+            Destroy(gameObject);
         }
     }
 
