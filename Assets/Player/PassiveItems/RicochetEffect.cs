@@ -1,8 +1,4 @@
-﻿using System.Collections;
-using UnityEngine;
-
-using UnityEngine;
-using System.Collections.Generic;
+﻿using UnityEngine;
 using System.Linq;
 
 public class RicochetEffect : IEffect

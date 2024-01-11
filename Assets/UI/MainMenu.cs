@@ -5,10 +5,12 @@ using UnityEngine.UI;
 
 public class MainMenu : MonoBehaviour
 {
-    public Button multiplayerBtn;
+    [SerializeField] private GameObject loading;
+    [SerializeField] private Button multiplayerBtn;
 
     void OnEnable()
     {
+        loading.SetActive(false);
         multiplayerBtn.interactable = true;
     }
 
@@ -16,20 +18,30 @@ public class MainMenu : MonoBehaviour
     public async void OnMultiplayerClick()
     {
         multiplayerBtn.interactable = false;
-        await NetworkController.Instance.JoinLobby();
-        UIController.Instance.ShowUIElement(UIElement.Multiplayer);
+        loading.SetActive(true);
 
+        GameController.Instance.CreateNetworkController();
+        await NetworkController.Instance.JoinLobby();
+
+        UIController.Instance.ShowUIElement(UIElement.Multiplayer);
     }
 
+    public void OnSettingsClick(){}
 
+
+    // Debug
     public async void OnDebugJoinClick()
     {
+        loading.SetActive(true);
+        GameController.Instance.CreateNetworkController();
         await NetworkController.Instance.StartGame(Fusion.GameMode.Client, "TestSession");
         UIController.Instance.ShowUIElement(UIElement.Game);
     }
 
     public async void OnDebugHostClick()
     {
+        loading.SetActive(true);
+        GameController.Instance.CreateNetworkController();
         await NetworkController.Instance.StartGame(Fusion.GameMode.Host, "TestSession");
         LevelController.Instance.StartLevel();
         UIController.Instance.ShowUIElement(UIElement.Game);

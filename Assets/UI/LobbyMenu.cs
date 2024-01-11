@@ -91,18 +91,6 @@ public class LobbyMenu : MonoBehaviour
 
     public void OnBackClick()
     {
-        NetworkRunner runner = NetworkController.Instance.GetComponent<NetworkRunner>();
-        if(runner.IsServer)
-        {
-            runner.Shutdown(destroyGameObject: true);
-            Debug.Log("Shutdown");
-        }
-        else
-        {
-            runner.Disconnect(runner.LocalPlayer);
-            Debug.Log("Disconnect");
-        }
-        
-        UIController.Instance.ShowUIElement(UIElement.Main);
+        UIController.Instance.ShowDialog(UIElement.LeaveDialog);
     }
 }

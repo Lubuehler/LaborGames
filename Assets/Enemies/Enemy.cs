@@ -113,7 +113,6 @@ public class Enemy : NetworkBehaviour
     }
 
 
-
     public override void Render()
     {
         UpdateTarget();

@@ -62,7 +62,7 @@ public class Player : NetworkBehaviour
         _nrb2d = GetComponent<NetworkRigidbody2D>();
         _spriteRenderer = GetComponentInChildren<SpriteRenderer>();
         _capsuleCollider = GetComponent<CapsuleCollider2D>();
-        this.weapon = GetComponent<Weapon>();
+        weapon = GetComponent<Weapon>();
 
     }
 

@@ -44,6 +44,6 @@ public class Airship : Enemy
     {
         Quaternion rotation = Quaternion.LookRotation(Vector3.forward, networkRigidbody2D.Rigidbody.velocity);
         var projectile = Runner.Spawn(projectilePrefab, missileSpawnPosition.position, rotation, Object.InputAuthority);
-        projectile?.Fire(networkRigidbody2D.Rigidbody.velocity.normalized);
+        projectile?.Fire((currentTarget.transform.position - transform.position).normalized);
     }
 }

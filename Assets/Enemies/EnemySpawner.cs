@@ -1,11 +1,7 @@
 using Fusion;
-using System.Collections;
 using System.Collections.Generic;
-using System.Drawing;
 using System.Linq;
 using UnityEngine;
-using UnityEngine.UIElements;
-using static Unity.Collections.Unicode;
 
 public class EnemySpawner : NetworkBehaviour
 {
@@ -15,7 +11,6 @@ public class EnemySpawner : NetworkBehaviour
     private List<NetworkObject> _spawnedCoins = new List<NetworkObject>();
     public static EnemySpawner Instance;
 
-    [SerializeField] private GameObject background;
     [SerializeField] private GameObject coinPrefab;
 
     // Enemies
@@ -108,7 +103,7 @@ public class EnemySpawner : NetworkBehaviour
 
     private Vector3 GetRandomPosition(SpawnLocation location)
     {
-        BoxCollider2D boxCollider2D = background.GetComponent<BoxCollider2D>();
+        BoxCollider2D boxCollider2D = GameController.Instance.background.GetComponent<BoxCollider2D>();
         float width = boxCollider2D.size.x;
         float height = boxCollider2D.size.y;
         float padding = 2f;

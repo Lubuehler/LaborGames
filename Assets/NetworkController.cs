@@ -11,6 +11,7 @@ public class NetworkController : MonoBehaviour, INetworkRunnerCallbacks
     public static NetworkController Instance;
     private NetworkRunner _runner;
     [SerializeField] private NetworkPrefabRef _playerPrefab;
+    [SerializeField] private GameObject levelControllerPrefab;
 
     // Session stuff
     public List<SessionInfo> sessionList;
@@ -61,7 +62,6 @@ public class NetworkController : MonoBehaviour, INetworkRunnerCallbacks
             SceneManager = gameObject.AddComponent<NetworkSceneManagerDefault>(),
             PlayerCount = 4
         });
-
         currentSession = _runner.SessionInfo;
         return result;
     }
@@ -70,6 +70,10 @@ public class NetworkController : MonoBehaviour, INetworkRunnerCallbacks
 
     public void OnPlayerJoined(NetworkRunner runner, PlayerRef player)
     {
+        if (player == runner.LocalPlayer)
+        {
+            _runner.Spawn(levelControllerPrefab);
+        }
         if (runner.IsServer)
         {
             Vector2 spawnPosition = new Vector2(0, 0);
@@ -84,6 +88,8 @@ public class NetworkController : MonoBehaviour, INetworkRunnerCallbacks
 
     public void OnPlayerLeft(NetworkRunner runner, PlayerRef player)
     {
+        runner.Disconnect(player);
+        runner.Despawn(GetPlayerAvatar(player));
         OnPlayerListChanged?.Invoke();
     }
 
@@ -166,6 +172,7 @@ public struct NetworkInputData : INetworkInput
     public NetworkButtons buttons;
 }
 
-enum MyButtons {
+enum MyButtons
+{
     SpecialAttack = 0,
 }

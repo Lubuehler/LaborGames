@@ -57,8 +57,7 @@ public class Weapon : NetworkBehaviour
     public override void Spawned()
     {
         player = GetBehaviour<Player>();
-        //selectedSpecialAttack = int.MinValue;
-        selectedSpecialAttack = 3;
+        selectedSpecialAttack = int.MinValue;
     }
 
     [Networked] public NetworkButtons ButtonsPrevious { get; set; }
