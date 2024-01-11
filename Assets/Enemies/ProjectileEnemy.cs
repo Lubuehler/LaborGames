@@ -2,7 +2,7 @@ using System.Collections;
 using UnityEngine;
 using Fusion;
 
-public class ProjectileJet : NetworkBehaviour
+public class ProjectileEnemy : NetworkBehaviour
 {
     private NetworkRigidbody2D _rigidbody;
     public float speed = 20.0f;
@@ -21,7 +21,7 @@ public class ProjectileJet : NetworkBehaviour
     IEnumerator DestroyAfterTime()
     {
         yield return new WaitForSeconds(5);
-        Runner.Despawn(this.GetComponent<NetworkObject>());
+        Runner.Despawn(GetComponent<NetworkObject>());
     }
 
     protected void Awake()
@@ -31,7 +31,6 @@ public class ProjectileJet : NetworkBehaviour
 
     void OnCollisionEnter2D(Collision2D collision)
     {
-        // Check if the collision involves the specified layers.
         if ((collisionLayers.value & (1 << collision.gameObject.layer)) != 0)
         {
             collision.gameObject.GetComponent<Player>().TakeDamage(damage);

@@ -7,7 +7,6 @@ public class ExplosionScript : MonoBehaviour
 {
     private void Start()
     {
-        // Call an RPC to play the explosion on all clients
         RpcPlayExplosion();
     }
 

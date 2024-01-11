@@ -8,6 +8,7 @@ public enum EnemyType
 {
     Drone,
     Jet,
+    Airship,
 }
 
 public class Enemy : NetworkBehaviour

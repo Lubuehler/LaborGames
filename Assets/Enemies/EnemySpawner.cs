@@ -15,10 +15,14 @@ public class EnemySpawner : NetworkBehaviour
     private List<NetworkObject> _spawnedCoins = new List<NetworkObject>();
     public static EnemySpawner Instance;
 
+    [SerializeField] private GameObject background;
     [SerializeField] private GameObject coinPrefab;
+
+    // Enemies
     [SerializeField] private GameObject dronePrefab;
     [SerializeField] private GameObject jetPrefab;
-    [SerializeField] private GameObject background;
+    [SerializeField] private GameObject airshipPrefab;
+
 
     [SerializeField] public float speed = 3f;
 
@@ -44,15 +48,20 @@ public class EnemySpawner : NetworkBehaviour
 
     public void SpawnEnemy()
     {
-        // if(_spawnedEnemies.Count >= 1)
-        // {
-        //     return;
-        // }
+        if(_spawnedEnemies.Count >= 1)
+        {
+            return;
+        }
         EnemyType enemyType = SelectEnemyTypeBasedOnSpawnRate();
         Vector2 position;
         NetworkObject spawnedEnemy;
         switch (enemyType)
         {
+            case EnemyType.Airship:
+                position = GetRandomPosition(SpawnLocation.Sides);
+                spawnedEnemy = Runner.Spawn(airshipPrefab, position, Quaternion.identity);
+                break;
+
             case EnemyType.Jet:
                 position = GetRandomPosition(SpawnLocation.Sides);
                 spawnedEnemy = Runner.Spawn(jetPrefab, position, Quaternion.identity);
@@ -85,7 +94,7 @@ public class EnemySpawner : NetworkBehaviour
     private EnemyType SelectEnemyTypeBasedOnSpawnRate()
     {
         float totalRate = enemySpawnRates.Values.Sum();
-        float randomPoint = UnityEngine.Random.value * totalRate;
+        float randomPoint = Random.value * totalRate;
 
         foreach (var pair in enemySpawnRates)
         {
@@ -110,11 +119,11 @@ public class EnemySpawner : NetworkBehaviour
         switch (location)
         {
             case SpawnLocation.Top:
-                x = UnityEngine.Random.Range(-width / 2, width / 2);
+                x = Random.Range(-width / 2, width / 2);
                 y = height / 2 + padding;
                 break;
             case SpawnLocation.Bottom:
-                x = UnityEngine.Random.Range(-width / 2, width / 2);
+                x = Random.Range(-width / 2, width / 2);
                 y = -height / 2 - padding;
                 break;
             case SpawnLocation.Sides:

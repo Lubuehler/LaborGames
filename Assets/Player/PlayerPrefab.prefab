@@ -496,7 +496,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _interpolationDataSource: 0
   _projectilePrefab: {fileID: 1350390008315525890, guid: 95fb6b4a33b3a6543bcec83d35c8c1bf, type: 3}
-  empPrefab: {fileID: 1329845292236604, guid: 87914b4f3f298e541968506f49f26089, type: 3}
+  empPrefab: {fileID: 1329845292236604, guid: 41dbe25fe29c6bc479115bcc6666f7fc, type: 3}
   teleportPrefab: {fileID: 5616772272965261741, guid: 567b249f8d8d04940bdc344a9d4da063, type: 3}
   shield: {fileID: 1702566521383160805}
   shieldAnimator: {fileID: 7184656381466371801}
@@ -506,3 +506,4 @@ MonoBehaviour:
   specialAttackTimer: 0
   animationDuration: 10
   shieldActive: 0
+  slownessActive: 0

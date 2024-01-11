@@ -2,7 +2,7 @@ using Fusion;
 using UnityEngine;
 public class Jet : Enemy
 {
-    [SerializeField] private ProjectileJet projectilePrefab;
+    [SerializeField] private ProjectileEnemy projectilePrefab;
 
     public bool maneuverStarted = false;
 

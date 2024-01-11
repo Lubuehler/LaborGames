@@ -45,7 +45,6 @@ public class HUD : MonoBehaviour
         if (weapon.selectedSpecialAttack != int.MinValue)
         {
             specialAttack.SetActive(true);
-
             Item selectedItem = ShopSystem.Instance.allItems.FirstOrDefault(item => item.itemID == weapon.selectedSpecialAttack);
             specialAttack.GetComponentInChildren<TMP_Text>().text = selectedItem?.itemName;
             specialAttackIcon.sprite = selectedItem?.icon;

@@ -28,7 +28,6 @@ public class Weapon : NetworkBehaviour
     public float animationDuration = 10f;
 
 
-
     // Teleport
     private static int maxLength = 8; // 4 times per second -> 2 seconds
     private Queue<Vector3> positions = new Queue<Vector3>(maxLength + 1);
@@ -42,7 +41,6 @@ public class Weapon : NetworkBehaviour
     private bool animationTriggered = false;
 
     // Slowness 
-
     private float slownessTime = 5.0f;
     public bool slownessActive = false;
 
@@ -59,7 +57,8 @@ public class Weapon : NetworkBehaviour
     public override void Spawned()
     {
         player = GetBehaviour<Player>();
-        selectedSpecialAttack = int.MinValue;
+        //selectedSpecialAttack = int.MinValue;
+        selectedSpecialAttack = 3;
     }
 
     [Networked] public NetworkButtons ButtonsPrevious { get; set; }
