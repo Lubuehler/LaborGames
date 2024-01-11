@@ -17,10 +17,10 @@ public class MultiTargetAttackEffect : IEffect
 
     private void HandleOnAttack(Transform weapon, Transform target)
     {
-        List<GameObject> enemies = LevelController.Instance.FindClosestEnemies(target, additionalAttacks, 20f);
-        foreach (GameObject enemy in enemies)
+        List<Enemy> enemies = LevelController.Instance.FindClosestEnemies(target.position, additionalAttacks, 5f);
+        foreach (Enemy enemy in enemies)
         {
-            this.weapon.ReleaseBullet(enemy.transform);
+            this.weapon.ReleaseBullet(enemy.getTransform());
         }
     }
 

@@ -192,4 +192,9 @@ public class HUD : MonoBehaviour
         LevelController.Instance.localPlayer.TakeDamage(1000);
     }
 
+    public void OnDebugShopClick()
+    {
+        LevelController.Instance.isShopping = true;
+    }
+
 }

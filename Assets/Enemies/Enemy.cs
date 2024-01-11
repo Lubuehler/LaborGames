@@ -42,6 +42,16 @@ public class Enemy : NetworkBehaviour
         UpdateTarget();
     }
 
+    public Vector3 getPosition()
+    {
+        return networkRigidbody2D.transform.position;
+    }
+
+    public Transform getTransform()
+    {
+        return networkRigidbody2D.transform;
+    }
+
 
     protected virtual void Move()
     {

@@ -67,6 +67,20 @@ MonoBehaviour:
       value: 0.4
     itemType: 0
     tier: 3
+  - itemName: Statikk Shiv
+    itemID: 3087
+    price: 99
+    description: 50 Attack Damage30% Attack Speed20% Critical Strike ChanceEnergized: Moving and Attacking will generate an Energized Attack.Electroshock: Fires chain lightning that bounces to and damages nearby enemies.
+    icon: {fileID: 0}
+    modifiers:
+    - statName: Attack Damage
+      value: 50
+    - statName: Critical Strike Chance
+      value: 0.2
+    - statName: Attack Speed
+      value: 0.3
+    itemType: 0
+    tier: 3
   - itemID: 3
     itemName: EMP
     icon: {fileID: 21300000, guid: eda440128390ecd418e297b80bd1dd0c, type: 3}

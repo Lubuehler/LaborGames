@@ -8,7 +8,6 @@ public class Projectile : NetworkBehaviour
 {
     private NetworkRigidbody2D _rigidbody;
     public float speed = 20.0f;
-    public int damage = 50;
     public LayerMask collisionLayers;
 
     private Func<GameObject, bool> onHit;

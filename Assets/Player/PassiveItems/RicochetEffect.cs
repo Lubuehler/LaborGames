@@ -1,8 +1,4 @@
-﻿using System.Collections;
-using UnityEngine;
-
-using UnityEngine;
-using System.Collections.Generic;
+﻿using UnityEngine;
 using System.Linq;
 
 public class RicochetEffect : IEffect
@@ -16,26 +12,30 @@ public class RicochetEffect : IEffect
     {
         this.weapon = weapon;
         this.maxJumps = 1;
-        this.jumpRange = 20;
+        this.jumpRange = 200;
         weapon.OnHitTarget += HandleOnHitTarget;
     }
 
     private void HandleOnHitTarget(Transform hitTarget)
     {
-        PerformRicochet(hitTarget, maxJumps);
+        Enemy enemy = hitTarget.GetComponent<Enemy>();
+        if (enemy != null)
+        {
+            PerformRicochet(enemy, maxJumps);
+
+        }
     }
 
-    private void PerformRicochet(Transform currentTarget, int jumpsRemaining)
+    private void PerformRicochet(Enemy firstTarget, int jumpsRemaining)
     {
-        Transform nextTarget = currentTarget;
-
+        Enemy currentTarget = firstTarget;
         while (jumpsRemaining > 0)
         {
-            GameObject nextTargetObj = LevelController.Instance.FindClosestEnemies(nextTarget, 1, jumpRange).FirstOrDefault();
-            if (nextTargetObj != null)
+            Enemy nextEnemy = LevelController.Instance.FindClosestEnemies(currentTarget.getPosition(), 1, jumpRange, ignoreEnemy: currentTarget).First();
+            if (nextEnemy != null)
             {
                 // Simulate an attack on the next target
-                this.weapon.ReleaseBullet(nextTargetObj.transform);
+                this.weapon.ReleaseBullet(nextEnemy.getTransform(), origin: currentTarget.getTransform());
             }
             else
             {

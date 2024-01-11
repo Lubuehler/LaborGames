@@ -35,7 +35,7 @@ public class LevelController : NetworkBehaviour
     public event Action OnPlayerListChanged;
 
     [Networked]
-    public bool isShopping { get; private set; }
+    public bool isShopping { get; set; }
 
     [SerializeField] private LayerMask enemyMask;
 
@@ -167,7 +167,7 @@ public class LevelController : NetworkBehaviour
 
         RemainingWaveTime = duration;
 
-        while (RemainingWaveTime > 0 && waveInProgress)
+        while (RemainingWaveTime > 0 && waveInProgress && isShopping == false)
         {
             // Assuming the game is not paused and you're counting down
             RemainingWaveTime -= 1;
@@ -177,10 +177,8 @@ public class LevelController : NetworkBehaviour
         }
 
         RpcEndWave();
-        print("wave ended");
         if (gameRunning && GetLivingPlayers().Count() != 0)
         {
-            print("shopping now");
             EnemySpawner.Instance.speed = 3f;
             RpcEnterShoppingPhase();
         }
@@ -326,12 +324,14 @@ public class LevelController : NetworkBehaviour
         return deadPlayers;
     }
 
-    public List<GameObject> FindClosestEnemies(Transform primaryTarget, int count, float maxRange)
+    public List<Enemy> FindClosestEnemies(Vector3 position, int count, float maxRange, Enemy ignoreEnemy = null)
     {
-        return FindObjectsOfType<GameObject>()
-            .Where(t => (enemyMask.value & (1 << t.layer)) != 0 &&
-                        Vector3.Distance(t.transform.position, primaryTarget.position) <= maxRange)
-            .OrderBy(t => Vector3.Distance(t.transform.position, primaryTarget.position))
+        return FindObjectsOfType<Enemy>()
+            .Where(t => t != ignoreEnemy)
+            .Where(t => (enemyMask.value & (1 << t.gameObject.layer)) != 0)
+            .Where(t => Vector3.Distance(t.getPosition(), position) <= maxRange)
+                        
+            .OrderBy(t => Vector3.Distance(t.getPosition(), position))
             .Take(count)
             .ToList();
     }

@@ -149,7 +149,7 @@ public class Weapon : NetworkBehaviour
                 currentTime += Time.deltaTime;
                 if (currentTime >= 1f / player.attackSpeed)
                 {
-                    Shoot(LevelController.Instance.FindClosestEnemies(transform, 1, 10f).FirstOrDefault());
+                    Shoot(LevelController.Instance.FindClosestEnemies(transform.position, 1, 10f).FirstOrDefault());
                     currentTime = 0f;
                 }
             }
@@ -207,27 +207,34 @@ public class Weapon : NetworkBehaviour
         }
     }
 
-    private void Shoot(GameObject target)
+    private void Shoot(Enemy target)
     {
         if (target != null)
         {
-            ReleaseBullet(target.transform);
-            OnAttack?.Invoke(gameObject.transform, transform);
+            ReleaseBullet(target.getTransform());
+            OnAttack?.Invoke(gameObject.transform, target.getTransform());
         }
     }
 
-    public void ReleaseBullet(Transform target)
+    public void ReleaseBullet(Transform target, Transform origin = null)
     {
-        if (target != null)
+        if (target == null)
+        { return; }
+            if (origin == null) {
+            origin = transform;
+        } else
         {
-            Vector3 direction = target.position - _nrb2d.transform.position;
+            print("origin: " + origin.position.x + ", " + origin.position.y + ", target: " + target.position.x + ", " + target.position.y);
 
-            Quaternion rotation = Quaternion.LookRotation(Vector3.forward, direction);
-
-            var projectile = Runner.Spawn(_projectilePrefab, _nrb2d.transform.position, rotation, Object.InputAuthority);
-
-            projectile?.Fire(direction.normalized,  OnBulletHit);
         }
+
+        Projectile projectile;
+        Vector3 direction;
+        direction = target.position - origin.position;
+        projectile = Runner.Spawn(_projectilePrefab, origin.position, Quaternion.LookRotation(Vector3.forward, direction), Object.InputAuthority);
+
+        projectile?.Fire(direction.normalized,  OnBulletHit);
+        
     }
 
     public bool OnBulletHit(GameObject gameObject)

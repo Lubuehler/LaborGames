@@ -160,7 +160,7 @@ public class Player : NetworkBehaviour
             damage = 0;
         }
         double randomNumber = new System.Random().NextDouble();
-        if (randomNumber > dodgeChance)
+        if (randomNumber < dodgeChance)
         {
             return;
         }
