@@ -1,4 +1,4 @@
-using System.Collections;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -20,6 +20,7 @@ public class UIController : MonoBehaviour
     // Dialogs
     [SerializeField] private GameObject leaveDialogCanvas;
     [SerializeField] private GameObject directJoinDialogCanvas;
+    [SerializeField] private GameObject exceptionDialog;
 
     public Dictionary<UIElement, GameObject> canvasDict = new Dictionary<UIElement, GameObject>();
 
@@ -52,6 +53,7 @@ public class UIController : MonoBehaviour
 
         canvasDict[UIElement.DirectJoinDialog] = directJoinDialogCanvas;
         canvasDict[UIElement.LeaveDialog] = leaveDialogCanvas;
+        canvasDict[UIElement.ExceptionDialog] = exceptionDialog;
 
         DataController.Instance.LoadData();
         if (string.IsNullOrEmpty(DataController.Instance.playerData.playerName))
@@ -109,6 +111,14 @@ public class UIController : MonoBehaviour
         canvasDict[uIElement].SetActive(false);
         activeDialog = null;
     }
+
+    public void ShowExceptionDialog(UIElement uIElement, String message)
+    {
+        var gameObject = canvasDict[uIElement];
+        gameObject.SetActive(true);
+        gameObject.GetComponent<ExceptionDialog>().SetMessage(message);
+        activeDialog = uIElement;
+    }
 }
 
 public enum UIElement
@@ -126,4 +136,5 @@ public enum UIElement
 
     DirectJoinDialog,
     LeaveDialog,
+    ExceptionDialog,
 }

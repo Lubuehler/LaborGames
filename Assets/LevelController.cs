@@ -39,8 +39,6 @@ public class LevelController : NetworkBehaviour
 
     [SerializeField] private LayerMask enemyMask;
 
-
-
     private void Awake()
     {
         if (Instance == null)
@@ -334,5 +332,10 @@ public class LevelController : NetworkBehaviour
             .OrderBy(t => Vector3.Distance(t.transform.position, primaryTarget.position))
             .Take(count)
             .ToList();
+    }
+
+    public void TriggerPlayerListChanged()
+    {
+        OnPlayerListChanged.Invoke();
     }
 }

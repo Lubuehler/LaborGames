@@ -118,6 +118,12 @@ public class NetworkController : MonoBehaviour, INetworkRunnerCallbacks
     public void OnShutdown(NetworkRunner runner, ShutdownReason shutdownReason)
     {
         Debug.Log(shutdownReason);
+        if(runner.IsClient)
+        {
+            UIController.Instance.ShowUIElement(UIElement.Main);
+            var message = "ShutdownReason: " + shutdownReason;
+            UIController.Instance.ShowExceptionDialog(UIElement.ExceptionDialog, message);
+        }
     }
     public void OnConnectedToServer(NetworkRunner runner) { }
     public void OnDisconnectedFromServer(NetworkRunner runner) { }
