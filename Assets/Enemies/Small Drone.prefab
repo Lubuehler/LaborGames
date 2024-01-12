@@ -172,7 +172,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _interpolationDataSource: 0
-  speed: 3
   health: 2
   viewingDistance: 4
   enemyLayerMask:
@@ -185,6 +184,7 @@ MonoBehaviour:
   explosionRange: 0.8
   explosionDamage: 40
   deathExplosionPrefab: {fileID: 7726421982602285071, guid: cc38b5938cf4f7947a6710d03457cb5f, type: 3}
+  smokeGrenadePrefab: {fileID: 9129722000280626897, guid: c9390d258899ade40bf1e92801c0e88c, type: 3}
 --- !u!50 &6852596507332962957
 Rigidbody2D:
   serializedVersion: 4

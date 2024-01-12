@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System;
 using System.Collections;
 using System.Linq;
+using UnityEngine.UIElements;
 
 public class LevelController : NetworkBehaviour
 {
@@ -51,6 +52,7 @@ public class LevelController : NetworkBehaviour
         {
             Destroy(gameObject);
         }
+        
     }
 
     public override void Spawned()
@@ -196,9 +198,10 @@ public class LevelController : NetworkBehaviour
     {
         if (currentWave >= 0)
         {
-            EnemySpawner.Instance.UpdateEnemySpawnRate(EnemyType.Jet, 1);
+            EnemySpawner.Instance.UpdateEnemySpawnRate(EnemyType.Jet, 3);
             //EnemySpawner.Instance.UpdateEnemySpawnRate(EnemyType.Drone, 3);
             EnemySpawner.Instance.UpdateEnemySpawnRate(EnemyType.Drone, 10);
+            //EnemySpawner.Instance.UpdateEnemySpawnRate(EnemyType.LaserDrone, 1);
         }
     }
 

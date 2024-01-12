@@ -506,3 +506,4 @@ MonoBehaviour:
   specialAttackTimer: 0
   animationDuration: 10
   shieldActive: 0
+  slownessActive: 0

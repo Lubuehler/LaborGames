@@ -18,7 +18,8 @@ public class EnemySpawner : NetworkBehaviour
     [SerializeField] private GameObject coinPrefab;
     [SerializeField] private GameObject dronePrefab;
     [SerializeField] private GameObject jetPrefab;
-    [SerializeField] private GameObject background;
+    [SerializeField] private GameObject laserDronePrefab;
+    [SerializeField] public GameObject background;
 
     [SerializeField] public float speed = 3f;
 
@@ -53,6 +54,10 @@ public class EnemySpawner : NetworkBehaviour
         NetworkObject spawnedEnemy;
         switch (enemyType)
         {
+            case EnemyType.LaserDrone:
+                position = GetRandomPosition(SpawnLocation.Sides);
+                spawnedEnemy = Runner.Spawn(laserDronePrefab, position, Quaternion.identity);
+                break;
             case EnemyType.Jet:
                 position = GetRandomPosition(SpawnLocation.Sides);
                 spawnedEnemy = Runner.Spawn(jetPrefab, position, Quaternion.identity);

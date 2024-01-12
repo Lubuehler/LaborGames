@@ -7150,6 +7150,7 @@ MonoBehaviour:
   coinPrefab: {fileID: 7642399719152706105, guid: fb1664e303f842649974e2b83a76942f, type: 3}
   dronePrefab: {fileID: 4776032338861653262, guid: c277ef3b8d5d3ae49b14c01c25e63955, type: 3}
   jetPrefab: {fileID: 8933241707471840372, guid: 93f248326ffcc6e438b85289384b468e, type: 3}
+  laserDronePrefab: {fileID: 6668634034695240566, guid: 6537276e53508364ba33debfca9f9a93, type: 3}
   background: {fileID: 791546675}
   speed: 3
 --- !u!1 &811386237
@@ -10296,7 +10297,7 @@ Camera:
   m_Enabled: 1
   serializedVersion: 2
   m_ClearFlags: 1
-  m_BackGroundColor: {r: 0.21960786, g: 0.21960786, b: 0.21960786, a: 0}
+  m_BackGroundColor: {r: 0.4716981, g: 0.4716981, b: 0.4716981, a: 0}
   m_projectionMatrixMode: 1
   m_GateFitMode: 2
   m_FOVAxisMode: 0

@@ -66,6 +66,11 @@ public class Player : NetworkBehaviour
 
     }
 
+    public Vector2 getPosition()
+    {
+        return _nrb2d.transform.position;
+    }
+
     public override void Spawned()
     {
         isAlive = true;

@@ -8,6 +8,7 @@ public enum EnemyType
 {
     Drone,
     Jet,
+    LaserDrone
 }
 
 public class Enemy : NetworkBehaviour
@@ -42,9 +43,14 @@ public class Enemy : NetworkBehaviour
         UpdateTarget();
     }
 
-    public Vector3 getPosition()
+    public Vector2 getPosition()
     {
-        return networkRigidbody2D.transform.position;
+        return networkRigidbody2D.ReadPosition();
+    }
+    
+    public Vector2 getVelocity()
+    {
+        return networkRigidbody2D.ReadVelocity();
     }
 
     public Transform getTransform()
@@ -127,7 +133,10 @@ public class Enemy : NetworkBehaviour
     {
         UpdateTarget();
         Move();
+        DoSomething();
     }
+
+    protected virtual void DoSomething() { }
 
     protected void UpdateTarget()
     {
