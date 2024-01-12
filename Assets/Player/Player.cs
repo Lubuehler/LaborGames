@@ -1,10 +1,8 @@
 using Fusion;
 using UnityEngine;
 using System.Collections;
-using System.Collections.Generic;
 using System;
 using System.Linq;
-
 
 public class Player : NetworkBehaviour
 {
@@ -135,7 +133,7 @@ public class Player : NetworkBehaviour
     {
         if (((1 << collider.gameObject.layer) & coinMask) != 0)
         {
-            Runner.Despawn(collider.gameObject.GetComponent<NetworkObject>());
+            EnemySpawner.Instance.CoinCollected(collider.gameObject.GetComponent<Coin>());
             coins++;
             OnCoinsChanged?.Invoke();
         }
@@ -155,10 +153,11 @@ public class Player : NetworkBehaviour
 
     public void TakeDamage(float damage)
     {
-        if(GetBehaviour<Weapon>().shieldActive)
+        if (weapon.shieldActive)
         {
             damage = 0;
         }
+
         double randomNumber = new System.Random().NextDouble();
         if (randomNumber > dodgeChance)
         {
@@ -243,7 +242,7 @@ public class Player : NetworkBehaviour
     {
 
         Item item = ShopSystem.Instance.allItems.FirstOrDefault(item => item.itemID == id);
-        foreach(Item test in ShopSystem.Instance.allItems)
+        foreach (Item test in ShopSystem.Instance.allItems)
         {
             print(test.itemID);
         }
@@ -286,5 +285,4 @@ public class Player : NetworkBehaviour
     {
         OnHealthChanged?.Invoke(currentHealth, maxHealth);
     }
-
 }

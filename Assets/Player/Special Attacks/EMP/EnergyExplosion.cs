@@ -1,9 +1,7 @@
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
 using Fusion;
+using UnityEngine;
 
-public class EMP : NetworkBehaviour
+public class EnergyExplosion : NetworkBehaviour
 {
     [SerializeField] private LayerMask enemyLayer;
 

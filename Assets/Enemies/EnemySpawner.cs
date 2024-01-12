@@ -8,7 +8,7 @@ public class EnemySpawner : NetworkBehaviour
     private Dictionary<EnemyType, float> enemySpawnRates = new Dictionary<EnemyType, float>();
 
     private List<NetworkObject> _spawnedEnemies = new List<NetworkObject>();
-    private List<NetworkObject> _spawnedCoins = new List<NetworkObject>();
+    public List<NetworkObject> _spawnedCoins = new List<NetworkObject>();
     public static EnemySpawner Instance;
 
     [SerializeField] private GameObject coinPrefab;
@@ -43,10 +43,10 @@ public class EnemySpawner : NetworkBehaviour
 
     public void SpawnEnemy()
     {
-        if(_spawnedEnemies.Count >= 1)
-        {
-            return;
-        }
+        // if(_spawnedEnemies.Count >= 1)
+        // {
+        //     return;
+        // }
         EnemyType enemyType = SelectEnemyTypeBasedOnSpawnRate();
         Vector2 position;
         NetworkObject spawnedEnemy;
@@ -152,5 +152,11 @@ public class EnemySpawner : NetworkBehaviour
             NetworkObject spawnedCoin = Runner.Spawn(coinPrefab, position, Quaternion.identity);
             _spawnedCoins.Add(spawnedCoin);
         }
+    }
+
+    public void CoinCollected(Coin coin)
+    {
+        _spawnedCoins.Remove(coin.GetComponent<NetworkObject>());
+        Runner.Despawn(coin.GetComponent<NetworkObject>());
     }
 }

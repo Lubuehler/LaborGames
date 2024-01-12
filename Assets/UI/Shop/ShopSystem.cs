@@ -46,6 +46,7 @@ public class ShopSystem : MonoBehaviour
             if (item.itemType == ItemType.SpecialAttack)
             {
                 LevelController.Instance.localPlayer.GetBehaviour<Weapon>().RPC_AddSpecialAttack(item.itemID);
+                availableItems.Remove(item);
             }
             else if (item.itemType == ItemType.Item)
             {

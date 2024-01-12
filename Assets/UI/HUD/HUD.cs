@@ -68,7 +68,7 @@ public class HUD : MonoBehaviour
 
         if (specialAttack.activeSelf)
         {
-            float newHeight = Mathf.Lerp(0, initialHeight, weapon.specialAttackTimer / weapon.animationDuration);
+            float newHeight = Mathf.Lerp(0, initialHeight, weapon.specialAttackTimer / weapon.cooldown);
             SetImageHeight(newHeight);
         }
 
