@@ -49,6 +49,10 @@ public class HUD : MonoBehaviour
             specialAttack.GetComponentInChildren<TMP_Text>().text = selectedItem?.itemName;
             specialAttackIcon.sprite = selectedItem?.icon;
         }
+        else
+        {
+            specialAttack.SetActive(false);
+        }
 
         UpdateCoinsCounter();
         OnPlayerListChanged();

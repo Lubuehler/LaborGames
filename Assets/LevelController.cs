@@ -213,7 +213,7 @@ public class LevelController : NetworkBehaviour
     public void StartLevel()
     {
         StartNextWave();
-        this.gameRunning = true;
+        gameRunning = true;
     }
 
     [Rpc(RpcSources.All, RpcTargets.All)]
@@ -245,6 +245,10 @@ public class LevelController : NetworkBehaviour
     public void RpcGameOver()
     {
         RpcEndWave();
+        foreach(Player player in players)
+        {
+            player.GetComponent<Weapon>().ResetSpecialAttacks();
+        }
         UIController.Instance.ShowUIElement(UIElement.Endscreen);
         print("Game Over");
         StopGame();

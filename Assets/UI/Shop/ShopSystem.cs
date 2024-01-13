@@ -22,12 +22,10 @@ public class ShopSystem : MonoBehaviour
         }
         else
         {
-            Destroy(this.gameObject);
+            Destroy(gameObject);
         }
         allItems.AddRange(itemDatabase.items);
         availableItems.AddRange(itemDatabase.items);
-
-
     }
 
     public void BuyItem(Item item)
@@ -57,7 +55,6 @@ public class ShopSystem : MonoBehaviour
             return true;
         }
         return false;
-
     }
 
     public bool CanAfford(int price)

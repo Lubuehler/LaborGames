@@ -94,12 +94,14 @@ public class ShopMenu : MonoBehaviour
             player.OnStatsChanged += UpdateStats;
             UpdateStats(); // Update immediately to show current stats
         }
-        this.wave.text = "Shop (Wave " + LevelController.Instance.currentWave.ToString() + ")";
-        this.coins.text = player.coins.ToString();
+        wave.text = "Shop (Wave " + LevelController.Instance.currentWave.ToString() + ")";
+        coins.text = player.coins.ToString();
 
         refreshButtonPriceText.text = (initialRefreshShopPrice + refreshShopPriceIncreasePerWave * LevelController.Instance.currentWave).ToString();
         ressurectButtonPriceText.text = (initialRespawnPrice + respawnPriceIncreasePerWave * LevelController.Instance.currentWave).ToString();
+
         RandomizeShop();
+        ClearCells();
     }
 
     private void Update()
@@ -253,15 +255,30 @@ public class ShopMenu : MonoBehaviour
         {
             if (item.itemType == ItemType.SpecialAttack)
             {
-                GameObject itemVis = Instantiate(specialAttackCellPrefab);
-                itemVis.transform.SetParent(specialAttackCellGroup.transform, false);
+                GameObject itemVis = Instantiate(specialAttackCellPrefab, parent: specialAttackCellGroup.transform);
+                //itemVis.transform.SetParent(specialAttackCellGroup.transform, false);
                 itemVis.GetComponent<SpecialAttackCell>().Initialize(item);
             }
             else if (item.itemType == ItemType.Item)
             {
-                GameObject itemVis = Instantiate(itemCellPrefab);
-                itemVis.transform.SetParent(itemCellGroup.transform, false);
+                GameObject itemVis = Instantiate(itemCellPrefab, parent: itemCellGroup.transform);
+                //itemVis.transform.SetParent(itemCellGroup.transform, false);
                 itemVis.GetComponent<ItemCell>().Initialize(item);
+            }
+        }
+    }
+
+    private void ClearCells()
+    {
+        if (player.GetComponent<Weapon>().specialAttacks.Count == 0 && player.items.Count == 0)
+        {
+            while (specialAttackCellGroup.transform.childCount > 0)
+            {
+                DestroyImmediate(specialAttackCellGroup.transform.GetChild(0).gameObject);
+            }
+            while (itemCellGroup.transform.childCount > 0)
+            {
+                DestroyImmediate(itemCellGroup.transform.GetChild(0).gameObject);
             }
         }
     }

@@ -15,45 +15,37 @@ public class Weapon : NetworkBehaviour
     [SerializeField] private GameObject shield;
     [SerializeField] private GameObject slowness;
 
-
     private NetworkRigidbody2D _nrb2d;
     private Player player;
 
     private float currentTime { get; set; }
 
     [Networked] public int shotCounter { get; set; } = 0;
-
-
-    // ###############################################
-    public bool shieldActive = false;
-    // ###############################################
-
-
     [Networked, Capacity(20)] public NetworkLinkedList<int> specialAttacks { get; }
     [Networked(OnChanged = nameof(OnSpecialAttackChanged))] public int selectedSpecialAttack { get; set; }
+    [Networked] public NetworkButtons ButtonsPrevious { get; set; }
+    [Networked] public bool specialAttackAvailable { get; set; }
 
-
-    public bool specialAttackAvailable;
     public float specialAttackTimer;
     public float cooldown = 2f;
 
+    public bool shieldActive = false;
 
     public event Action<Transform, int> OnAttack;
     public event Action<Vector2, int, int> OnHitTarget;
+
     private void Awake()
     {
         _nrb2d = GetComponent<NetworkRigidbody2D>();
-        specialAttackAvailable = false;
         specialAttackTimer = cooldown;
     }
 
     public override void Spawned()
     {
         player = GetBehaviour<Player>();
+        specialAttackAvailable = false;
         selectedSpecialAttack = int.MinValue;
     }
-
-    [Networked] public NetworkButtons ButtonsPrevious { get; set; }
 
     public override void FixedUpdateNetwork()
     {
@@ -74,8 +66,6 @@ public class Weapon : NetworkBehaviour
                 }
             }
         }
-
-
     }
 
     public static void OnSpecialAttackChanged(Changed<Weapon> changed)
@@ -201,7 +191,6 @@ public class Weapon : NetworkBehaviour
         projectile = Instantiate(_projectilePrefab, (Vector2)origin, Quaternion.LookRotation(Vector3.forward, direction));
 
         projectile.Fire(direction.normalized, this, shotID);
-
     }
 
     public void OnBulletHit(Enemy enemy, int shotID)
@@ -243,6 +232,13 @@ public class Weapon : NetworkBehaviour
     {
         selectedSpecialAttack = itemID;
         specialAttacks.Add(itemID);
+    }
+
+    public void ResetSpecialAttacks()
+    {
+        specialAttacks.Clear();
+        selectedSpecialAttack = int.MinValue;
+        OnSpecialAttackChanged(int.MinValue);
     }
 
     private void ResetTimer()
