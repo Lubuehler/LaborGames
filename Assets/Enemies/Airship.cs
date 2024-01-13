@@ -37,6 +37,25 @@ public class Airship : Enemy
         slider.value = currentValue / maxValue;
     }
 
+    protected override void Move()
+    {
+        if (!movementDisabled)
+        {
+            if (currentTarget == null || !currentTarget.GetComponent<Player>().isAlive)
+            {
+                networkRigidbody2D.Rigidbody.velocity = Vector2.Lerp(networkRigidbody2D.Rigidbody.velocity, Vector2.zero, Runner.DeltaTime * movementSmoothing);
+                return;
+            }
+            Vector2 toTarget = currentTarget.transform.position - transform.position;
+            Vector2 separationForce = CalculateSeparationForce();
+
+            var speed = EnemySpawner.Instance.speed / 2;
+
+            Vector2 desiredVelocity = (toTarget.normalized + separationForce).normalized * speed;
+            networkRigidbody2D.Rigidbody.velocity = Vector2.Lerp(networkRigidbody2D.Rigidbody.velocity, desiredVelocity, Runner.DeltaTime * movementSmoothing);
+        }
+    }
+
 
     protected override void DoSomething()
     {

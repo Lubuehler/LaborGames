@@ -189,11 +189,11 @@ public class Enemy : NetworkBehaviour
         EnemySpawner.Instance.EnemyDefeated(this, transform.position);
     }
 
-    public void EMPHit()
+    public void EMPHit(float duration)
     {
         movementDisabled = true;
         networkRigidbody2D.Rigidbody.velocity = Vector2.Lerp(networkRigidbody2D.Rigidbody.velocity, Vector2.zero, Runner.DeltaTime * movementSmoothing);
-        StartCoroutine(EnableMovementAfterDelay(5f));
+        StartCoroutine(EnableMovementAfterDelay(duration));
     }
 
     private IEnumerator EnableMovementAfterDelay(float delay)

@@ -46,9 +46,6 @@ public class Jet : Enemy
                     lockedPosition = playerPosition;
                     Vector2 toTarget = lockedPosition - currentPosition;
 
-
-
-
                     desiredVelocity = toTarget.normalized * speed * 2;
 
                     maneuverStarted = true;
@@ -109,9 +106,7 @@ public class Jet : Enemy
                 {
                     Vector2 toTarget = currentTarget.transform.position - transform.position;
                     Vector2 separationForce = CalculateSeparationForce();
-
-
-
+                    
                     Vector2 desiredVelocity = (toTarget.normalized + separationForce).normalized * speed;
                     networkRigidbody2D.Rigidbody.velocity = Vector2.Lerp(networkRigidbody2D.Rigidbody.velocity, desiredVelocity, Runner.DeltaTime * movementSmoothing);
                 }

@@ -3,10 +3,9 @@ using Fusion;
 
 public class EMP : NetworkBehaviour
 {
-    [SerializeField] private GameObject emp;
-
+    [SerializeField] private GameObject energyExplosionPrefab;
     public void Activate(NetworkRigidbody2D rigidbody)
     {
-        Runner.Spawn(emp, rigidbody.transform.position, rigidbody.transform.rotation);
+        Runner.Spawn(energyExplosionPrefab, rigidbody.transform.position, rigidbody.transform.rotation);
     }
 }
