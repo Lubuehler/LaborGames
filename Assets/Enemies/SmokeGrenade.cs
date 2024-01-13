@@ -9,6 +9,11 @@ public class SmokeGrenade : MonoBehaviour
     private Vector2 targetPosition;
     private bool isTargetPositionSet = false;
 
+    private void Start()
+    {
+        EnemySpawner.Instance.RegisterObject(gameObject);
+    }
+
     void Update()
     {
         if (!isTargetPositionSet) return;

@@ -287,6 +287,7 @@ GameObject:
   - component: {fileID: 2754143876365907347}
   - component: {fileID: 2734766463685694589}
   - component: {fileID: 890382369318792739}
+  - component: {fileID: -1136366162854279397}
   m_Layer: 7
   m_Name: PlayerPrefab
   m_TagString: Untagged
@@ -374,6 +375,7 @@ MonoBehaviour:
   tiltAmount: 15
   background: {fileID: 0}
   weapon: {fileID: 0}
+  passiveItemEffectManager: {fileID: 0}
   _isAlive: 0
   _playerName: 
   _lobbyReady: 0
@@ -507,3 +509,19 @@ MonoBehaviour:
   animationDuration: 10
   shieldActive: 0
   slownessActive: 0
+--- !u!114 &-1136366162854279397
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8443049997164568140}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b0a547b5554a8f54aa6922b3a17c115f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  aoeEffectExplosionPrefab: {fileID: 7443919952219706187, guid: 5fdcd69f1f11b70448cb5f380d63bc2e, type: 3}
+  enemyLayer:
+    serializedVersion: 2
+    m_Bits: 64

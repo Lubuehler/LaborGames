@@ -1,44 +1,44 @@
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
-using Fusion;
-using System;
 
-public class Projectile : NetworkBehaviour
+public class Projectile : MonoBehaviour
 {
-    private NetworkRigidbody2D _rigidbody;
+    private Rigidbody2D _rigidbody;
     public float speed = 20.0f;
     public LayerMask collisionLayers;
+    private Weapon weapon;
 
-    private Func<GameObject, bool> onHit;
+    private int shotID;
 
-    public void Fire(Vector2 direction, Func<GameObject, bool> onHit)
+    public void Fire(Vector2 direction, Weapon weapon, int shotID)
     {
-        _rigidbody.Rigidbody.velocity = direction * speed;
-        this.onHit = onHit;
+        print("fire");
+        _rigidbody.velocity = direction * speed;
         StartCoroutine(DestroyAfterTime());
+        this.weapon = weapon;
+        this.shotID = shotID;
     }
 
 
     IEnumerator DestroyAfterTime()
     {
         yield return new WaitForSeconds(5);
-        Runner.Despawn(this.GetComponent<NetworkObject>());
+        Destroy(gameObject);
     }
 
     protected void Awake()
     {
-        _rigidbody = GetComponent<NetworkRigidbody2D>();
+        _rigidbody = GetComponent<Rigidbody2D>();
     }
 
-    // TODO change to OverlapBox
     void OnCollisionEnter2D(Collision2D collision)
     {
-        // Check if the collision involves the specified layers.
         if ((collisionLayers.value & (1 << collision.gameObject.layer)) != 0)
         {
-            onHit(collision.gameObject);
+            weapon.OnBulletHit(collision.gameObject.GetComponent<Enemy>(), shotID);
+
             Destroy(gameObject);
+            print("destroyed shot");
         }
     }
 }

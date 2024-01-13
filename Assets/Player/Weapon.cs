@@ -1,10 +1,8 @@
+using Fusion;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using Fusion;
 using UnityEngine;
-using UnityEngine.UI;
 
 public class Weapon : NetworkBehaviour
 {
@@ -17,7 +15,10 @@ public class Weapon : NetworkBehaviour
 
     private NetworkRigidbody2D _nrb2d;
     private Player player;
-    private float currentTime;
+
+    private float currentTime { get; set; }
+
+    [Networked] public int shotCounter { get; set; } = 0;
 
 
     // Special attack
@@ -26,7 +27,6 @@ public class Weapon : NetworkBehaviour
     public bool specialAttackAvailable;
     public float specialAttackTimer;
     public float animationDuration = 10f;
-
 
 
     // Teleport
@@ -47,8 +47,8 @@ public class Weapon : NetworkBehaviour
     public bool slownessActive = false;
 
 
-    public event Action<Transform, Transform> OnAttack;
-    public event Action<Transform> OnHitTarget;
+    public event Action<Transform, int> OnAttack;
+    public event Action<Vector2, int, int> OnHitTarget;
     private void Awake()
     {
         _nrb2d = GetComponent<NetworkRigidbody2D>();
@@ -102,6 +102,8 @@ public class Weapon : NetworkBehaviour
                 }
             }
         }
+
+
     }
 
     private void DeployEMP()
@@ -142,107 +144,111 @@ public class Weapon : NetworkBehaviour
 
     public override void Render()
     {
-        if (LevelController.Instance.waveInProgress)
+        if (!LevelController.Instance.waveInProgress)
         {
-            if (player.isAlive)
+            return;
+        }
+
+        if (player.isAlive)
+        {
+            currentTime += Time.deltaTime;
+
+            if (currentTime >= 1f / player.attackSpeed)
             {
-                currentTime += Time.deltaTime;
-                if (currentTime >= 1f / player.attackSpeed)
-                {
-                    Shoot(LevelController.Instance.FindClosestEnemies(transform.position, 1, 10f).FirstOrDefault());
-                    currentTime = 0f;
-                }
+                Shoot(LevelController.Instance.FindClosestEnemies(transform.position, 1, 10f).FirstOrDefault(), shotCounter++);
+                currentTime = 0f;
+            }
+        }
+
+        if (!specialAttackAvailable)
+        {
+            specialAttackTimer -= Time.deltaTime;
+            if (specialAttackTimer <= 0)
+            {
+                specialAttackAvailable = true;
+            }
+        }
+
+        if (selectedSpecialAttack == 4)
+        {
+            positionTimer += Time.deltaTime;
+
+            if (positionTimer >= interval)
+            {
+                StorePosition();
+                positionTimer = 0f;
+            }
+        }
+
+        if (selectedSpecialAttack == 5 && shieldActive)
+        {
+            shieldTime -= Time.deltaTime;
+
+            if (shieldTime <= 2.0f && !animationTriggered)
+            {
+                shieldAnimator.SetTrigger("ShieldEnd");
+                animationTriggered = true;
             }
 
-            if (!specialAttackAvailable)
+            if (shieldTime <= 0.0f)
             {
-                specialAttackTimer -= Time.deltaTime;
-                if (specialAttackTimer <= 0)
-                {
-                    specialAttackAvailable = true;
-                }
+                shieldActive = false;
+                shield.SetActive(false);
+                shieldTime = 5.0f;
+                animationTriggered = false;
             }
+        }
 
-            if (selectedSpecialAttack == 4)
+        if (selectedSpecialAttack == 6 && slownessActive)
+        {
+            slownessTime -= Time.deltaTime;
+
+            if (slownessTime <= 0.0f)
             {
-                positionTimer += Time.deltaTime;
-
-                if (positionTimer >= interval)
-                {
-                    StorePosition();
-                    positionTimer = 0f;
-                }
-            }
-
-            if (selectedSpecialAttack == 5 && shieldActive)
-            {
-                shieldTime -= Time.deltaTime;
-
-                if (shieldTime <= 2.0f && !animationTriggered)
-                {
-                    shieldAnimator.SetTrigger("ShieldEnd");
-                    animationTriggered = true;
-                }
-
-                if (shieldTime <= 0.0f)
-                {
-                    shieldActive = false;
-                    shield.SetActive(false);
-                    shieldTime = 5.0f;
-                    animationTriggered = false;
-                }
-            }
-
-            if (selectedSpecialAttack == 6 && slownessActive)
-            {
-                slownessTime -= Time.deltaTime;
-
-                if (slownessTime <= 0.0f)
-                {
-                    slownessActive = false;
-                    slownessTime = 5.0f;
-                    EnemySpawner.Instance.speed = 3;
-                }
+                slownessActive = false;
+                slownessTime = 5.0f;
+                EnemySpawner.Instance.speed = 3;
             }
         }
     }
 
-    private void Shoot(Enemy target)
+    private void Shoot(Enemy target, int shotID)
     {
         if (target != null)
         {
-            ReleaseBullet(target.getTransform());
-            OnAttack?.Invoke(gameObject.transform, target.getTransform());
+            OnAttack?.Invoke(target.getTransform(), shotID);
+            ReleaseBullet(target, shotID);
         }
     }
 
-    public void ReleaseBullet(Transform target, Transform origin = null)
+    public void ReleaseBullet(Enemy target, int shotID, Vector2? origin = null)
     {
         if (target == null)
         { return; }
-            if (origin == null) {
-            origin = transform;
-        } else
+        if (origin == null)
         {
-            print("origin: " + origin.position.x + ", " + origin.position.y + ", target: " + target.position.x + ", " + target.position.y);
-
+            origin = player.getPosition();
         }
 
         Projectile projectile;
-        Vector3 direction;
-        direction = target.position - origin.position;
-        projectile = Runner.Spawn(_projectilePrefab, origin.position, Quaternion.LookRotation(Vector3.forward, direction), Object.InputAuthority);
+        Vector2 direction;
+        direction = target.getPosition() - (Vector2)origin;
 
-        projectile?.Fire(direction.normalized,  OnBulletHit);
-        
+        projectile = Instantiate(_projectilePrefab, (Vector2)origin, Quaternion.LookRotation(Vector3.forward, direction));
+
+        projectile.Fire(direction.normalized, this, shotID);
+
     }
 
-    public bool OnBulletHit(GameObject gameObject)
+    public void OnBulletHit(Enemy enemy, int shotID)
     {
-        OnHitTarget?.Invoke(gameObject.transform);
-        gameObject.GetComponent<Enemy>().TakeDamage(CalculateDamage());
-        
-        return true;
+        if (enemy == null || enemy.gameObject == null) { return; }
+        OnHitTarget?.Invoke(enemy.getPosition(), enemy.gameObject.GetInstanceID(), shotID);
+
+        if (HasStateAuthority)
+        {
+            enemy.TakeDamage(CalculateDamage());
+        }
     }
 
     private int CalculateDamage()
@@ -251,7 +257,8 @@ public class Weapon : NetworkBehaviour
         if (randomNumber < player.critChance)
         {
             return (int)player.attackDamage;
-        }  else
+        }
+        else
         {
             return (int)(player.attackDamage * player.critDamageMultiplier);
         }

@@ -147,7 +147,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _interpolationDataSource: 0
-  speed: 4
   health: 3
   viewingDistance: 20
   enemyLayerMask:
@@ -159,8 +158,9 @@ MonoBehaviour:
   separationRadius: 10
   explosionRange: 1
   explosionDamage: 40
-  deathExplosionPrefab: {fileID: 7726421982602285071, guid: cc38b5938cf4f7947a6710d03457cb5f, type: 3}
+  deathExplosionPrefab: {fileID: 1337198075554910, guid: 25c7aa9ad705fe143a4d71c1c8deb7d4, type: 3}
   projectilePrefab: {fileID: 7345909911863687230, guid: ab92a0ed00bd5b344b3db50dd766d0d8, type: 3}
+  maneuverStarted: 0
 --- !u!114 &2827710277521792308
 MonoBehaviour:
   m_ObjectHideFlags: 0

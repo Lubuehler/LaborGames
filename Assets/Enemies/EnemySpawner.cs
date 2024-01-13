@@ -1,11 +1,7 @@
 using Fusion;
-using System.Collections;
 using System.Collections.Generic;
-using System.Drawing;
 using System.Linq;
 using UnityEngine;
-using UnityEngine.UIElements;
-using static Unity.Collections.Unicode;
 
 public class EnemySpawner : NetworkBehaviour
 {
@@ -13,6 +9,7 @@ public class EnemySpawner : NetworkBehaviour
 
     private List<NetworkObject> _spawnedEnemies = new List<NetworkObject>();
     private List<NetworkObject> _spawnedCoins = new List<NetworkObject>();
+    public List<GameObject> spawnedObjects = new List<GameObject>();
     public static EnemySpawner Instance;
 
     [SerializeField] private GameObject coinPrefab;
@@ -45,10 +42,7 @@ public class EnemySpawner : NetworkBehaviour
 
     public void SpawnEnemy()
     {
-        // if(_spawnedEnemies.Count >= 1)
-        // {
-        //     return;
-        // }
+
         EnemyType enemyType = SelectEnemyTypeBasedOnSpawnRate();
         Vector2 position;
         NetworkObject spawnedEnemy;
@@ -72,7 +66,6 @@ public class EnemySpawner : NetworkBehaviour
 
         }
         _spawnedEnemies.Add(spawnedEnemy);
-
     }
 
     public void UpdateEnemySpawnRate(EnemyType type, float newSpawnRate)
@@ -130,6 +123,11 @@ public class EnemySpawner : NetworkBehaviour
 
     }
 
+    public void RegisterObject(GameObject gameObject)
+    {
+        spawnedObjects.Add(gameObject);
+    }
+
     public void RPC_DespawnEverything()
     {
         foreach (NetworkObject coin in _spawnedCoins)
@@ -140,8 +138,13 @@ public class EnemySpawner : NetworkBehaviour
         {
             Runner.Despawn(enemy);
         }
+        foreach (GameObject gameObject in spawnedObjects)
+        {
+            Destroy(gameObject);
+        }
         _spawnedEnemies.Clear();
         _spawnedCoins.Clear();
+        spawnedObjects.Clear();
     }
 
     public void EnemyDefeated(Enemy enemy, Vector2 position)

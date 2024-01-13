@@ -1,10 +1,9 @@
-using UnityEngine;
 using Fusion;
-using System.Collections.Generic;
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
-using UnityEngine.UIElements;
+using UnityEngine;
 
 public class LevelController : NetworkBehaviour
 {
@@ -31,7 +30,7 @@ public class LevelController : NetworkBehaviour
 
     public Player localPlayer;
 
-    public List<Player> players {get; private set; } = new List<Player>();
+    public List<Player> players { get; private set; } = new List<Player>();
 
     public event Action OnPlayerListChanged;
 
@@ -52,7 +51,7 @@ public class LevelController : NetworkBehaviour
         {
             Destroy(gameObject);
         }
-        
+
     }
 
     public override void Spawned()
@@ -62,12 +61,12 @@ public class LevelController : NetworkBehaviour
         initialized = true;
         if (!Runner.IsServer) return;
         EnemySpawner.Instance.UpdateEnemySpawnRate(EnemyType.Drone, 1);
-        
+
 
         List<PlayerRef> playerRefs = new List<PlayerRef>(Runner.ActivePlayers);
         foreach (PlayerRef player in playerRefs)
         {
-            if (Runner.GetPlayerObject(player) == null) {  continue; }
+            if (Runner.GetPlayerObject(player) == null) { continue; }
             players.Add(Runner.GetPlayerObject(player).GetComponent<Player>());
         }
         OnPlayerListChanged?.Invoke();
@@ -79,7 +78,7 @@ public class LevelController : NetworkBehaviour
         if (Runner.IsServer)
         {
             networkObject.GetComponent<Player>().lobbyReady = ready;
-            
+
 
             bool allPlayersReady = true;
             foreach (Player player in players)
@@ -88,10 +87,10 @@ public class LevelController : NetworkBehaviour
                 {
                     allPlayersReady = false;
                 }
-                
+
             }
             if (allPlayersReady)
-            {                  
+            {
                 StartLevel();
                 RpcShowGame();
                 Runner.SessionInfo.IsVisible = false;
@@ -134,11 +133,11 @@ public class LevelController : NetworkBehaviour
     }
 
     [Rpc(RpcSources.All, RpcTargets.All)]
-    private void RpcEndShoppingPhase ()
+    private void RpcEndShoppingPhase()
     {
 
         RpcShowGame();
-        
+
         isShopping = false;
 
     }
@@ -237,11 +236,11 @@ public class LevelController : NetworkBehaviour
         {
             RpcGameOver();
 
-      
+
         }
         else if (localPlayer == player && !isShopping && gameRunning)
         {
-           StartSpectator();
+            StartSpectator();
         }
     }
 
@@ -296,7 +295,7 @@ public class LevelController : NetworkBehaviour
         {
             StartSpectator();
         }
-        
+
     }
 
     public List<Player> GetLivingPlayers()
@@ -304,7 +303,7 @@ public class LevelController : NetworkBehaviour
         List<Player> livingPlayers = new List<Player>();
         foreach (Player p in players)
         {
-            if ( p.isAlive )
+            if (p.isAlive)
 
             {
                 livingPlayers.Add((Player)p);
@@ -327,13 +326,13 @@ public class LevelController : NetworkBehaviour
         return deadPlayers;
     }
 
-    public List<Enemy> FindClosestEnemies(Vector3 position, int count, float maxRange, Enemy ignoreEnemy = null)
+    public List<Enemy> FindClosestEnemies(Vector3 position, int count, float maxRange, int ignoreEnemyWithId = -1)
     {
         return FindObjectsOfType<Enemy>()
-            .Where(t => t != ignoreEnemy)
+            .Where(t => t.gameObject.GetInstanceID() != ignoreEnemyWithId)
             .Where(t => (enemyMask.value & (1 << t.gameObject.layer)) != 0)
             .Where(t => Vector3.Distance(t.getPosition(), position) <= maxRange)
-                        
+
             .OrderBy(t => Vector3.Distance(t.getPosition(), position))
             .Take(count)
             .ToList();

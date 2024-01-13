@@ -1,58 +1,59 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class AoEDamageEffect : IEffect
 {
     private Weapon weapon;
-    private float damageRadius;
-    private float damageAmount = 10;
+    private float damageRadius = 4;
     private GameObject visualEffectPrefab;
     private LayerMask enemyLayer;
-    private float damageIncrease = 10;
-
+    private float radiusIncrease = 4;
 
     public AoEDamageEffect(Weapon weapon, GameObject visualEffectPrefab, LayerMask enemyLayer)
     {
-        this.weapon = weapon;
+        ((IEffect)this).SubscribeToActions(weapon);
         this.visualEffectPrefab = visualEffectPrefab;
 
-        weapon.OnHitTarget += HandleOnHitTarget;
         this.enemyLayer = enemyLayer;
     }
 
-    private void HandleOnHitTarget(Transform target)
+    private void HandleOnHitTarget(Vector2 position, int targetID, int shotID)
     {
-        // Deal damage in a circle around the target
-        Collider[] hitColliders = Physics.OverlapSphere(target.position, damageRadius, enemyLayer);
-        foreach (var hitCollider in hitColliders)
-        {
-            ApplyDamage(hitCollider.gameObject);
-        }
-
-        // Display the visual effect
+        Debug.Log("HandleOnHit AOE");
         if (visualEffectPrefab != null)
         {
-            GameObject effect = GameObject.Instantiate(visualEffectPrefab, target.position, Quaternion.identity);
-            GameObject.Destroy(effect, 2.0f); // Destroy the effect after 2 seconds
+            GameObject effect = GameObject.Instantiate(visualEffectPrefab, position, Quaternion.identity);
+            effect.transform.localScale = Vector3.one * damageRadius;
+            GameObject.Destroy(effect, 2.0f);
         }
-    }
 
-    private void ApplyDamage(GameObject enemyObject)
-    {
-        Enemy enemy = enemyObject.GetComponent<Enemy>();
-        enemy.TakeDamage(((int)damageAmount));
+        Collider[] hitColliders = Physics.OverlapSphere(position, damageRadius, enemyLayer);
+        foreach (var hitCollider in hitColliders)
+        {
+            if (hitCollider.gameObject.GetInstanceID() == targetID)
+            {
+                continue;
+            }
+            weapon.OnBulletHit(hitCollider.GetComponent<Enemy>(), shotID);
+
+        }
+
     }
 
     public void EnhanceEffect()
     {
-        damageAmount += damageIncrease;
+        damageRadius += radiusIncrease;
     }
 
     public void ReduceEffect()
     {
-        damageAmount -= damageIncrease;
+        damageRadius -= radiusIncrease;
+    }
+
+    public void SubscribeToActions(Weapon weapon)
+    {
+        this.weapon = weapon;
+        weapon.OnHitTarget += HandleOnHitTarget;
+
     }
 
     ~AoEDamageEffect()

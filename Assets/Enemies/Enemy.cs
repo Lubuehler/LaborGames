@@ -1,8 +1,7 @@
 using Fusion;
-using UnityEngine;
-using System.Collections.Generic;
 using System.Collections;
-using UnityEngine.UIElements;
+using System.Collections.Generic;
+using UnityEngine;
 
 public enum EnemyType
 {
@@ -47,7 +46,7 @@ public class Enemy : NetworkBehaviour
     {
         return networkRigidbody2D.ReadPosition();
     }
-    
+
     public Vector2 getVelocity()
     {
         return networkRigidbody2D.ReadVelocity();

@@ -2,19 +2,14 @@ using System.Linq;
 using UnityEngine;
 using System.Collections.Generic;
 using System;
-using System.Reflection;
-using ExitGames.Client.Photon.StructWrapping;
-using static UnityEditor.Progress;
+
 
 public class ShopSystem : MonoBehaviour
 {
     public List<Item> allItems;
     public List<Item> availableItems;
     [SerializeField] private ItemDatabase itemDatabase;
-    private Dictionary<int, Func<IEffect>> itemEffectMappings;
-
-    [SerializeField] private GameObject aoeEffectExplosionPrefab;
-    [SerializeField] private LayerMask enemyLayer;
+   
 
     public event Action<int> OnSpecialAttacksChanged;
 
@@ -33,13 +28,7 @@ public class ShopSystem : MonoBehaviour
         allItems.AddRange(itemDatabase.items);
         availableItems.AddRange(itemDatabase.items);
 
-        itemEffectMappings = new Dictionary<int, Func<IEffect>>()
-        {
-            {3085, () => new MultiTargetAttackEffect(LevelController.Instance.localPlayer.weapon) },
-            {3074, () => new AoEDamageEffect(LevelController.Instance.localPlayer.weapon, aoeEffectExplosionPrefab, enemyLayer) },
-            {3087, () => new RicochetEffect(LevelController.Instance.localPlayer.weapon) }
-        // ... other mappings
-        };
+
     }
 
     public void BuyItem(Item item)
@@ -54,10 +43,7 @@ public class ShopSystem : MonoBehaviour
             else if (item.itemType == ItemType.Item)
             {
                 LevelController.Instance.localPlayer.RPC_ApplyItem(item.itemID);
-                if (itemEffectMappings.ContainsKey(item.itemID))
-                {
-                    LevelController.Instance.localPlayer.passiveItemEffectManager.AddOrEnhanceEffect(itemEffectMappings[item.itemID]());
-                }
+                LevelController.Instance.localPlayer.RPC_AddItemEffect(item.itemID);
             }
             OnSpecialAttacksChanged.Invoke(item.itemID);
         }
@@ -83,14 +69,5 @@ public class ShopSystem : MonoBehaviour
     {
         allItems.AddRange(itemDatabase.items);
         availableItems.AddRange(itemDatabase.items);
-    }
-
-    public IEffect GetEffectForItem(int itemId)
-    {
-        if (itemEffectMappings.TryGetValue(itemId, out var effectCreator))
-        {
-            return effectCreator();
-        }
-        return null;
     }
 }

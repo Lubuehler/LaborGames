@@ -10,6 +10,7 @@ public class Drone : Enemy
     private float lastThrowTime = -30f;
     protected override void DoSomething()
     {
+        if (currentTarget ==  null) return;
         if (Time.time - lastThrowTime >= throwCooldown)
         {
             if (Vector3.Distance(getPosition(), currentTarget.GetComponent<Player>().getPosition()) < 10)

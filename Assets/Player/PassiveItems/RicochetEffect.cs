@@ -1,50 +1,51 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
 using System.Linq;
+using UnityEngine;
 
 public class RicochetEffect : IEffect
 {
     private Weapon weapon;
-    private int maxJumps;
-    private float jumpRange;
+    private int maxJumps = 1;
+    private float jumpRange = 7;
     private const int increasePerItem = 1;
+    private Dictionary<int, int> ricochetsRemainingPerShot = new Dictionary<int, int>();
 
     public RicochetEffect(Weapon weapon)
     {
+        ((IEffect)this).SubscribeToActions(weapon);
+    }
+
+    private void HandleOnHitTarget(Vector2 position, int targetID, int shotID)
+    {
+        if (!ricochetsRemainingPerShot.ContainsKey(shotID))
+        {
+            ricochetsRemainingPerShot[shotID] = maxJumps;
+        }
+        if (ricochetsRemainingPerShot[shotID] <= 0)
+        {
+            ricochetsRemainingPerShot.Remove(shotID);
+            return;
+        }
+
+        PerformRicochet(position, targetID, shotID);
+
+    }
+
+    private void PerformRicochet(Vector2 position, int targetID, int shotID)
+    {
+        ricochetsRemainingPerShot[shotID]--;
+        Enemy nextEnemy = LevelController.Instance.FindClosestEnemies(position, 1, jumpRange, ignoreEnemyWithId: targetID).FirstOrDefault();
+        if (nextEnemy != null)
+        {
+            weapon.ReleaseBullet(nextEnemy, shotID, origin: position);
+        }
+
+    }
+
+    void IEffect.SubscribeToActions(Weapon weapon)
+    {
         this.weapon = weapon;
-        this.maxJumps = 1;
-        this.jumpRange = 200;
         weapon.OnHitTarget += HandleOnHitTarget;
-    }
-
-    private void HandleOnHitTarget(Transform hitTarget)
-    {
-        Enemy enemy = hitTarget.GetComponent<Enemy>();
-        if (enemy != null)
-        {
-            PerformRicochet(enemy, maxJumps);
-
-        }
-    }
-
-    private void PerformRicochet(Enemy firstTarget, int jumpsRemaining)
-    {
-        Enemy currentTarget = firstTarget;
-        while (jumpsRemaining > 0)
-        {
-            Enemy nextEnemy = LevelController.Instance.FindClosestEnemies(currentTarget.getPosition(), 1, jumpRange, ignoreEnemy: currentTarget).First();
-            if (nextEnemy != null)
-            {
-                // Simulate an attack on the next target
-                this.weapon.ReleaseBullet(nextEnemy.getTransform(), origin: currentTarget.getTransform());
-            }
-            else
-            {
-                // No more targets within range
-                break;
-            }
-
-            jumpsRemaining--;
-        }
     }
 
     void IEffect.ReduceEffect()

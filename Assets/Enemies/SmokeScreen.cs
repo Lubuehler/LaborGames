@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class SmokeScreen : MonoBehaviour
@@ -8,7 +6,6 @@ public class SmokeScreen : MonoBehaviour
     public float smokeGrenadeRadius = 7f;
 
     private ParticleSystem fogParticleSystem;
-    private GameObject player;
 
     [SerializeField] private GameObject smokeGrenadePrefab;
     [SerializeField] private const float keepAliveDuration = 30f;
@@ -18,16 +15,24 @@ public class SmokeScreen : MonoBehaviour
     private void Awake()
     {
         fogParticleSystem = GetComponent<ParticleSystem>();
-        player = LevelController.Instance.localPlayer.gameObject;
     }
 
     void Update()
     {
-        if (explosionTime - Time.time > keepAliveDuration){
+        if (explosionTime - Time.time > keepAliveDuration)
+        {
             Destroy(this);
         }
-        if (player == null || 
-            Vector3.Distance(player.transform.position, transform.position) > smokeGrenadeRadius + playerClearRadius)
+        Vector2 playerPos = Vector2.zero;
+        try
+        {
+            playerPos = Camera.main.GetComponent<CameraScript>().target.GetComponent<Player>().getPosition();
+        }
+        catch
+        {
+            return;
+        }
+        if (Vector3.Distance(playerPos, transform.position) > smokeGrenadeRadius + playerClearRadius)
         {
             return;
         }
@@ -37,18 +42,19 @@ public class SmokeScreen : MonoBehaviour
 
         for (int i = 0; i < particleCount; i++)
         {
-            float distance = Vector3.Distance(player.transform.position, particles[i].position);
+            float distance = Vector3.Distance(playerPos, particles[i].position);
             if (distance < playerClearRadius && Random.value > 0.95)
             {
                 particles[i].remainingLifetime = 0;
-                
+
             }
         }
 
         fogParticleSystem.SetParticles(particles, particleCount);
     }
 
-    public void Emit() { 
+    public void Emit()
+    {
         fogParticleSystem.Play();
         explosionTime = Time.time;
     }

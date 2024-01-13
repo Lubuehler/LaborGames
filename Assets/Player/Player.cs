@@ -12,9 +12,10 @@ public class Player : NetworkBehaviour
     [SerializeField] private LayerMask coinMask;
     [SerializeField] private float tiltAmount = 15.0f;
     [SerializeField] private GameObject background;
-    [SerializeField] public Weapon weapon;
 
-    public PassiveItemEffectManager passiveItemEffectManager = new PassiveItemEffectManager();
+    private Weapon weapon;
+
+    public PassiveItemEffectManager passiveItemEffectManager;
 
     private NetworkRigidbody2D _nrb2d;
     private SpriteRenderer _spriteRenderer;
@@ -63,6 +64,8 @@ public class Player : NetworkBehaviour
         _spriteRenderer = GetComponentInChildren<SpriteRenderer>();
         _capsuleCollider = GetComponent<CapsuleCollider2D>();
         this.weapon = GetComponent<Weapon>();
+        passiveItemEffectManager = GetComponent<PassiveItemEffectManager>();
+        passiveItemEffectManager.Initialize(weapon);
 
     }
 
@@ -97,7 +100,7 @@ public class Player : NetworkBehaviour
 
     public void InitiallySetStats()
     {
-        coins = 200;
+        coins = 2000;
         maxHealth = 100;
         attackDamage = 20;
         attackSpeed = 1;
@@ -284,6 +287,12 @@ public class Player : NetworkBehaviour
             items.Add(item.itemID);
             OnStatsChanged?.Invoke();
         }
+    }
+
+    [Rpc(RpcSources.InputAuthority, RpcTargets.All)]
+    public void RPC_AddItemEffect(int itemID)
+    {
+        passiveItemEffectManager.AddOrEnhanceEffect(itemID);
     }
 
     [Rpc(RpcSources.All, RpcTargets.All)]

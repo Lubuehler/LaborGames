@@ -1,20 +1,21 @@
 using System.Collections;
 using UnityEngine;
 using Fusion;
+using System;
 
 public class ProjectileJet : NetworkBehaviour
 {
     private NetworkRigidbody2D _rigidbody;
-    public float speed = 20.0f;
-    public int damage = 50;
     public LayerMask collisionLayers;
 
     float maxDistance = 50f;
 
-    public void Fire(Vector2 direction)
+    private Jet firedBy;
+
+    public void Fire(Vector2 direction, float speed, Jet jet)
     {
         _rigidbody.Rigidbody.velocity = direction * speed;
-
+        this.firedBy = jet;
         StartCoroutine(DestroyAfterTime());
     }
 
@@ -31,11 +32,14 @@ public class ProjectileJet : NetworkBehaviour
 
     void OnCollisionEnter2D(Collision2D collision)
     {
-        // Check if the collision involves the specified layers.
         if ((collisionLayers.value & (1 << collision.gameObject.layer)) != 0)
         {
-            collision.gameObject.GetComponent<Player>().TakeDamage(damage);
-            Destroy(gameObject);
+            if (HasStateAuthority)
+            {
+
+                firedBy.OnProjectileHit(collision.gameObject.GetComponent<Player>());
+                Destroy(gameObject);
+            }
         }
     }
 }

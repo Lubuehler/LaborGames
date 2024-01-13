@@ -6,6 +6,10 @@ public class Jet : Enemy
 
     public bool maneuverStarted = false;
 
+    // Projectile Stats
+    private float projectileSpeed = 20f;
+    private int projectileDamage = 50;
+
     // Speed & Fire
     private Vector2 lockedPosition;
     private Vector2 desiredVelocity;
@@ -117,6 +121,11 @@ public class Jet : Enemy
     {
         Quaternion rotation = Quaternion.LookRotation(Vector3.forward, networkRigidbody2D.Rigidbody.velocity);
         var projectile = Runner.Spawn(projectilePrefab, networkRigidbody2D.transform.position, rotation, Object.InputAuthority);
-        projectile?.Fire(networkRigidbody2D.Rigidbody.velocity.normalized);
+        projectile?.Fire(networkRigidbody2D.Rigidbody.velocity.normalized, projectileSpeed, this);
+    }
+
+    public void OnProjectileHit(Player player)
+    {
+        player.TakeDamage(projectileDamage);
     }
 }

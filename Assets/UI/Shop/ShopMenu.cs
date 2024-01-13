@@ -100,8 +100,7 @@ public class ShopMenu : MonoBehaviour
 
     private void Update()
     {
-        Player localPlayer = NetworkController.Instance.GetLocalPlayerObject().GetComponent<Player>();
-        if (localPlayer.isAlive)
+        if (LevelController.Instance.localPlayer.isAlive)
         {
             switch (LevelController.Instance.GetDeadPlayers().Count)
             {

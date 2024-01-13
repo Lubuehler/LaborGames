@@ -183,7 +183,7 @@ MonoBehaviour:
   separationRadius: 1
   explosionRange: 0.8
   explosionDamage: 40
-  deathExplosionPrefab: {fileID: 7726421982602285071, guid: cc38b5938cf4f7947a6710d03457cb5f, type: 3}
+  deathExplosionPrefab: {fileID: 1337198075554910, guid: 25c7aa9ad705fe143a4d71c1c8deb7d4, type: 3}
   smokeGrenadePrefab: {fileID: 9129722000280626897, guid: c9390d258899ade40bf1e92801c0e88c, type: 3}
 --- !u!50 &6852596507332962957
 Rigidbody2D:
