@@ -8,7 +8,7 @@ public class EnemySpawner : NetworkBehaviour
     private Dictionary<EnemyType, float> enemySpawnRates = new Dictionary<EnemyType, float>();
 
     private List<NetworkObject> _spawnedEnemies = new List<NetworkObject>();
-    private List<NetworkObject> _spawnedCoins = new List<NetworkObject>();
+    public List<NetworkObject> _spawnedCoins = new List<NetworkObject>();
     public List<GameObject> spawnedObjects = new List<GameObject>();
     public static EnemySpawner Instance;
 

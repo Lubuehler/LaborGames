@@ -1,8 +1,8 @@
 using Fusion;
-using UnityEngine;
-using System.Collections;
 using System;
+using System.Collections;
 using System.Linq;
+using UnityEngine;
 
 public class Player : NetworkBehaviour
 {
@@ -13,7 +13,7 @@ public class Player : NetworkBehaviour
 
     private Weapon weapon;
 
-    public PassiveItemEffectManager passiveItemEffectManager;
+    private PassiveItemEffectManager passiveItemEffectManager;
 
     private NetworkRigidbody2D _nrb2d;
     private SpriteRenderer _spriteRenderer;

@@ -1,5 +1,4 @@
-using System.Collections;
-using System.Collections.Generic;
+using Fusion;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -10,9 +9,13 @@ public class Airship : Enemy
     [SerializeField] private GameObject smoke;
     [SerializeField] private Transform missileSpawnPosition;
 
+    [SerializeField] private GameObject smokeGrenadePrefab;
+    [SerializeField] private const float throwCooldown = 30f;
+
+    private float lastThrowTime = -30f;
+
     public float attackSpeed = 0.5f;
     private int maxHealth;
-    private float currentTime;
 
     void Awake()
     {
@@ -21,12 +24,6 @@ public class Airship : Enemy
 
     void LateUpdate()
     {
-        currentTime += Time.deltaTime;
-        if (currentTime >= 1f / attackSpeed && Vector3.Distance(transform.position, currentTarget.transform.position) <= 10)
-        {
-            Fire();
-            currentTime = 0f;
-        }
         UpdateHealthBar(health, maxHealth);
 
         if (health <= maxHealth * 0.3)
@@ -40,11 +37,25 @@ public class Airship : Enemy
         slider.value = currentValue / maxValue;
     }
 
-    private void Fire()
+
+    protected override void DoSomething()
     {
-        var direction = (currentTarget.transform.position - transform.position).normalized;
-        Quaternion rotation = Quaternion.LookRotation(Vector3.forward, direction);
-        var projectile = Runner.Spawn(projectilePrefab, missileSpawnPosition.position, rotation, Object.InputAuthority);
-        projectile?.Fire(direction);
+        if (currentTarget == null) return;
+        if (Time.time - lastThrowTime >= throwCooldown)
+        {
+            if (Vector3.Distance(getPosition(), currentTarget.GetComponent<Player>().getPosition()) < 10)
+            {
+                RPC_throwSmokeGrenade();
+                lastThrowTime = Time.time;
+            }
+        }
     }
+
+    [Rpc]
+    public void RPC_throwSmokeGrenade()
+    {
+        GameObject grenade = Instantiate(smokeGrenadePrefab, getPosition(), Quaternion.identity);
+        grenade.GetComponent<SmokeGrenade>().ThrowToTargetPosition(currentTarget.GetComponent<Player>().getPosition());
+    }
+
 }

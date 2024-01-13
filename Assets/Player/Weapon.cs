@@ -1,6 +1,5 @@
 using Fusion;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
@@ -151,27 +150,29 @@ public class Weapon : NetworkBehaviour
     {
         if (!LevelController.Instance.waveInProgress)
         {
+            return;
+        }
 
-            // Shooting
-            if (player.isAlive)
+        // Shooting
+        if (player.isAlive)
+        {
+            currentTime += Time.deltaTime;
+            if (currentTime >= 1f / player.attackSpeed)
             {
-                currentTime += Time.deltaTime;
-                if (currentTime >= 1f / player.attackSpeed)
-                {
-                    Shoot(LevelController.Instance.FindClosestEnemies(transform, 1, 10f).FirstOrDefault(), shotCounter++);
-                    currentTime = 0f;
-                }
+                Shoot(LevelController.Instance.FindClosestEnemies(player.getPosition(), 1, 10f).FirstOrDefault(), shotCounter++);
+                currentTime = 0f;
+            }
+        }
+
+        // Special attack cooldown
+        if (!specialAttackAvailable)
+        {
+            specialAttackTimer -= Time.deltaTime;
+            if (specialAttackTimer <= 0)
+            {
+                specialAttackAvailable = true;
             }
 
-            // Special attack cooldown
-            if (!specialAttackAvailable)
-            {
-                specialAttackTimer -= Time.deltaTime;
-                if (specialAttackTimer <= 0)
-                {
-                    specialAttackAvailable = true;
-                }
-            }
         }
     }
 
@@ -179,8 +180,8 @@ public class Weapon : NetworkBehaviour
     {
         if (target != null)
         {
-            OnAttack?.Invoke(target.getTransform(), shotID);
             ReleaseBullet(target, shotID);
+            OnAttack?.Invoke(target.getTransform(), shotID);
         }
     }
 
@@ -206,6 +207,9 @@ public class Weapon : NetworkBehaviour
     public void OnBulletHit(Enemy enemy, int shotID)
     {
         if (enemy == null || enemy.gameObject == null) { return; }
+        print(shotID);
+        print(enemy);
+        print(enemy.gameObject);
         OnHitTarget?.Invoke(enemy.getPosition(), enemy.gameObject.GetInstanceID(), shotID);
 
         if (HasStateAuthority)
@@ -222,30 +226,28 @@ public class Weapon : NetworkBehaviour
             return (int)player.attackDamage;
         }
         else
-        }
-        else
         {
-            return (int) (player.attackDamage* player.critDamageMultiplier);
+            return (int)(player.attackDamage * player.critDamageMultiplier);
         }
     }
 
 
     [Rpc(RpcSources.InputAuthority, RpcTargets.All)]
-public void RPC_SetSelectedSpecialAttack(int itemID)
-{
-    selectedSpecialAttack = itemID;
-}
+    public void RPC_SetSelectedSpecialAttack(int itemID)
+    {
+        selectedSpecialAttack = itemID;
+    }
 
-[Rpc(RpcSources.InputAuthority, RpcTargets.All)]
-public void RPC_AddSpecialAttack(int itemID)
-{
-    selectedSpecialAttack = itemID;
-    specialAttacks.Add(itemID);
-}
+    [Rpc(RpcSources.InputAuthority, RpcTargets.All)]
+    public void RPC_AddSpecialAttack(int itemID)
+    {
+        selectedSpecialAttack = itemID;
+        specialAttacks.Add(itemID);
+    }
 
-private void ResetTimer()
-{
-    specialAttackAvailable = false;
-    specialAttackTimer = cooldown;
-}
+    private void ResetTimer()
+    {
+        specialAttackAvailable = false;
+        specialAttackTimer = cooldown;
+    }
 }

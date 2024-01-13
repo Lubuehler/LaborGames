@@ -535,6 +535,7 @@ MonoBehaviour:
   projectilePrefab: {fileID: 2661065193516136052, guid: ae4f69d8bdf65434fafadff3174696b3, type: 3}
   smoke: {fileID: 1805175693917273592}
   missileSpawnPosition: {fileID: 5505154306456055341}
+  smokeGrenadePrefab: {fileID: 9129722000280626897, guid: c9390d258899ade40bf1e92801c0e88c, type: 3}
   attackSpeed: 1
 --- !u!70 &-2820575830745567039
 CapsuleCollider2D:

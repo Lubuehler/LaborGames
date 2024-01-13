@@ -1,7 +1,6 @@
+using Fusion;
 using System.Collections;
 using UnityEngine;
-using Fusion;
-using System;
 
 public class ProjectileEnemy : NetworkBehaviour
 {
