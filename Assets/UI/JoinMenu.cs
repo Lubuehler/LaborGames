@@ -88,7 +88,7 @@ public class JoinMenu : MonoBehaviour
 
     public void OnDirectConnectClick()
     {
-        UIController.Instance.ShowDialog(UIElement.DirectJoin);
+        UIController.Instance.ShowDialog(UIElement.DirectJoinDialog);
     }
 
     public void OnJoinGameClick()

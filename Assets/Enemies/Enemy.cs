@@ -7,7 +7,7 @@ public enum EnemyType
 {
     Drone,
     Jet,
-    LaserDrone
+    Airship,
 }
 
 public class Enemy : NetworkBehaviour
@@ -125,7 +125,6 @@ public class Enemy : NetworkBehaviour
             Die();
         }
     }
-
 
 
     public override void Render()

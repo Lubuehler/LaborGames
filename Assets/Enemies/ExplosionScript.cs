@@ -1,13 +1,9 @@
-using Fusion;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class ExplosionScript : MonoBehaviour
 {
     private void Start()
     {
-        // Call an RPC to play the explosion on all clients
         RpcPlayExplosion();
     }
 

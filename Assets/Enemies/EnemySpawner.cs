@@ -13,10 +13,12 @@ public class EnemySpawner : NetworkBehaviour
     public static EnemySpawner Instance;
 
     [SerializeField] private GameObject coinPrefab;
+
+    // Enemies
     [SerializeField] private GameObject dronePrefab;
     [SerializeField] private GameObject jetPrefab;
-    [SerializeField] private GameObject laserDronePrefab;
-    [SerializeField] public GameObject background;
+    [SerializeField] private GameObject airshipPrefab;
+
 
     [SerializeField] public float speed = 3f;
 
@@ -48,10 +50,11 @@ public class EnemySpawner : NetworkBehaviour
         NetworkObject spawnedEnemy;
         switch (enemyType)
         {
-            case EnemyType.LaserDrone:
+            case EnemyType.Airship:
                 position = GetRandomPosition(SpawnLocation.Sides);
-                spawnedEnemy = Runner.Spawn(laserDronePrefab, position, Quaternion.identity);
+                spawnedEnemy = Runner.Spawn(airshipPrefab, position, Quaternion.identity);
                 break;
+
             case EnemyType.Jet:
                 position = GetRandomPosition(SpawnLocation.Sides);
                 spawnedEnemy = Runner.Spawn(jetPrefab, position, Quaternion.identity);
@@ -83,7 +86,7 @@ public class EnemySpawner : NetworkBehaviour
     private EnemyType SelectEnemyTypeBasedOnSpawnRate()
     {
         float totalRate = enemySpawnRates.Values.Sum();
-        float randomPoint = UnityEngine.Random.value * totalRate;
+        float randomPoint = Random.value * totalRate;
 
         foreach (var pair in enemySpawnRates)
         {
@@ -97,7 +100,7 @@ public class EnemySpawner : NetworkBehaviour
 
     private Vector3 GetRandomPosition(SpawnLocation location)
     {
-        BoxCollider2D boxCollider2D = background.GetComponent<BoxCollider2D>();
+        BoxCollider2D boxCollider2D = GameController.Instance.background.GetComponent<BoxCollider2D>();
         float width = boxCollider2D.size.x;
         float height = boxCollider2D.size.y;
         float padding = 2f;
@@ -108,11 +111,11 @@ public class EnemySpawner : NetworkBehaviour
         switch (location)
         {
             case SpawnLocation.Top:
-                x = UnityEngine.Random.Range(-width / 2, width / 2);
+                x = Random.Range(-width / 2, width / 2);
                 y = height / 2 + padding;
                 break;
             case SpawnLocation.Bottom:
-                x = UnityEngine.Random.Range(-width / 2, width / 2);
+                x = Random.Range(-width / 2, width / 2);
                 y = -height / 2 - padding;
                 break;
             case SpawnLocation.Sides:
@@ -156,5 +159,11 @@ public class EnemySpawner : NetworkBehaviour
             NetworkObject spawnedCoin = Runner.Spawn(coinPrefab, position, Quaternion.identity);
             _spawnedCoins.Add(spawnedCoin);
         }
+    }
+
+    public void CoinCollected(Coin coin)
+    {
+        _spawnedCoins.Remove(coin.GetComponent<NetworkObject>());
+        Runner.Despawn(coin.GetComponent<NetworkObject>());
     }
 }

@@ -1,5 +1,9 @@
 fileFormatVersion: 2
-guid: 6892b627efe95144992f3d92ba5a11d6
+<<<<<<< HEAD
+guid: 98b11a591e6528e4785b8d3ce666a1ea
+=======
+guid: 14c39b77f14604d43b4125f5bd275851
+>>>>>>> lukas-dev
 TextureImporter:
   internalIDToNameTable: []
   externalObjects: {}

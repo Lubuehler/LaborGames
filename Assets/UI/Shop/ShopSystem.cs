@@ -1,4 +1,3 @@
-using System.Linq;
 using UnityEngine;
 using System.Collections.Generic;
 using System;
@@ -9,7 +8,7 @@ public class ShopSystem : MonoBehaviour
     public List<Item> allItems;
     public List<Item> availableItems;
     [SerializeField] private ItemDatabase itemDatabase;
-   
+
 
     public event Action<int> OnSpecialAttacksChanged;
 
@@ -39,6 +38,7 @@ public class ShopSystem : MonoBehaviour
             if (item.itemType == ItemType.SpecialAttack)
             {
                 LevelController.Instance.localPlayer.GetBehaviour<Weapon>().RPC_AddSpecialAttack(item.itemID);
+                availableItems.Remove(item);
             }
             else if (item.itemType == ItemType.Item)
             {

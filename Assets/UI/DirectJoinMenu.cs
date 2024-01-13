@@ -25,9 +25,8 @@ public class DirectJoinMenu : MonoBehaviour
             {
                 UIController.Instance.ShowUIElement(UIElement.Lobby);
             }
-            UIController.Instance.HideDialog(UIElement.DirectJoin);
+            UIController.Instance.HideDialog(UIElement.DirectJoinDialog);
         }
-
     }
 
     public void GetSessionName(string input)
@@ -37,6 +36,6 @@ public class DirectJoinMenu : MonoBehaviour
 
     public void OnCancelClick()
     {
-        UIController.Instance.HideDialog(UIElement.DirectJoin);
+        UIController.Instance.HideDialog(UIElement.DirectJoinDialog);
     }
 }

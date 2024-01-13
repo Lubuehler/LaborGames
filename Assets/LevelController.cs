@@ -39,8 +39,6 @@ public class LevelController : NetworkBehaviour
 
     [SerializeField] private LayerMask enemyMask;
 
-
-
     private void Awake()
     {
         if (Instance == null)
@@ -197,10 +195,9 @@ public class LevelController : NetworkBehaviour
     {
         if (currentWave >= 0)
         {
-            EnemySpawner.Instance.UpdateEnemySpawnRate(EnemyType.Jet, 3);
-            //EnemySpawner.Instance.UpdateEnemySpawnRate(EnemyType.Drone, 3);
+            EnemySpawner.Instance.UpdateEnemySpawnRate(EnemyType.Jet, 1);
             EnemySpawner.Instance.UpdateEnemySpawnRate(EnemyType.Drone, 10);
-            //EnemySpawner.Instance.UpdateEnemySpawnRate(EnemyType.LaserDrone, 1);
+            EnemySpawner.Instance.UpdateEnemySpawnRate(EnemyType.Airship, 1);
         }
     }
 
@@ -336,5 +333,10 @@ public class LevelController : NetworkBehaviour
             .OrderBy(t => Vector3.Distance(t.getPosition(), position))
             .Take(count)
             .ToList();
+    }
+
+    public void TriggerPlayerListChanged()
+    {
+        OnPlayerListChanged.Invoke();
     }
 }
