@@ -196,8 +196,7 @@ public class Player : NetworkBehaviour
 
     public void Heal(float amount)
     {
-        currentHealth += amount;
-        currentHealth = Mathf.Clamp(currentHealth, 0, maxHealth);
+        currentHealth = Mathf.Clamp(currentHealth + amount, 0, maxHealth);
 
         RpcHealthChanged();
     }

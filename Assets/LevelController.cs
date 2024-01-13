@@ -195,7 +195,7 @@ public class LevelController : NetworkBehaviour
     {
         if (currentWave >= 0)
         {
-            EnemySpawner.Instance.UpdateEnemySpawnRate(EnemyType.Jet, 1);
+            EnemySpawner.Instance.UpdateEnemySpawnRate(EnemyType.Jet, 100);
             EnemySpawner.Instance.UpdateEnemySpawnRate(EnemyType.Drone, 10);
             EnemySpawner.Instance.UpdateEnemySpawnRate(EnemyType.Airship, 1);
         }

@@ -1,12 +1,9 @@
 using System;
 using System.Collections.Generic;
-using UnityEngine;
-using TMPro;
-using UnityEngine.UI;
-using Fusion;
-using Unity.VisualScripting;
-using ExitGames.Client.Photon.StructWrapping;
 using System.Linq;
+using TMPro;
+using UnityEngine;
+using UnityEngine.UI;
 
 public class ShopMenu : MonoBehaviour
 {
@@ -18,6 +15,7 @@ public class ShopMenu : MonoBehaviour
 
     public Button goButton;
     [SerializeField] private Button ressurectButton;
+    [SerializeField] private Button healButton;
 
 
     [SerializeField] private TMP_Text ressurectButtonPriceText;
@@ -48,6 +46,10 @@ public class ShopMenu : MonoBehaviour
     private int initialRespawnPrice;
     [SerializeField]
     private int respawnPriceIncreasePerWave;
+    [SerializeField]
+    private int initialHealPrice;
+    [SerializeField]
+    private int refreshHealIncreasePerWave;
 
 
     private void OnEnable()
@@ -85,6 +87,8 @@ public class ShopMenu : MonoBehaviour
         ShopSystem.Instance.OnSpecialAttacksChanged += UpdateSpecialAttacks;
 
         goButton.interactable = true;
+        healButton.interactable = true;
+
         if (player != null)
         {
             player.OnStatsChanged += UpdateStats;
@@ -167,13 +171,22 @@ public class ShopMenu : MonoBehaviour
         }
     }
 
-    public void OnRefreshClicked ()
+    public void OnRefreshClicked()
     {
         if (ShopSystem.Instance.BuyService(initialRefreshShopPrice + refreshShopPriceIncreasePerWave * LevelController.Instance.currentWave))
         {
             RandomizeShop();
         }
-    
+
+    }
+
+    public void OnHealClicked()
+    {
+        if (ShopSystem.Instance.BuyService(initialHealPrice + refreshHealIncreasePerWave * LevelController.Instance.currentWave))
+        {
+            LevelController.Instance.localPlayer.Heal(float.MaxValue);
+            healButton.interactable = false;
+        }
     }
 
     public void UpdateDisplayedItems()
@@ -194,14 +207,16 @@ public class ShopMenu : MonoBehaviour
     {
         for (int i = itemGroup.transform.childCount - 1; i >= 0; i--)
         {
-            if (itemGroup.transform.GetChild(i).gameObject.GetComponentInChildren<ShopItem>() != null) {
+            if (itemGroup.transform.GetChild(i).gameObject.GetComponentInChildren<ShopItem>() != null)
+            {
                 itemGroup.transform.GetChild(i).gameObject.GetComponentInChildren<ShopItem>().Redraw();
             }
         }
         if (!ShopSystem.Instance.CanAfford(initialRespawnPrice + respawnPriceIncreasePerWave * LevelController.Instance.currentWave))
         {
             ressurectButtonPriceText.color = Color.red;
-        } else
+        }
+        else
         {
             ressurectButtonPriceText.color = Color.white;
         }
@@ -242,7 +257,7 @@ public class ShopMenu : MonoBehaviour
                 itemVis.transform.SetParent(specialAttackCellGroup.transform, false);
                 itemVis.GetComponent<SpecialAttackCell>().Initialize(item);
             }
-            else if(item.itemType == ItemType.Item)
+            else if (item.itemType == ItemType.Item)
             {
                 GameObject itemVis = Instantiate(itemCellPrefab);
                 itemVis.transform.SetParent(itemCellGroup.transform, false);

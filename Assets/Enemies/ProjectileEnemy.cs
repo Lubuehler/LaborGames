@@ -6,21 +6,26 @@ public class ProjectileEnemy : NetworkBehaviour
 {
     private NetworkRigidbody2D _rigidbody;
     public LayerMask collisionLayers;
+    private ParticleSystem trail;
 
     float maxDistance = 50f;
 
     private Jet firedBy;
 
-    public void Fire(Vector2 direction, float speed, Jet jet)
+    public void Fire(Vector2 direction, float speed, Jet jet, ParticleSystem trail)
     {
+
         _rigidbody.Rigidbody.velocity = direction * speed;
         this.firedBy = jet;
+        this.trail = trail;
+        trail.Play();
         StartCoroutine(DestroyAfterTime());
     }
 
     IEnumerator DestroyAfterTime()
     {
         yield return new WaitForSeconds(5);
+        Destroy(trail.gameObject);
         Runner.Despawn(GetComponent<NetworkObject>());
     }
 
@@ -37,7 +42,8 @@ public class ProjectileEnemy : NetworkBehaviour
             {
 
                 firedBy.OnProjectileHit(collision.gameObject.GetComponent<Player>());
-                Destroy(gameObject);
+                Destroy(trail.gameObject);
+                Runner.Despawn(GetComponent<NetworkObject>());
             }
         }
     }

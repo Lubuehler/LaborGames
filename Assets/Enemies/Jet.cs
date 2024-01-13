@@ -2,7 +2,9 @@ using Fusion;
 using UnityEngine;
 public class Jet : Enemy
 {
-    [SerializeField] private ProjectileEnemy projectilePrefab;
+    [SerializeField] private GameObject rocketPrefab;
+    [SerializeField] private GameObject rocketTrailPrefab;
+
 
     public bool maneuverStarted = false;
 
@@ -45,7 +47,7 @@ public class Jet : Enemy
                     Vector2 toTarget = lockedPosition - currentPosition;
 
 
-                    
+
 
                     desiredVelocity = toTarget.normalized * speed * 2;
 
@@ -120,8 +122,14 @@ public class Jet : Enemy
     private void Fire()
     {
         Quaternion rotation = Quaternion.LookRotation(Vector3.forward, networkRigidbody2D.Rigidbody.velocity);
-        var projectile = Runner.Spawn(projectilePrefab, networkRigidbody2D.transform.position, rotation, Object.InputAuthority);
-        projectile?.Fire(networkRigidbody2D.Rigidbody.velocity.normalized, projectileSpeed, this);
+        var projectile = Runner.Spawn(rocketPrefab, networkRigidbody2D.transform.position, rotation, Object.InputAuthority);
+
+        var vec2 = new Vector2(networkRigidbody2D.Rigidbody.velocity.x, networkRigidbody2D.Rigidbody.velocity.y);
+
+        var trail = Instantiate(rocketTrailPrefab, getPosition(), Quaternion.LookRotation(vec2)).GetComponent<ParticleSystem>();
+        projectile?.GetComponentInChildren<ProjectileEnemy>()?.Fire(networkRigidbody2D.Rigidbody.velocity.normalized, projectileSpeed, this, trail);
+
+
     }
 
     public void OnProjectileHit(Player player)
