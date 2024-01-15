@@ -61,7 +61,7 @@ public class Player : NetworkBehaviour
         _nrb2d = GetComponent<NetworkRigidbody2D>();
         _spriteRenderer = GetComponentInChildren<SpriteRenderer>();
         _capsuleCollider = GetComponent<CapsuleCollider2D>();
-        this.weapon = GetComponent<Weapon>();
+        weapon = GetComponent<Weapon>();
         passiveItemEffectManager = GetComponent<PassiveItemEffectManager>();
         passiveItemEffectManager.Initialize(weapon);
 
@@ -153,10 +153,24 @@ public class Player : NetworkBehaviour
         NetworkController.Instance.TriggerPlayerListChanged();
     }
 
+
+    private float flameDamageCooldown = 0.2f;
+    private bool allowFlameDamage = true;
     public override void Render()
     {
         _spriteRenderer.enabled = isAlive;
         _capsuleCollider.enabled = isAlive;
+
+
+        if (!allowFlameDamage)
+        {
+            flameDamageCooldown -= Time.deltaTime;
+            if (flameDamageCooldown <= 0)
+            {
+                allowFlameDamage = true;
+                flameDamageCooldown = 0.2f;
+            }
+        }
     }
 
     public void TakeDamage(float damage)
@@ -178,6 +192,7 @@ public class Player : NetworkBehaviour
 
         if (currentHealth <= 0 && isAlive)
         {
+            RemoveRandomItems();
             RpcDie();
             if (HasInputAuthority)
             {
@@ -212,6 +227,8 @@ public class Player : NetworkBehaviour
     [Rpc(RpcSources.All, RpcTargets.All)]
     public void RpcDie()
     {
+        Debug.Log("Die");
+        RemoveRandomItems();
         isAlive = false;
         Runner.Spawn(deathExplosionPrefab, transform.position, transform.rotation);
     }
@@ -297,5 +314,30 @@ public class Player : NetworkBehaviour
     public void RpcHealthChanged()
     {
         OnHealthChanged?.Invoke(currentHealth, maxHealth);
+    }
+
+    private void RemoveRandomItems()
+    {
+        Debug.Log("RemoveRandomItems");
+        int itemRemoveCount = items.Count / 3;
+        while (itemRemoveCount > 0)
+        {
+            items.Remove(UnityEngine.Random.Range(0, items.Count));
+            itemRemoveCount--;
+        }
+
+        int specialAttackRemoveCount = weapon.specialAttacks.Count / 3;
+        while (specialAttackRemoveCount > 0)
+        {
+            weapon.specialAttacks.Remove(UnityEngine.Random.Range(0, weapon.specialAttacks.Count));
+            specialAttackRemoveCount--;
+        }
+    }
+
+    public void OnParticleCollision(GameObject other)
+    {
+        if(!allowFlameDamage) return;
+        TakeDamage(5);
+        allowFlameDamage = false;
     }
 }

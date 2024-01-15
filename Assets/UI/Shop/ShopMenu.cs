@@ -256,13 +256,11 @@ public class ShopMenu : MonoBehaviour
             if (item.itemType == ItemType.SpecialAttack)
             {
                 GameObject itemVis = Instantiate(specialAttackCellPrefab, parent: specialAttackCellGroup.transform);
-                //itemVis.transform.SetParent(specialAttackCellGroup.transform, false);
                 itemVis.GetComponent<SpecialAttackCell>().Initialize(item);
             }
             else if (item.itemType == ItemType.Item)
             {
                 GameObject itemVis = Instantiate(itemCellPrefab, parent: itemCellGroup.transform);
-                //itemVis.transform.SetParent(itemCellGroup.transform, false);
                 itemVis.GetComponent<ItemCell>().Initialize(item);
             }
         }

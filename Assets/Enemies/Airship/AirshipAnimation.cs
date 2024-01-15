@@ -21,12 +21,14 @@ public class AirshipAnimation : MonoBehaviour
     {
         if (_rb.ReadVelocity().x < -.1f)
         {
-            _renderer.flipX = false;
+            transform.localScale = new Vector3(1, 1, 1);
+            //_renderer.flipX = false;
             AdjustSmokeRotation(345f);
         }
         else if (_rb.ReadVelocity().x > .1f)
         {
-            _renderer.flipX = true;
+            transform.localScale = new Vector3(-1, 1, 1);
+            //_renderer.flipX = true;
             AdjustSmokeRotation(195f);
         }
     }

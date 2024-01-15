@@ -196,9 +196,6 @@ public class Weapon : NetworkBehaviour
     public void OnBulletHit(Enemy enemy, int shotID)
     {
         if (enemy == null || enemy.gameObject == null) { return; }
-        print(shotID);
-        print(enemy);
-        print(enemy.gameObject);
         OnHitTarget?.Invoke(enemy.getPosition(), enemy.gameObject.GetInstanceID(), shotID);
 
         if (HasStateAuthority)
@@ -241,7 +238,7 @@ public class Weapon : NetworkBehaviour
         OnSpecialAttackChanged(int.MinValue);
     }
 
-    private void ResetTimer()
+    public void ResetTimer()
     {
         specialAttackAvailable = false;
         specialAttackTimer = cooldown;

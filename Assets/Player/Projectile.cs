@@ -12,7 +12,6 @@ public class Projectile : MonoBehaviour
 
     public void Fire(Vector2 direction, Weapon weapon, int shotID)
     {
-        print("fire");
         _rigidbody.velocity = direction * speed;
         StartCoroutine(DestroyAfterTime());
         this.weapon = weapon;
@@ -38,7 +37,6 @@ public class Projectile : MonoBehaviour
             weapon.OnBulletHit(collision.gameObject.GetComponent<Enemy>(), shotID);
 
             Destroy(gameObject);
-            print("destroyed shot");
         }
     }
 }

@@ -137,7 +137,6 @@ public class LevelController : NetworkBehaviour
         RpcShowGame();
 
         isShopping = false;
-
     }
 
 
@@ -147,6 +146,11 @@ public class LevelController : NetworkBehaviour
     {
         waveInProgress = true;
         currentWave++;
+
+        foreach(Player player in players)
+        {
+            player?.GetComponent<Weapon>().ResetTimer();
+        }
         StartCoroutine(WaveRoutine(waveDuration));
     }
 
@@ -197,7 +201,7 @@ public class LevelController : NetworkBehaviour
         {
             EnemySpawner.Instance.UpdateEnemySpawnRate(EnemyType.Jet, 1);
             EnemySpawner.Instance.UpdateEnemySpawnRate(EnemyType.Drone, 10);
-            EnemySpawner.Instance.UpdateEnemySpawnRate(EnemyType.Airship, 10);
+            EnemySpawner.Instance.UpdateEnemySpawnRate(EnemyType.Airship, 1);
         }
     }
 
