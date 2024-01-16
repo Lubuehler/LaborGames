@@ -26,7 +26,15 @@ public class MainMenu : MonoBehaviour
         UIController.Instance.ShowUIElement(UIElement.Multiplayer);
     }
 
-    public void OnSettingsClick(){}
+    public void OnSettingsClick()
+    {
+        UIController.Instance.ShowUIElement(UIElement.Settings);
+    }
+
+    public void OnQuitClick()
+    {
+        Application.Quit();
+    }
 
 
     // Debug

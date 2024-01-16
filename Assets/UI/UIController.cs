@@ -17,7 +17,7 @@ public class UIController : MonoBehaviour
     [SerializeField] private GameObject spectatorCanvas;
     [SerializeField] private GameObject endscreenCanvas;
     [SerializeField] private GameObject debugCanvas;
-
+    [SerializeField] private GameObject settingsCanvas;
     // Dialogs
     [SerializeField] private GameObject leaveDialogCanvas;
     [SerializeField] private GameObject directJoinDialogCanvas;
@@ -51,6 +51,7 @@ public class UIController : MonoBehaviour
         canvasDict[UIElement.Spectator] = spectatorCanvas;
         canvasDict[UIElement.Endscreen] = endscreenCanvas;
         canvasDict[UIElement.Endscreen] = endscreenCanvas;
+        canvasDict[UIElement.Settings] = settingsCanvas;
 
         canvasDict[UIElement.DirectJoinDialog] = directJoinDialogCanvas;
         canvasDict[UIElement.LeaveDialog] = leaveDialogCanvas;
@@ -139,6 +140,7 @@ public enum UIElement
     Lobby,
     Spectator,
     Endscreen,
+    Settings,
 
     DirectJoinDialog,
     LeaveDialog,

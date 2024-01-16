@@ -37,6 +37,40 @@ public class DataController : MonoBehaviour
         }
     }
 
+    public void SetScreenMode(int fullScreenMode)
+    {
+
+
+        switch (fullScreenMode)
+        {
+            case 0: // Fullscreen
+                Screen.fullScreenMode = FullScreenMode.Windowed;
+                break;
+            case 1: // Windowed
+                Screen.fullScreenMode = FullScreenMode.ExclusiveFullScreen;
+                break;
+            case 2: // Borderless Windowed
+                Screen.fullScreenMode = FullScreenMode.MaximizedWindow;
+                break;
+            default:
+                break;
+        }
+    }
+
+    public void SetResolution(int resolutionIndex)
+    {
+        QualitySettings.SetQualityLevel(resolutionIndex);
+    }
+
+    public void InitializeSettings()
+    {
+        // Load saved settings or initialize to default values
+        var resolutionIndex = PlayerPrefs.GetInt("Resolution", QualitySettings.GetQualityLevel());
+        var fullScreenMode = PlayerPrefs.GetInt("ScreenMode", (int)Screen.fullScreenMode);
+
+        SetResolution(resolutionIndex);
+        SetScreenMode(fullScreenMode);
+    }
 
 }
 
