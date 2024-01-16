@@ -1,0 +1,20 @@
+fileFormatVersion: 2
+guid: 70c8da455d0a8b14cbf2c1b095f7cdf0
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences:
+  - statRowPrefab: {instanceID: 0}
+  - statsPanelTransform: {instanceID: 0}
+  - wave: {instanceID: 0}
+  - coins: {instanceID: 0}
+  - goButton: {instanceID: 0}
+  - ressurectButton: {instanceID: 0}
+  - itemDatabase: {fileID: 11400000, guid: 825f1f62c8f307d419d4a5466ab67a9b, type: 2}
+  - itemGroup: {instanceID: 0}
+  - shopItemPrefab: {instanceID: 0}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

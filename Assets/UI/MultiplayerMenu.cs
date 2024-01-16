@@ -4,7 +4,6 @@ using UnityEngine;
 
 public class MultiplayerMenu : MonoBehaviour
 {
-    public Canvas joinCanvas;
 
     public void OnHostClick()
     {

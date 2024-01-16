@@ -1,47 +1,76 @@
 using Fusion;
-using UnityEngine;
+using System.Collections;
 using System.Collections.Generic;
+using UnityEngine;
 
 public enum EnemyType
 {
     Drone,
     Jet,
+    Airship,
+    LaserDrone
 }
 
 public class Enemy : NetworkBehaviour
 {
-    [SerializeField] private float speed = 3f;
-    [SerializeField] private int health = 100;
-    [SerializeField] private double viewingDistance = 20d;
-    [SerializeField] private LayerMask enemyLayerMask;
-    [SerializeField] private float separationRadius = 5f;
+    //[SerializeField] protected float speed = 3f;
+    [Networked] protected int health { get; set; } = 100;
+    [SerializeField] protected double viewingDistance = 20d;
+    [SerializeField] protected LayerMask enemyLayerMask;
+    [SerializeField] protected LayerMask playerLayerMask;
+    [SerializeField] protected float separationRadius = 5f;
+    [SerializeField] protected float explosionRange = 1f;
+    [SerializeField] protected float explosionDamage = 40f;
+    [SerializeField] protected GameObject deathExplosionPrefab;
+
 
     protected NetworkRigidbody2D networkRigidbody2D;
     protected NetworkObject currentTarget;
 
+    protected float movementSmoothing = .5f;
+
+    protected bool movementDisabled = false;
+    protected bool stopRequested = false;
+
+
     public override void Spawned()
     {
         networkRigidbody2D = GetComponent<NetworkRigidbody2D>();
-        if (networkRigidbody2D == null)
-        {
-            Debug.LogError("NetworkRigidbody2D component not found on " + gameObject.name);
-        }
-
         UpdateTarget();
     }
 
-    private float movementSmoothing = .5f;
+    public Vector2 getPosition()
+    {
+        return networkRigidbody2D.ReadPosition();
+    }
+
+    public Vector2 getVelocity()
+    {
+        return networkRigidbody2D.ReadVelocity();
+    }
+
+    public Transform getTransform()
+    {
+        return networkRigidbody2D.transform;
+    }
 
 
     protected virtual void Move()
     {
-        if (currentTarget != null && networkRigidbody2D != null)
+        if (!movementDisabled)
         {
-            Vector2 toTarget = (currentTarget.transform.position - transform.position);
+            if (currentTarget == null || !currentTarget.GetComponent<Player>().isAlive || stopRequested)
+            {
+                networkRigidbody2D.Rigidbody.velocity = Vector2.Lerp(networkRigidbody2D.Rigidbody.velocity, Vector2.zero, Runner.DeltaTime * movementSmoothing);
+                return;
+            }
+            Vector2 toTarget = currentTarget.transform.position - transform.position;
             Vector2 separationForce = CalculateSeparationForce();
 
+            var speed = EnemySpawner.Instance.speed;
+
             Vector2 desiredVelocity = (toTarget.normalized + separationForce).normalized * speed;
-            networkRigidbody2D.Rigidbody.velocity = Vector2.Lerp(networkRigidbody2D.Rigidbody.velocity, desiredVelocity, Time.deltaTime * movementSmoothing);
+            networkRigidbody2D.Rigidbody.velocity = Vector2.Lerp(networkRigidbody2D.Rigidbody.velocity, desiredVelocity, Runner.DeltaTime * movementSmoothing);
         }
     }
 
@@ -76,7 +105,7 @@ public class Enemy : NetworkBehaviour
             }
         }
 
-        float maxSeparationForce = 1f;
+        float maxSeparationForce = .4f;
         if (separationForce.magnitude > maxSeparationForce)
         {
             separationForce = separationForce.normalized * maxSeparationForce;
@@ -84,48 +113,92 @@ public class Enemy : NetworkBehaviour
         return separationForce;
     }
 
-
-    public void TakeDamage(int damage)
+    [Rpc(RpcSources.All, RpcTargets.All)]
+    public void RPC_TakeDamage(int damage)
     {
         health -= damage;
+    }
+
+
+    public override void Render()
+    {
         if (health <= 0)
         {
             Die();
         }
+        else
+        {
+            UpdateTarget();
+            Move();
+            DoSomething();
+        }
+
     }
 
-    protected virtual void Die()
-    {
-        Debug.Log("Enemy died");
-        Runner.Despawn(GetComponent<NetworkObject>());
-    }
-
-    public override void Render()
-    {
-        UpdateTarget();
-        Move();
-    }
+    protected virtual void DoSomething() { }
 
     protected void UpdateTarget()
     {
-        if (currentTarget != null && (currentTarget.transform.position - transform.position).magnitude < viewingDistance)
+        if (currentTarget == null ||
+            !currentTarget.GetComponent<Player>().isAlive ||
+            (currentTarget.transform.position - transform.position).magnitude < viewingDistance)
         {
-            return;
+            currentTarget = GetClosestPlayer();
         }
+    }
 
-        currentTarget = null;
+    private NetworkObject GetClosestPlayer()
+    {
+        NetworkObject closestPlayer = null;
         double closestDistance = double.MaxValue;
-
-
-        foreach (NetworkObject player in NetworkController.Instance.characters.Values)
+        foreach (PlayerRef playerRef in Runner.ActivePlayers)
         {
-            Vector3 playerPosition = player.transform.position;
+            NetworkObject playerObject = NetworkController.Instance.GetPlayerAvatar(playerRef);
+            if (!playerObject.GetComponent<Player>().isAlive)
+            {
+                continue;
+            }
+            Vector3 playerPosition = playerObject.transform.position;
             double distance = (playerPosition - transform.position).magnitude;
             if (distance < closestDistance)
             {
                 closestDistance = distance;
-                currentTarget = player;
+                closestPlayer = playerObject;
             }
         }
+        return closestPlayer;
+    }
+
+    void OnCollisionEnter2D(Collision2D collision)
+    {
+        if ((playerLayerMask.value & (1 << collision.gameObject.layer)) != 0)
+        {
+            collision.gameObject.GetComponent<Player>().TakeDamage(explosionDamage);
+            Explode();
+        }
+    }
+
+    private void Explode()
+    {
+        Runner.Spawn(deathExplosionPrefab, transform.position, transform.rotation);
+        health -= int.MaxValue;
+    }
+
+    protected virtual void Die()
+    {
+        EnemySpawner.Instance.EnemyDefeated(this, transform.position);
+    }
+
+    public void EMPHit(float duration)
+    {
+        movementDisabled = true;
+        networkRigidbody2D.Rigidbody.velocity = Vector2.Lerp(networkRigidbody2D.Rigidbody.velocity, Vector2.zero, Runner.DeltaTime * movementSmoothing);
+        StartCoroutine(EnableMovementAfterDelay(duration));
+    }
+
+    private IEnumerator EnableMovementAfterDelay(float delay)
+    {
+        yield return new WaitForSeconds(delay);
+        movementDisabled = false;
     }
 }

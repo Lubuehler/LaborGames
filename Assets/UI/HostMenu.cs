@@ -1,16 +1,24 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using TMPro;
 
 public class HostMenu : MonoBehaviour
 {
+    [SerializeField] private TMP_InputField inputField;
     private string sessionName;
-    public void OnCreateClick()
+
+    void OnEnable()
+    {
+        inputField.text = "";
+    }
+
+    public async void OnCreateClick()
     {
         if (!string.IsNullOrEmpty(sessionName))
         {
-            NetworkController.Instance.StartGame(Fusion.GameMode.Host, sessionName);
-            UIController.Instance.ShowUIElement(UIElement.Game);
+            await NetworkController.Instance.StartGame(Fusion.GameMode.Host, sessionName);
+            UIController.Instance.ShowUIElement(UIElement.Lobby);
         }
 
     }
@@ -18,7 +26,6 @@ public class HostMenu : MonoBehaviour
     public void GetSessionName(string input)
     {
         sessionName = input;
-        Debug.Log(sessionName);
     }
 
     public void OnBackClick()

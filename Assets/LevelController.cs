@@ -1,12 +1,44 @@
-using UnityEngine;
 using Fusion;
+using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
+using UnityEngine;
 
 public class LevelController : NetworkBehaviour
 {
-    private List<NetworkObject> _spawnedEnemies = new List<NetworkObject>();
-    public GameObject dronePrefab;
     public static LevelController Instance;
+
+
+    [Networked]
+    public bool gameRunning { get; set; }
+    public bool initialized { get; set; } = false;
+
+    [Networked]
+    public int currentWave { get; set; }
+    private float waveDuration = 30f;
+    private float waveDurationIncrease = 2f;
+
+    private float waveEndTime; // Time when the current wave will end
+
+    //[Networked(OnChanged = nameof(ShowGame))]
+    [Networked]
+    public bool waveInProgress { get; set; }
+
+    [Networked]
+    public float RemainingWaveTime { get; private set; }
+
+    public Player localPlayer;
+
+    public List<Player> players { get; private set; } = new List<Player>();
+
+    public event Action OnPlayerListChanged;
+    public event Action OnCurrentWaveChanged;
+
+    [Networked]
+    public bool isShopping { get; set; }
+
+    [SerializeField] private LayerMask enemyMask;
 
     private void Awake()
     {
@@ -16,60 +48,299 @@ public class LevelController : NetworkBehaviour
         }
         else
         {
-            Destroy(this.gameObject);
+            Destroy(gameObject);
         }
+
     }
 
     public override void Spawned()
     {
+        gameRunning = false;
+        waveInProgress = false;
+        initialized = true;
+
+        RPC_TriggerPlayerListChanged();
+    }
+
+    [Rpc]
+    public void RPC_Ready(NetworkObject networkObject, bool ready)
+    {
         if (Runner.IsServer)
         {
-            StartLevel();
+            networkObject.GetComponent<Player>().lobbyReady = ready;
+
+
+            bool allPlayersReady = true;
+            foreach (Player player in players)
+            {
+                if (!player.lobbyReady)
+                {
+                    allPlayersReady = false;
+                }
+
+            }
+            if (allPlayersReady)
+            {
+                StartLevel();
+                RpcShowGame();
+                Runner.SessionInfo.IsVisible = false;
+                foreach (Player player in players)
+                {
+                    player.lobbyReady = false;
+
+                }
+
+            }
         }
     }
 
-    private void SpawnEnemy(Vector3 position, EnemyType enemyType)
+    [Rpc(RpcSources.All, RpcTargets.StateAuthority)]
+    public void RPC_ShopReady(NetworkObject playerObject, bool ready)
     {
-        if (enemyType == EnemyType.Drone)
+        playerObject.GetComponent<Player>().shopReady = ready;
+
+
+        bool allPlayersReady = true;
+        foreach (Player player in players)
         {
-            if (Runner == null)
+            if (!player.shopReady)
             {
-                print("runner is null in spawn enemy");
+                allPlayersReady = false;
             }
-            NetworkObject spawnedEnemy = Runner.Spawn(dronePrefab, position, Quaternion.identity);
-            _spawnedEnemies.Add(spawnedEnemy);
-        }
-        else if (enemyType == EnemyType.Jet)
-        {
 
         }
+        if (allPlayersReady)
+        {
+            RpcEndShoppingPhase();
+
+            StartNextWave();
+            foreach (Player player in players)
+            {
+                player.shopReady = false;
+
+            }
+        }
+    }
+
+    [Rpc(RpcSources.All, RpcTargets.All)]
+    private void RpcEndShoppingPhase()
+    {
+
+        RpcShowGame();
+
+        isShopping = false;
+        localPlayer.Heal(0f);
+
+    }
+
+
+
+    [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
+    private void RpcStartWave()
+    {
+        waveInProgress = true;
+        currentWave++;
+        OnCurrentWaveChanged?.Invoke();
+
+        foreach (Player player in players)
+        {
+            player?.GetComponent<Weapon>().ResetTimer();
+        }
+        StartCoroutine(WaveRoutine(waveDuration));
+    }
+
+    [Rpc(RpcSources.All, RpcTargets.All)]
+    private void RpcEndWave()
+    {
+        waveInProgress = false;
+        EnemySpawner.Instance.RPC_DespawnEverything();
+    }
+
+
+    private IEnumerator WaveRoutine(float duration)
+    {
+        if (!Runner.IsServer) yield break;
+
+        Debug.Log($"Wave {currentWave} started.");
+
+        RemainingWaveTime = duration;
+
+        while (RemainingWaveTime > 0 && waveInProgress && isShopping == false)
+        {
+            // Assuming the game is not paused and you're counting down
+            RemainingWaveTime -= 1;
+
+            EnemySpawner.Instance.SpawnEnemy();
+            yield return new WaitForSeconds(1);
+        }
+
+        RpcEndWave();
+        if (gameRunning && GetLivingPlayers().Count() != 0)
+        {
+            EnemySpawner.Instance.speed = 3f;
+            RpcEnterShoppingPhase();
+        }
+    }
+
+
+    [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
+    private void RpcEnterShoppingPhase()
+    {
+        isShopping = true;
+        UIController.Instance.ShowUIElement(UIElement.Shop);
+    }
+
+    private void UpdateEnemyPool()
+    {
+        if (currentWave >= 0)
+        {
+            EnemySpawner.Instance.UpdateEnemySpawnRate(EnemyType.LaserDrone, 1);
+            EnemySpawner.Instance.UpdateEnemySpawnRate(EnemyType.Jet, 1);
+            EnemySpawner.Instance.UpdateEnemySpawnRate(EnemyType.Drone, 5);
+            EnemySpawner.Instance.UpdateEnemySpawnRate(EnemyType.Airship, 1);
+        }
+    }
+
+    public void StartNextWave()
+    {
+        if (!Runner.IsServer) return;
+
+        UpdateEnemyPool();
+        waveDuration += currentWave; // Increase wave duration based on current wave
+        RpcStartWave();
     }
 
     public void StartLevel()
     {
-        for (int i = 0; i < 20; i++)
+        StartNextWave();
+        gameRunning = true;
+    }
+
+    [Rpc(RpcSources.All, RpcTargets.All)]
+    public void RpcPlayerSpawned(Player player)
+    {
+        if (!players.Contains(player))
         {
-            Vector2 spawnPosition = new Vector2(Random.Range(-10, 10), Random.Range(-10, 10));
-            SpawnEnemy(spawnPosition, EnemyType.Drone);
+            players.Add(player);
+            OnPlayerListChanged?.Invoke();
         }
     }
 
-    public void EnemyDefeated(Enemy enemy)
+    [Rpc(RpcSources.All, RpcTargets.All)]
+    public void RpcPlayerDowned(Player player)
     {
-        if (Runner.IsServer)
+        if (GetLivingPlayers().Count == 0)
         {
-            _spawnedEnemies.Remove(enemy.GetComponentInParent<NetworkObject>());
-            Runner.Despawn(enemy.GetComponentInParent<NetworkObject>());
-            CheckForLevelCompletion();
+            RpcGameOver();
+
+
+        }
+        else if (localPlayer == player && !isShopping && gameRunning)
+        {
+            StartSpectator();
         }
     }
 
-    private void CheckForLevelCompletion()
+    [Rpc]
+    public void RpcGameOver()
     {
-        if (_spawnedEnemies.Count == 0)
+        RpcEndWave();
+        foreach (Player player in players)
         {
-            Debug.Log("Level Completed!");
-            // Handle level completion logic here
+            player.GetComponent<Weapon>().ResetSpecialAttacks();
         }
+        UIController.Instance.ShowUIElement(UIElement.Endscreen);
+        print("Game Over");
+        StopGame();
+    }
+
+    public void StartSpectator()
+    {
+        Player selectedPlayer = players.FirstOrDefault(player => player.GetComponent<Player>().isAlive);
+
+        UIController.Instance.ShowUIElement(UIElement.Spectator);
+        Camera.main.GetComponent<CameraScript>().target = selectedPlayer.GetComponent<NetworkObject>();
+        print("Spectating");
+    }
+
+    public void StopGame()
+    {
+        foreach (var player in players)
+        {
+            player.RpcReset();
+        }
+        gameRunning = false;
+    }
+
+    public void RessurectPlayers()
+    {
+        foreach (Player player in players)
+        {
+            if (!player.isAlive)
+            {
+                player.RpcRessurect();
+            }
+        }
+    }
+
+
+    [Rpc]
+    private void RpcShowGame()
+    {
+
+        if (NetworkController.Instance.GetLocalPlayerObject().GetComponent<Player>().isAlive)
+        {
+            UIController.Instance.ShowUIElement(UIElement.Game);
+        }
+        else
+        {
+            StartSpectator();
+        }
+    }
+
+    public List<Player> GetLivingPlayers()
+    {
+        List<Player> livingPlayers = new List<Player>();
+        foreach (Player p in players)
+        {
+            if (p.isAlive)
+
+            {
+                livingPlayers.Add((Player)p);
+            }
+        }
+        return livingPlayers;
+    }
+
+    public List<Player> GetDeadPlayers()
+    {
+        List<Player> deadPlayers = new List<Player>();
+        foreach (Player p in players)
+        {
+            if (!p.isAlive)
+
+            {
+                deadPlayers.Add((Player)p);
+            }
+        }
+        return deadPlayers;
+    }
+
+    public List<Enemy> FindClosestEnemies(Vector3 position, int count, float maxRange, int ignoreEnemyWithId = -1)
+    {
+        return FindObjectsOfType<Enemy>()
+            .Where(t => t.gameObject.GetInstanceID() != ignoreEnemyWithId)
+            .Where(t => (enemyMask.value & (1 << t.gameObject.layer)) != 0)
+            .Where(t => Vector3.Distance(t.getPosition(), position) <= maxRange)
+
+            .OrderBy(t => Vector3.Distance(t.getPosition(), position))
+            .Take(count)
+            .ToList();
+    }
+
+    [Rpc(sources: RpcSources.All, targets: RpcTargets.All)]
+    public void RPC_TriggerPlayerListChanged()
+    {
+        OnPlayerListChanged?.Invoke();
     }
 }

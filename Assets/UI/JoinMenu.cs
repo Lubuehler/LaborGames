@@ -7,10 +7,13 @@ using TMPro;
 
 public class JoinMenu : MonoBehaviour
 {
-    public string selectedSession = "";
-    public Transform elementParent;
-    public GameObject template;
-    public GameObject placeholder;
+    [SerializeField] private Transform elementParent;
+    [SerializeField] private GameObject template;
+    [SerializeField] private GameObject placeholder;
+
+    private string selectedSession = "";
+    private bool isDoubleClick = false;
+    private float doubleClickTime = 0.5f;
     void OnEnable()
     {
         NetworkController.Instance.OnSessionListChanged += UpdateSessionList;
@@ -22,7 +25,7 @@ public class JoinMenu : MonoBehaviour
         NetworkController.Instance.OnSessionListChanged -= UpdateSessionList;
     }
 
-    public  void UpdateSessionList()
+    public void UpdateSessionList()
     {
         for (int i = elementParent.childCount - 1; i >= 0; i--)
         {
@@ -52,26 +55,45 @@ public class JoinMenu : MonoBehaviour
         }
     }
 
-
     public void OnButtonClick(GameObject clickedButton)
     {
         selectedSession = clickedButton.name;
+        if (!isDoubleClick)
+        {
+            isDoubleClick = true;
+            Invoke(nameof(ResetDoubleClick), doubleClickTime);
+        }
+        else
+        {
+            JoinGame();
+        }
     }
 
+    private void ResetDoubleClick()
+    {
+        isDoubleClick = false;
+    }
 
+    private async void JoinGame()
+    {
+        if (!string.IsNullOrEmpty(selectedSession))
+        {
+            StartGameResult result = await NetworkController.Instance.StartGame(GameMode.Client, selectedSession);
+            if (result.Ok)
+            {
+                UIController.Instance.ShowUIElement(UIElement.Lobby);
+            }
+        }
+    }
 
     public void OnDirectConnectClick()
     {
-        UIController.Instance.ShowDialog(UIElement.DirectJoin);
+        UIController.Instance.ShowDialog(UIElement.DirectJoinDialog);
     }
 
     public void OnJoinGameClick()
     {
-        if (!string.IsNullOrEmpty(selectedSession))
-        {
-            NetworkController.Instance.StartGame(GameMode.Client, selectedSession);
-            UIController.Instance.ShowUIElement(UIElement.Game);
-        }
+        JoinGame();
     }
 
     public void OnBackClick()

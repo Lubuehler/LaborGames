@@ -1,33 +1,48 @@
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
-using Fusion;
 
-public class Projectile : NetworkBehaviour
+public class Projectile : MonoBehaviour
 {
-    private NetworkRigidbody2D _rigidbody;
+    [SerializeField] private GameObject hitExplosionPrefab;
+    private Rigidbody2D _rigidbody;
     public float speed = 20.0f;
-    public int damage = 50;
-    public LayerMask collisionLayers; // Specify which layers should interact with the projectile.
+    public LayerMask collisionLayers;
+    private Weapon weapon;
 
-    public void Fire(Vector2 direction)
+    private int shotID;
+
+    public void Fire(Vector2 direction, Weapon weapon, int shotID)
     {
-        _rigidbody.Rigidbody.velocity = direction * speed;
+        _rigidbody.velocity = direction * speed;
+        StartCoroutine(DestroyAfterTime());
+        this.weapon = weapon;
+        this.shotID = shotID;
+    }
+
+
+    IEnumerator DestroyAfterTime()
+    {
+        yield return new WaitForSeconds(5);
+        Destroy(gameObject);
     }
 
     protected void Awake()
     {
-        _rigidbody = GetComponent<NetworkRigidbody2D>();
+        _rigidbody = GetComponent<Rigidbody2D>();
     }
 
-    // TODO change to OverlapBox
     void OnCollisionEnter2D(Collision2D collision)
     {
-        // Check if the collision involves the specified layers.
         if ((collisionLayers.value & (1 << collision.gameObject.layer)) != 0)
         {
-            collision.gameObject.GetComponent<Enemy>().TakeDamage(damage);
+            weapon.OnBulletHit(collision.gameObject.GetComponent<Enemy>(), shotID);
+            Vector3 directionToShooter = (transform.position - weapon.transform.position).normalized;
+            float offsetDistance = 0.2f;
+            Vector3 explosionPosition = transform.position - (directionToShooter * offsetDistance);
+
+            Instantiate(hitExplosionPrefab, explosionPosition, Quaternion.identity);
             Destroy(gameObject);
         }
     }
+
 }

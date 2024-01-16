@@ -1,10 +1,11 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Fusion;
 
 public class CameraScript : MonoBehaviour
 {
-    public Transform target; // Reference to the airplane's transform
+    public NetworkObject target; // Reference to the airplane's transform
     public BoxCollider2D boundariesCollider; // Reference to the boundaries' Box Collider 2D
     public float smoothSpeed = 0.125f; // Speed at which the camera follows the airplane
     public Vector3 offset; // Offset position relative to the airplane
@@ -27,10 +28,12 @@ public class CameraScript : MonoBehaviour
 
     private void FixedUpdate()
     {
+        
         if (target == null) return; // If no target is assigned, don't proceed
-
+        Transform targetTransform = target.GetComponent<NetworkTransform>().InterpolationTarget;
+        
         // Calculate the desired position for the camera
-        Vector3 desiredPosition = new Vector3(target.position.x + offset.x, target.position.y + offset.y, transform.position.z);
+        Vector3 desiredPosition = new Vector3(targetTransform.position.x + offset.x, targetTransform.position.y + offset.y, transform.position.z);
 
         // Smoothly interpolate between the camera's current position and the desired position
         Vector3 smoothedPosition = Vector3.Lerp(transform.position, desiredPosition, smoothSpeed);
