@@ -33,6 +33,7 @@ public class LevelController : NetworkBehaviour
     public List<Player> players { get; private set; } = new List<Player>();
 
     public event Action OnPlayerListChanged;
+    public event Action OnCurrentWaveChanged;
 
     [Networked]
     public bool isShopping { get; set; }
@@ -57,17 +58,8 @@ public class LevelController : NetworkBehaviour
         gameRunning = false;
         waveInProgress = false;
         initialized = true;
-        if (!Runner.IsServer) return;
-        EnemySpawner.Instance.UpdateEnemySpawnRate(EnemyType.Drone, 1);
 
-
-        List<PlayerRef> playerRefs = new List<PlayerRef>(Runner.ActivePlayers);
-        foreach (PlayerRef player in playerRefs)
-        {
-            if (Runner.GetPlayerObject(player) == null) { continue; }
-            players.Add(Runner.GetPlayerObject(player).GetComponent<Player>());
-        }
-        OnPlayerListChanged?.Invoke();
+        RPC_TriggerPlayerListChanged();
     }
 
     [Rpc]
@@ -137,6 +129,8 @@ public class LevelController : NetworkBehaviour
         RpcShowGame();
 
         isShopping = false;
+        //TriggerPlayerListChanged();
+        localPlayer.Heal(0f);
 
     }
 
@@ -147,6 +141,7 @@ public class LevelController : NetworkBehaviour
     {
         waveInProgress = true;
         currentWave++;
+        OnCurrentWaveChanged?.Invoke();
         StartCoroutine(WaveRoutine(waveDuration));
     }
 
@@ -195,9 +190,10 @@ public class LevelController : NetworkBehaviour
     {
         if (currentWave >= 0)
         {
-            EnemySpawner.Instance.UpdateEnemySpawnRate(EnemyType.Jet, 100);
-            EnemySpawner.Instance.UpdateEnemySpawnRate(EnemyType.Drone, 10);
-            EnemySpawner.Instance.UpdateEnemySpawnRate(EnemyType.Airship, 1);
+            //EnemySpawner.Instance.UpdateEnemySpawnRate(EnemyType.LaserDrone, 100);
+            //EnemySpawner.Instance.UpdateEnemySpawnRate(EnemyType.Jet, 1);
+            EnemySpawner.Instance.UpdateEnemySpawnRate(EnemyType.Drone, 1);
+            //EnemySpawner.Instance.UpdateEnemySpawnRate(EnemyType.Airship, 1);
         }
     }
 
@@ -292,7 +288,6 @@ public class LevelController : NetworkBehaviour
         {
             StartSpectator();
         }
-
     }
 
     public List<Player> GetLivingPlayers()
@@ -335,8 +330,9 @@ public class LevelController : NetworkBehaviour
             .ToList();
     }
 
-    public void TriggerPlayerListChanged()
+    [Rpc(sources: RpcSources.All, targets: RpcTargets.All)]
+    public void RPC_TriggerPlayerListChanged()
     {
-        OnPlayerListChanged.Invoke();
+        OnPlayerListChanged?.Invoke();
     }
 }

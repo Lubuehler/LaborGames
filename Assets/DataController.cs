@@ -1,7 +1,5 @@
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
 using System;
+using UnityEngine;
 
 
 public class DataController : MonoBehaviour
@@ -39,7 +37,7 @@ public class DataController : MonoBehaviour
         }
     }
 
-    
+
 }
 
 [Serializable]

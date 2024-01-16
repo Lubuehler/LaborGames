@@ -36,7 +36,7 @@ public class Player : NetworkBehaviour
 
     // Player Stats
     [Networked] public int coins { get; set; }
-    [Networked] public float maxHealth { get; set; }
+    [Networked] public int maxHealth { get; set; }
     [Networked] public float attackDamage { get; set; }
     [Networked] public float attackSpeed { get; set; } // Schüsse pro Sekunde
     [Networked] public float critChance { get; set; }
@@ -46,7 +46,7 @@ public class Player : NetworkBehaviour
     [Networked] public float luck { get; set; }
     [Networked] public float armor { get; set; }
     [Networked] public float range { get; set; }
-    [Networked] public float currentHealth { get; set; }
+    [Networked] public int currentHealth { get; set; }
 
     //Items
     [Networked, Capacity(20)] public NetworkLinkedList<int> items { get; }
@@ -112,7 +112,7 @@ public class Player : NetworkBehaviour
 
         currentHealth = maxHealth;
         OnStatsChanged?.Invoke();
-        RpcHealthChanged();
+        RpcHealthChanged(currentHealth);
     }
 
 
@@ -161,6 +161,12 @@ public class Player : NetworkBehaviour
 
     public void TakeDamage(float damage)
     {
+        print("trake dmg");
+        if (!HasInputAuthority)
+        {
+            print("no input authority, therefore no ddmg.");
+            return;
+        }
         if (weapon.shieldActive)
         {
             damage = 0;
@@ -172,17 +178,14 @@ public class Player : NetworkBehaviour
             return;
         }
 
-        currentHealth -= damage;
-        currentHealth = Mathf.Clamp(currentHealth, 0, maxHealth);
-        RpcHealthChanged();
+        RpcHealthChanged(Mathf.Clamp(currentHealth -= (int)damage, 0, maxHealth));
 
         if (currentHealth <= 0 && isAlive)
         {
             RpcDie();
-            if (HasInputAuthority)
-            {
-                StartCoroutine(DelayedDeath());
-            }
+
+            StartCoroutine(DelayedDeath());
+
         }
     }
 
@@ -196,17 +199,14 @@ public class Player : NetworkBehaviour
 
     public void Heal(float amount)
     {
-        currentHealth = Mathf.Clamp(currentHealth + amount, 0, maxHealth);
-
-        RpcHealthChanged();
+        RpcHealthChanged(Mathf.Clamp(currentHealth + (int)amount, 0, maxHealth));
     }
 
-    public void IncreaseMaxHealth(float amount)
+    [Rpc(RpcSources.InputAuthority, RpcTargets.All)]
+    public void RPC_IncreaseMaxHealth(float amount)
     {
-        maxHealth += amount;
+        maxHealth += (int)amount;
         Heal(amount);
-        RpcHealthChanged();
-
     }
 
     [Rpc(RpcSources.All, RpcTargets.All)]
@@ -261,7 +261,7 @@ public class Player : NetworkBehaviour
                 switch (modifier.statName)
                 {
                     case "Max Health":
-                        maxHealth += modifier.value; break;
+                        maxHealth += (int)modifier.value; break;
                     case "Attack Damage":
                         attackDamage += modifier.value; break;
                     case "Attack Speed":
@@ -294,8 +294,9 @@ public class Player : NetworkBehaviour
     }
 
     [Rpc(RpcSources.All, RpcTargets.All)]
-    public void RpcHealthChanged()
+    public void RpcHealthChanged(int newHealth)
     {
+        currentHealth = newHealth;
         OnHealthChanged?.Invoke(currentHealth, maxHealth);
     }
 }

@@ -8,12 +8,13 @@ public enum EnemyType
     Drone,
     Jet,
     Airship,
+    LaserDrone
 }
 
 public class Enemy : NetworkBehaviour
 {
     //[SerializeField] protected float speed = 3f;
-    [SerializeField] protected int health = 100;
+    [Networked] protected int health { get; set; } = 100;
     [SerializeField] protected double viewingDistance = 20d;
     [SerializeField] protected LayerMask enemyLayerMask;
     [SerializeField] protected LayerMask playerLayerMask;
@@ -29,16 +30,12 @@ public class Enemy : NetworkBehaviour
     protected float movementSmoothing = .5f;
 
     protected bool movementDisabled = false;
+    protected bool stopRequested = false;
 
 
     public override void Spawned()
     {
         networkRigidbody2D = GetComponent<NetworkRigidbody2D>();
-        if (networkRigidbody2D == null)
-        {
-            Debug.LogError("NetworkRigidbody2D component not found on " + gameObject.name);
-        }
-
         UpdateTarget();
     }
 
@@ -62,7 +59,7 @@ public class Enemy : NetworkBehaviour
     {
         if (!movementDisabled)
         {
-            if (currentTarget == null || !currentTarget.GetComponent<Player>().isAlive)
+            if (currentTarget == null || !currentTarget.GetComponent<Player>().isAlive || stopRequested)
             {
                 networkRigidbody2D.Rigidbody.velocity = Vector2.Lerp(networkRigidbody2D.Rigidbody.velocity, Vector2.zero, Runner.DeltaTime * movementSmoothing);
                 return;
@@ -116,22 +113,26 @@ public class Enemy : NetworkBehaviour
         return separationForce;
     }
 
-
-    public void TakeDamage(int damage)
+    [Rpc(RpcSources.All, RpcTargets.All)]
+    public void RPC_TakeDamage(int damage)
     {
         health -= damage;
-        if (health <= 0)
-        {
-            Die();
-        }
     }
 
 
     public override void Render()
     {
-        UpdateTarget();
-        Move();
-        DoSomething();
+        if (health <= 0)
+        {
+            Die();
+        }
+        else
+        {
+            UpdateTarget();
+            Move();
+            DoSomething();
+        }
+
     }
 
     protected virtual void DoSomething() { }
@@ -179,9 +180,8 @@ public class Enemy : NetworkBehaviour
 
     private void Explode()
     {
-
         Runner.Spawn(deathExplosionPrefab, transform.position, transform.rotation);
-        Die();
+        health -= int.MaxValue;
     }
 
     protected virtual void Die()

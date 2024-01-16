@@ -1,8 +1,5 @@
-using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -24,13 +21,15 @@ public class HUD : MonoBehaviour
     [SerializeField] private GameObject arrowPrefab;
     private Dictionary<Player, GameObject> offScreenArrows = new Dictionary<Player, GameObject>();
 
-    private bool playerListSubscribed = false;
+    List<AllyHealthbar> allyHealthbars = new List<AllyHealthbar>();
 
     private bool initialized = false;
 
     private float initialHeight;
 
     private Weapon weapon;
+
+    private bool subscribed = false;
 
     public void OnEnable()
     {
@@ -40,6 +39,14 @@ public class HUD : MonoBehaviour
             initialized = true;
         }
 
+        if (LevelController.Instance != null && LevelController.Instance.localPlayer != null)
+        {
+            setupActiveItem();
+        }
+    }
+
+    private void setupActiveItem()
+    {
         weapon = LevelController.Instance.localPlayer.GetBehaviour<Weapon>();
 
         if (weapon.selectedSpecialAttack != int.MinValue)
@@ -49,42 +56,60 @@ public class HUD : MonoBehaviour
             specialAttack.GetComponentInChildren<TMP_Text>().text = selectedItem?.itemName;
             specialAttackIcon.sprite = selectedItem?.icon;
         }
+    }
 
+    private void setupSubscriptions()
+    {
+
+        RebuildAllyHealthbars();
         UpdateCoinsCounter();
-        OnPlayerListChanged();
+        updateWaveCounter();
+        subscribed = true;
+    }
+
+    private void unsubscribe()
+    {
+        if (subscribed)
+        {
+            LevelController.Instance.OnPlayerListChanged -= RebuildAllyHealthbars;
+            LevelController.Instance.localPlayer.OnCoinsChanged -= UpdateCoinsCounter;
+            LevelController.Instance.OnCurrentWaveChanged -= updateWaveCounter;
+            subscribed = false;
+        }
     }
 
     private void Update()
     {
-        if (LevelController.Instance != null && LevelController.Instance.initialized)
+        if (LevelController.Instance != null && LevelController.Instance.localPlayer != null)
         {
-            waveCounter.text = "WAVE " + LevelController.Instance.currentWave.ToString();
-            waveTimer.text = LevelController.Instance.RemainingWaveTime.ToString("F0");
-        }
-        if (LevelController.Instance.localPlayer != null)
-        {
-            LevelController.Instance.localPlayer.OnCoinsChanged += UpdateCoinsCounter;
-        }
+            if (!subscribed)
+            {
+                setupSubscriptions();
+            }
 
-        if (specialAttack.activeSelf)
-        {
-            float newHeight = Mathf.Lerp(0, initialHeight, weapon.specialAttackTimer / weapon.cooldown);
-            SetImageHeight(newHeight);
-        }
+            UpdateSpecialAttackCooldown();
+            UpdateOffScreenArrows();
+            updateWaveTimer();
 
-        UpdateOffScreenArrows();
-
-        if (!playerListSubscribed)
-        {
-            LevelController.Instance.OnPlayerListChanged += OnPlayerListChanged;
-            playerListSubscribed = true;
+            if (LevelController.Instance.players.Count != allyHealthbars.Count)
+            {
+                RebuildAllyHealthbars();
+            }
         }
     }
 
     private void OnDisable()
     {
-        LevelController.Instance.OnPlayerListChanged -= OnPlayerListChanged;
-        playerListSubscribed = false;
+        unsubscribe();
+    }
+
+    private void UpdateSpecialAttackCooldown()
+    {
+        if (specialAttack.activeSelf)
+        {
+            float newHeight = Mathf.Lerp(0, initialHeight, weapon.specialAttackTimer / weapon.cooldown);
+            SetImageHeight(newHeight);
+        }
     }
 
     private void SetImageHeight(float height)
@@ -93,21 +118,40 @@ public class HUD : MonoBehaviour
         rectTransform.sizeDelta = new Vector2(rectTransform.sizeDelta.x, height);
     }
 
-    public void OnPlayerListChanged()
+    public void updateWaveCounter()
+    {
+        waveCounter.text = "WAVE " + LevelController.Instance.currentWave.ToString();
+    }
+
+    public void updateWaveTimer()
+    {
+        waveTimer.text = LevelController.Instance.RemainingWaveTime.ToString("F0");
+
+    }
+
+    public void RebuildAllyHealthbars()
     {
         for (int i = allyHealthBarPanel.transform.childCount - 1; i >= 0; i--)
         {
             Destroy(allyHealthBarPanel.transform.GetChild(i).gameObject);
         }
+        allyHealthbars.Clear();
         foreach (Player player in LevelController.Instance.players)
         {
+            if (player == null)
+            {
+                subscribed = false;
+                return;
+            }
             if (player == LevelController.Instance.localPlayer)
             {
                 continue;
             }
             VerticalLayoutGroup allyHealthBar = Instantiate(allyHealthBarPrefab);
             allyHealthBar.transform.SetParent(allyHealthBarPanel.transform, false);
-            allyHealthBar.GetComponent<AllyHealthbar>().player = player;
+            var barComponent = allyHealthBar.GetComponent<AllyHealthbar>();
+            barComponent.SetPlayer(player);
+            allyHealthbars.Add(barComponent);
         }
     }
 

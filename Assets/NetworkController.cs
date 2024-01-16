@@ -1,10 +1,10 @@
-using System.Collections.Generic;
-using UnityEngine;
 using Fusion;
 using Fusion.Sockets;
 using System;
-using UnityEngine.SceneManagement;
+using System.Collections.Generic;
 using System.Threading.Tasks;
+using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class NetworkController : MonoBehaviour, INetworkRunnerCallbacks
 {
@@ -91,6 +91,7 @@ public class NetworkController : MonoBehaviour, INetworkRunnerCallbacks
         runner.Disconnect(player);
         runner.Despawn(GetPlayerAvatar(player));
         OnPlayerListChanged?.Invoke();
+        LevelController.Instance.RPC_TriggerPlayerListChanged();
     }
 
     public void OnInput(NetworkRunner runner, NetworkInput input)
@@ -118,7 +119,7 @@ public class NetworkController : MonoBehaviour, INetworkRunnerCallbacks
     public void OnShutdown(NetworkRunner runner, ShutdownReason shutdownReason)
     {
         Debug.Log(shutdownReason);
-        if(runner.IsClient)
+        if (runner.IsClient)
         {
             UIController.Instance.ShowUIElement(UIElement.Main);
             var message = "ShutdownReason: " + shutdownReason;

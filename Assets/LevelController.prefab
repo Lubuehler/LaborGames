@@ -94,9 +94,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _interpolationDataSource: 0
-  background: {fileID: 0}
+  _spawnedCoins: []
+  spawnedObjects: []
   coinPrefab: {fileID: 7642399719152706105, guid: fb1664e303f842649974e2b83a76942f, type: 3}
   dronePrefab: {fileID: 4776032338861653262, guid: c277ef3b8d5d3ae49b14c01c25e63955, type: 3}
   jetPrefab: {fileID: 8933241707471840372, guid: 93f248326ffcc6e438b85289384b468e, type: 3}
   airshipPrefab: {fileID: 4397550704796765876, guid: e41c62e9597578143813fe3354300af2, type: 3}
+  laserDronePrefab: {fileID: 3831136316225668827, guid: 1fdc72ff41471cc4984a5cd27eeccb1a, type: 3}
   speed: 3

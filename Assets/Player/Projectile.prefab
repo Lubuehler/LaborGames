@@ -158,6 +158,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0627af635b2a26c4ba42752ea708376c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  hitExplosionPrefab: {fileID: 1337198075554910, guid: 3a7c3798ca27e9246b755de86069e9db, type: 3}
   speed: 20
   collisionLayers:
     serializedVersion: 2

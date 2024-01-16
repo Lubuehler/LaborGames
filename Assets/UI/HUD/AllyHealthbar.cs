@@ -1,39 +1,22 @@
-using Fusion.StatsInternal;
-using System.Collections;
-using System.Collections.Generic;
 using TMPro;
-using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
 
 public class AllyHealthbar : MonoBehaviour
 {
-    [SerializeField] private TMP_Text playerName;
-    [SerializeField] private Image fillImage;
-    [SerializeField] private RectTransform fillRect;
-
+    private TMP_Text playerName;
+    private Slider slider;
     public Player player { get; set; }
-
-    private bool subscribed = false;
-    public bool meanwhileRespawned = false;
-    
-    [SerializeField] private float allyBarInitialWidth = 200;
-    [SerializeField] private float localPlayerInitialWidth = 400;
-    private float standardWidth = 0;
 
     private void Awake()
     {
-        fillRect = fillImage.GetComponent<RectTransform>();
+        slider = GetComponentInChildren<Slider>();
+        playerName = GetComponentInChildren<TMP_Text>();
     }
 
     public void UpdateHealthBar(float currentHealth, float maxHealth)
     {
-
-        // Adjust the fill's width based on maxHealth
-        fillRect.SetSizeDelta(standardWidth * player.maxHealth / 100, fillRect.sizeDelta.y);
-
-        // Adjust the fill amount based on the current health
-        fillImage.fillAmount = player.currentHealth / player.maxHealth;
+        slider.value = currentHealth / maxHealth;
     }
 
     private void OnDisable()
@@ -41,31 +24,22 @@ public class AllyHealthbar : MonoBehaviour
         if (player != null)
         {
             player.OnHealthChanged -= UpdateHealthBar;
-            subscribed = false;
         }
     }
 
-    private void Update()
+    private void OnEnable()
     {
-        if (!subscribed && player != null)
+        if (player != null)
         {
-            
-            if (player == LevelController.Instance.localPlayer)
-            {
-                standardWidth = localPlayerInitialWidth;
-                return;
-            }
-            else
-            {
-                standardWidth = allyBarInitialWidth;
-                playerName.text = player.playerName;
-            }
-
             player.OnHealthChanged += UpdateHealthBar;
-            subscribed = true;
-            UpdateHealthBar(player.currentHealth, player.maxHealth);
-        } else if (player != null && playerName.text == "") {
-            playerName.text = player.playerName;
         }
+    }
+
+    public void SetPlayer(Player player)
+    {
+        playerName.text = player.playerName;
+
+        player.OnHealthChanged += UpdateHealthBar;
+        UpdateHealthBar(player.currentHealth, player.maxHealth);
     }
 }

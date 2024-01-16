@@ -1,29 +1,21 @@
-using Fusion.StatsInternal;
 using UnityEngine;
 using UnityEngine.UI;
 
 public class HealthBar : MonoBehaviour
 {
-    public Image fillImage;
-    private RectTransform fillRect;
-    private float initialWidth = 400;
+    private Slider slider;
 
     private bool subscribed = false;
-    public bool meanwhileRespawned = false;
 
     private void Awake()
     {
-        fillRect = fillImage.GetComponent<RectTransform>();
+        slider = GetComponent<Slider>();
     }
 
 
     public void UpdateHealthBar(float currentHealth, float maxHealth)
     {
-        // Adjust the fill's width based on maxHealth
-        fillRect.SetSizeDelta(initialWidth * maxHealth / 100, fillRect.sizeDelta.y);
-
-        // Adjust the fill amount based on the current health
-        fillImage.fillAmount = currentHealth / maxHealth;
+        slider.value = currentHealth / maxHealth;
     }
 
     private void OnDisable()
@@ -37,7 +29,7 @@ public class HealthBar : MonoBehaviour
 
     private void Update()
     {
-        if (!subscribed && LevelController.Instance.localPlayer != null)
+        if (!subscribed && LevelController.Instance != null && LevelController.Instance.localPlayer != null)
         {
             LevelController.Instance.localPlayer.OnHealthChanged += UpdateHealthBar;
             subscribed = true;

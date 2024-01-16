@@ -3,6 +3,7 @@ using UnityEngine;
 
 public class Projectile : MonoBehaviour
 {
+    [SerializeField] private GameObject hitExplosionPrefab;
     private Rigidbody2D _rigidbody;
     public float speed = 20.0f;
     public LayerMask collisionLayers;
@@ -36,9 +37,13 @@ public class Projectile : MonoBehaviour
         if ((collisionLayers.value & (1 << collision.gameObject.layer)) != 0)
         {
             weapon.OnBulletHit(collision.gameObject.GetComponent<Enemy>(), shotID);
+            Vector3 directionToShooter = (transform.position - weapon.transform.position).normalized;
+            float offsetDistance = 0.2f;
+            Vector3 explosionPosition = transform.position - (directionToShooter * offsetDistance);
 
+            Instantiate(hitExplosionPrefab, explosionPosition, Quaternion.identity);
             Destroy(gameObject);
-            print("destroyed shot");
         }
     }
+
 }
