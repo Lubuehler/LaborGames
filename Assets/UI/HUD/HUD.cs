@@ -217,20 +217,11 @@ public class HUD : MonoBehaviour
         Vector3 edgePos = screenCenter + (direction * max / 2);
         edgePos = new Vector3(Mathf.Clamp(edgePos.x, padding, Screen.width - padding), Mathf.Clamp(edgePos.y, padding * 3, Screen.height - padding), 0);
         arrow.transform.position = edgePos - (direction * max / 2 * 0.05f);
-        print(edgePos);
 
         float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
         arrow.transform.rotation = Quaternion.Euler(new Vector3(0, 0, angle + 90)); // Adjusting by -90 degrees if arrow graphic points up
     }
 
-    public void OnDebugDieClick()
-    {
-        LevelController.Instance.localPlayer.TakeDamage(1000);
-    }
 
-    public void OnDebugShopClick()
-    {
-        LevelController.Instance.isShopping = true;
-    }
 
 }

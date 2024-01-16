@@ -88,9 +88,7 @@ public class LevelController : NetworkBehaviour
                 foreach (Player player in players)
                 {
                     player.lobbyReady = false;
-
                 }
-
             }
         }
     }
@@ -228,6 +226,17 @@ public class LevelController : NetworkBehaviour
             OnPlayerListChanged?.Invoke();
         }
     }
+
+    [Rpc(RpcSources.All, RpcTargets.All)]
+    public void RPC_PlayerLeft(Player player)
+    {
+        if (players.Contains(player))
+        {
+            players.Remove(player);
+            OnPlayerListChanged?.Invoke();
+        }
+    }
+
 
     [Rpc(RpcSources.All, RpcTargets.All)]
     public void RpcPlayerDowned(Player player)
