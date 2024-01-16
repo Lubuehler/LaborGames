@@ -17,7 +17,8 @@ public class ShopMenu : MonoBehaviour
     [SerializeField] private Button ressurectButton;
     [SerializeField] private Button healButton;
 
-
+    [SerializeField] private TMP_Text goButtonText;
+    [SerializeField] private TMP_Text deadText;
     [SerializeField] private TMP_Text ressurectButtonPriceText;
     [SerializeField] private TMP_Text refreshButtonPriceText;
 
@@ -69,6 +70,7 @@ public class ShopMenu : MonoBehaviour
                 { "Attack Speed", p => p.attackSpeed.ToString("F2") },
                 { "Critical Strike Chance", p=> p.critChance.ToString("F2") },
                 { "Critical Strike Damage Factor", p=> p.critDamageMultiplier.ToString("F2") },
+                { "Life Steal", p=> p.lifesteal.ToString("F2") },
                 { "Dodge Chance", p=> p.dodgeChance.ToString("F2") },
                 { "Movement Speed", p => p.movementSpeed.ToString("F2") },
                 { "Armor", p => p.armor.ToString("F2")  },
@@ -86,26 +88,33 @@ public class ShopMenu : MonoBehaviour
 
         ShopSystem.Instance.OnSpecialAttacksChanged += UpdateSpecialAttacks;
 
-        goButton.interactable = true;
-        healButton.interactable = true;
-
         if (player != null)
         {
             player.OnStatsChanged += UpdateStats;
-            UpdateStats(); // Update immediately to show current stats
+            UpdateStats();
         }
-        this.wave.text = "Shop (Wave " + LevelController.Instance.currentWave.ToString() + ")";
-        this.coins.text = player.coins.ToString();
+        wave.text = "Shop (Wave " + LevelController.Instance.currentWave.ToString() + ")";
+        coins.text = player.coins.ToString();
 
-        refreshButtonPriceText.text = (initialRefreshShopPrice + refreshShopPriceIncreasePerWave * LevelController.Instance.currentWave).ToString();
-        ressurectButtonPriceText.text = (initialRespawnPrice + respawnPriceIncreasePerWave * LevelController.Instance.currentWave).ToString();
+        InitializeButtons();
         RandomizeShop();
     }
 
-    private void Update()
+    private void InitializeButtons()
     {
+        goButtonText.text = "Go!";
+        goButton.interactable = true;
+        ressurectButton.interactable = true;
+
+        refreshButtonPriceText.text = (initialRefreshShopPrice + refreshShopPriceIncreasePerWave * LevelController.Instance.currentWave).ToString();
+        ressurectButtonPriceText.text = (initialRespawnPrice + respawnPriceIncreasePerWave * LevelController.Instance.currentWave).ToString();
+
         if (LevelController.Instance.localPlayer.isAlive)
         {
+            if (LevelController.Instance.localPlayer.currentHealth == LevelController.Instance.localPlayer.maxHealth)
+            {
+                healButton.interactable = false;
+            }
             switch (LevelController.Instance.GetDeadPlayers().Count)
             {
                 case 0:
@@ -121,9 +130,25 @@ public class ShopMenu : MonoBehaviour
         else
         {
             ressurectButton.gameObject.SetActive(false);
+            healButton.interactable = false;
         }
+    }
+
+    private void Update()
+    {
         coins.text = player.coins.ToString();
 
+        if (LevelController.Instance.localPlayer.isAlive)
+        {
+            if (deadText.enabled)
+            {
+                deadText.enabled = false;
+            }
+        }
+        else
+        {
+            deadText.enabled = true;
+        }
     }
 
     private void OnDisable()
@@ -161,6 +186,7 @@ public class ShopMenu : MonoBehaviour
     {
         goButton.interactable = false;
         LevelController.Instance.RPC_ShopReady(NetworkController.Instance.GetLocalPlayerObject(), true);
+        goButtonText.text = "Waiting for allies...";
     }
 
     public void OnRessurectClicked()
@@ -168,6 +194,7 @@ public class ShopMenu : MonoBehaviour
         if (ShopSystem.Instance.BuyService(initialRespawnPrice + respawnPriceIncreasePerWave * LevelController.Instance.currentWave))
         {
             LevelController.Instance.RessurectPlayers();
+            ressurectButton.interactable = false;
         }
     }
 

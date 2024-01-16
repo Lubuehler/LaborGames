@@ -211,7 +211,9 @@ public class Weapon : NetworkBehaviour
 
         if (HasInputAuthority)
         {
-            enemy.RPC_TakeDamage(CalculateDamage());
+            int damage = CalculateDamage();
+            enemy.RPC_TakeDamage(damage);
+            player.Heal(damage * player.lifesteal);
         }
     }
 

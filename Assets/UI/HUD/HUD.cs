@@ -165,15 +165,12 @@ public class HUD : MonoBehaviour
         var players = LevelController.Instance.GetLivingPlayers();
         foreach (var player in players)
         {
-            // Don't create an arrow for the local player
             if (player == LevelController.Instance.localPlayer) continue;
 
-            Vector3 screenPos = Camera.main.WorldToViewportPoint(player.transform.position);
+            Vector3 playerPos = Camera.main.WorldToViewportPoint(player.transform.position);
 
-            // Check if the player is off-screen
-            if (screenPos.x >= 0 && screenPos.x <= 1 && screenPos.y >= 0 && screenPos.y <= 1 && screenPos.z > 0)
+            if (playerPos.x >= 0 && playerPos.x <= 1 && playerPos.y >= 0 && playerPos.y <= 1 && playerPos.z > 0)
             {
-                // Player is on-screen, remove arrow if it exists
                 if (offScreenArrows.ContainsKey(player))
                 {
                     Destroy(offScreenArrows[player]);
@@ -182,16 +179,15 @@ public class HUD : MonoBehaviour
             }
             else
             {
-                // Player is off-screen, add or update arrow
                 if (!offScreenArrows.ContainsKey(player))
                 {
                     offScreenArrows[player] = Instantiate(arrowPrefab, transform);
                 }
-                PositionArrow(offScreenArrows[player], screenPos);
+                PositionArrow(offScreenArrows[player], playerPos);
             }
         }
-        var deadPlayers = LevelController.Instance.GetDeadPlayers();
-        foreach (var player in deadPlayers)
+        var dead = LevelController.Instance.GetDeadPlayers();
+        foreach (var player in dead)
         {
             if (offScreenArrows.ContainsKey(player))
             {
@@ -201,31 +197,24 @@ public class HUD : MonoBehaviour
         }
     }
 
-    private void PositionArrow(GameObject arrow, Vector3 screenPos)
+    private void PositionArrow(GameObject arrow, Vector3 playerPos)
     {
-        screenPos.x *= Screen.width;
-        screenPos.y *= Screen.height;
+        playerPos.x *= Screen.width;
+        playerPos.y *= Screen.height;
 
         Vector3 screenCenter = new Vector3(Screen.width / 2, Screen.height / 2, 0);
+        Vector3 direction = playerPos - screenCenter;
 
-        // Calculate direction from the center of the screen to the player
-        Vector3 direction = screenPos - screenCenter;
-
-        // Normalize the direction
         direction = direction.normalized;
 
         float padding = 0;
 
-        // Calculate the edge position
         float max = Mathf.Max(Screen.width, Screen.height);
-        Vector3 edgePos = screenCenter + direction * max / 2;
-        edgePos = new Vector3(Mathf.Clamp(edgePos.x, padding, Screen.width - padding), Mathf.Clamp(edgePos.y, padding, Screen.height - padding), 0);
-        edgePos *= 0.95f;
+        Vector3 edgePos = screenCenter + (direction * max / 2);
+        edgePos = new Vector3(Mathf.Clamp(edgePos.x, padding, Screen.width - padding), Mathf.Clamp(edgePos.y, padding * 3, Screen.height - padding), 0);
+        arrow.transform.position = edgePos - (direction * max / 2 * 0.05f);
+        print(edgePos);
 
-        // Set the position of the arrow
-        arrow.transform.position = edgePos;
-
-        // Calculate the angle to rotate the arrow
         float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
         arrow.transform.rotation = Quaternion.Euler(new Vector3(0, 0, angle + 90)); // Adjusting by -90 degrees if arrow graphic points up
     }

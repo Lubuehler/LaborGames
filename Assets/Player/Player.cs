@@ -41,6 +41,7 @@ public class Player : NetworkBehaviour
     [Networked] public float attackSpeed { get; set; } // Schüsse pro Sekunde
     [Networked] public float critChance { get; set; }
     [Networked] public float critDamageMultiplier { get; set; }
+    [Networked] public float lifesteal { get; set; }
     [Networked] public float dodgeChance { get; set; }
     [Networked] public float movementSpeed { get; set; }
     [Networked] public float luck { get; set; }
@@ -104,6 +105,7 @@ public class Player : NetworkBehaviour
         attackSpeed = 1;
         critChance = 0;
         critDamageMultiplier = 1;
+        lifesteal = 0;
         dodgeChance = 0;
         movementSpeed = 5;
         luck = 0;
