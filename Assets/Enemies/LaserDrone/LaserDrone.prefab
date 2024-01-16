@@ -5227,7 +5227,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _interpolationDataSource: 0
-  health: 100
   viewingDistance: 20
   enemyLayerMask:
     serializedVersion: 2
@@ -5241,7 +5240,7 @@ MonoBehaviour:
   deathExplosionPrefab: {fileID: 1337198075554910, guid: 25c7aa9ad705fe143a4d71c1c8deb7d4, type: 3}
   hitsPerSecond: 4
   damagePerHit: 1
-  rotationSpeed: 1
+  rotationSpeed: 2.5
   laserPrefab: {fileID: 4935729912998947065, guid: 32c70288f0ca8ab4d9500125ade65a42, type: 3}
 --- !u!1 &5921713289368855512
 GameObject:

@@ -24,19 +24,11 @@ public class Airship : Enemy
     public float attackSpeed = 0.5f;
     private int maxHealth;
 
-    void Awake()
+
+    public override void Spawned()
     {
+        base.Spawned();
         maxHealth = health;
-    }
-
-    void LateUpdate()
-    {
-        UpdateHealthBar(health, maxHealth);
-
-        if (health <= maxHealth * 0.3)
-        {
-            smoke.SetActive(true);
-        }
     }
 
     public void UpdateHealthBar(float currentValue, float maxValue)
@@ -66,6 +58,13 @@ public class Airship : Enemy
 
     protected override void DoSomething()
     {
+        UpdateHealthBar(health, maxHealth);
+
+        if (health <= maxHealth * 0.3)
+        {
+            smoke.SetActive(true);
+        }
+
         if (currentTarget == null) return;
         if (Time.time - lastThrowTime >= throwCooldown)
         {
