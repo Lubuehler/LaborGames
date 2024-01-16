@@ -31,12 +31,11 @@ public class PassiveItemEffectManager : MonoBehaviour
 
     public void AddOrEnhanceEffect(int itemID)
     {
-        Func<IEffect> effectFunc = itemEffectMappings[itemID];
-        if (effectFunc == null)
+        if (!itemEffectMappings.ContainsKey(itemID))
         {
             return;
         }
-        IEffect effect = effectFunc();
+        IEffect effect = itemEffectMappings[itemID]();
         Type effectType = effect.GetType();
         if (effects.ContainsKey(effectType))
         {
