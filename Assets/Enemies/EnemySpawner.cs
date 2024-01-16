@@ -43,9 +43,14 @@ public class EnemySpawner : NetworkBehaviour
         }
     }
 
-    public void SpawnEnemy()
-    {        
+    public void SpawnEnemy(EnemyType? type = null)
+    {
         EnemyType enemyType = SelectEnemyTypeBasedOnSpawnRate();
+
+        if (type != null)
+        {
+            enemyType = (EnemyType)type;
+        }
         Vector2 position;
         NetworkObject spawnedEnemy;
         switch (enemyType)
@@ -135,6 +140,7 @@ public class EnemySpawner : NetworkBehaviour
         spawnedObjects.Add(gameObject);
     }
 
+    [Rpc]
     public void RPC_DespawnEverything()
     {
         foreach (NetworkObject coin in _spawnedCoins)

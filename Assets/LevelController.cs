@@ -37,6 +37,7 @@ public class LevelController : NetworkBehaviour
 
     [Networked]
     public bool isShopping { get; set; }
+    public bool isSpawning = true;
 
     [SerializeField] private LayerMask enemyMask;
 
@@ -167,10 +168,12 @@ public class LevelController : NetworkBehaviour
 
         while (RemainingWaveTime > 0 && waveInProgress && isShopping == false)
         {
-            // Assuming the game is not paused and you're counting down
             RemainingWaveTime -= 1;
 
-            EnemySpawner.Instance.SpawnEnemy();
+            if (isSpawning)
+            {
+                EnemySpawner.Instance.SpawnEnemy();
+            }
             yield return new WaitForSeconds(1);
         }
 

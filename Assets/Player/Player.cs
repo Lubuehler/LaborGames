@@ -339,8 +339,13 @@ public class Player : NetworkBehaviour
 
     public void OnParticleCollision(GameObject other)
     {
-        if(!allowFlameDamage) return;
+        if (!allowFlameDamage) return;
         TakeDamage(5);
         allowFlameDamage = false;
+    }
+
+    public void TriggerGoldChanged()
+    {
+        OnCoinsChanged?.Invoke();
     }
 }

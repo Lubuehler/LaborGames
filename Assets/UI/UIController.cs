@@ -16,6 +16,7 @@ public class UIController : MonoBehaviour
     [SerializeField] private GameObject hudCanvas;
     [SerializeField] private GameObject spectatorCanvas;
     [SerializeField] private GameObject endscreenCanvas;
+    [SerializeField] private GameObject debugCanvas;
 
     // Dialogs
     [SerializeField] private GameObject leaveDialogCanvas;
@@ -70,11 +71,16 @@ public class UIController : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.Escape))
         {
-            if(activeDialog != null)
+            if (activeDialog != null)
             {
                 HideDialog(activeDialog.Value);
             }
             ShowDialog(UIElement.LeaveDialog);
+        }
+
+        if (Input.GetKeyDown(KeyCode.Tab))
+        {
+            debugCanvas.SetActive(!debugCanvas.activeSelf);
         }
     }
 
@@ -86,11 +92,11 @@ public class UIController : MonoBehaviour
             var canvas = canvasEntry.Value;
             var isActive = canvasEntry.Key == targetElement;
 
-            if(isActive)
+            if (isActive)
             {
                 activeUIElement = targetElement;
             }
-            
+
             canvas.SetActive(isActive);
         }
 
