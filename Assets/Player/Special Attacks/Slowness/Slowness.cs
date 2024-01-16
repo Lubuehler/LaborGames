@@ -3,17 +3,20 @@ using UnityEngine;
 
 public class Slowness : NetworkBehaviour
 {
-    private float slownessTime = 5.0f;
+    [SerializeField] private float slownessFactor = 0.5f;
+    private float slownessTime = 10.0f;
     private bool slownessActive = false;
+    
     public void Activate()
     {
-        EnemySpawner.Instance.speed = 1.5f;
-        slownessActive = true;        
+        EnemySpawner.Instance.speed *= slownessFactor;
+        slownessActive = true;
     }
 
     public void OnEnable()
     {
-        slownessTime = 5.0f;
+        slownessTime = 10.0f;
+        slownessActive = false;
     }
 
     public override void Render()
@@ -24,15 +27,20 @@ public class Slowness : NetworkBehaviour
 
             if (slownessTime <= 0.0f)
             {
-                slownessActive = false;
-                slownessTime = 5.0f;
-                EnemySpawner.Instance.speed = 3;
+                Reset();
             }
         }
     }
 
     public void OnDisable()
     {
-        EnemySpawner.Instance.speed = 3;
+        Reset();
+    }
+
+    private void Reset()
+    {
+        slownessActive = false;
+        slownessTime = 10.0f;
+        EnemySpawner.Instance.speed /= slownessFactor;
     }
 }

@@ -44,8 +44,7 @@ public class EnemySpawner : NetworkBehaviour
     }
 
     public void SpawnEnemy()
-    {
-
+    {        
         EnemyType enemyType = SelectEnemyTypeBasedOnSpawnRate();
         Vector2 position;
         NetworkObject spawnedEnemy;

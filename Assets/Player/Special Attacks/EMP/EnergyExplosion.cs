@@ -4,15 +4,17 @@ using UnityEngine;
 public class EnergyExplosion : NetworkBehaviour
 {
     [SerializeField] private LayerMask enemyLayer;
+    [SerializeField] private float range = 40f;
+    [SerializeField] private float duration = 5.0f;
 
     public override void Render()
     {
-        RaycastHit2D[] hits = Physics2D.CircleCastAll(transform.position, 40f, Vector2.zero, Mathf.Infinity, enemyLayer);
+        RaycastHit2D[] hits = Physics2D.CircleCastAll(transform.position, range, Vector2.zero, Mathf.Infinity, enemyLayer);
         if (hits.Length > 0)
         {
             foreach (var hit in hits)
             {
-                hit.collider.gameObject.GetComponent<Enemy>().EMPHit();
+                hit.collider.gameObject.GetComponent<Enemy>().EMPHit(duration);
             }
         }
     }

@@ -27,7 +27,6 @@ public class Teleport : NetworkBehaviour
         Runner.Spawn(teleportParticlePrefab, networkRigidbody.transform.position);
     }
 
-
     public override void Render()
     {
         positionTimer += Time.deltaTime;

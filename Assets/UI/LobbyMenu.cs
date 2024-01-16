@@ -7,13 +7,13 @@ using TMPro;
 
 public class LobbyMenu : MonoBehaviour
 {
-    public Transform elementParent;
-    public GameObject row;
-    public TMP_Text header;
-    public TMP_Text playerCount;
+    [SerializeField] private Transform elementParent;
+    [SerializeField] private GameObject cell;
+    [SerializeField] private TMP_Text header;
+    [SerializeField] private TMP_Text playerCount;
+    [SerializeField] private GameObject readyButton;
 
     private bool ready;
-    public GameObject readyButton;
 
     void OnEnable()
     {
@@ -34,25 +34,28 @@ public class LobbyMenu : MonoBehaviour
 
     public void UpdatePlayerList()
     {
-        for (int i = elementParent.childCount - 1; i >= 0; i--)
+        while (elementParent.childCount > 0)
         {
-            Transform child = elementParent.GetChild(i);
-            Destroy(child.gameObject);
+            DestroyImmediate(elementParent.transform.GetChild(0).gameObject);
         }
 
         NetworkRunner _runner = NetworkController.Instance.GetComponent<NetworkRunner>();
         List<PlayerRef> players = new List<PlayerRef>(_runner.ActivePlayers);
 
-
         foreach (PlayerRef player in players)
         {
             NetworkObject networkObject = _runner.GetPlayerObject(player);
-            GameObject g = Instantiate(row, elementParent);
-            g.transform.GetChild(0).GetComponent<TMP_Text>().text = networkObject.GetComponent<Player>().playerName;
-            if (networkObject.GetComponent<Player>().lobbyReady)
-            {
-                g.transform.GetChild(1).gameObject.SetActive(true);
-            }
+            
+            GameObject g = Instantiate(cell, elementParent);
+            g.transform.GetChild(0).GetChild(0).GetComponentInChildren<TMP_Text>().text = networkObject.GetComponent<Player>().playerName;
+
+            // Checkmark
+            var lobbyReady = networkObject.GetComponent<Player>().lobbyReady;
+            g.transform.GetChild(0).GetChild(0).GetChild(1).gameObject.SetActive(lobbyReady);
+
+            // Self player indicator
+            var playerIsLocal = player.Equals(_runner.LocalPlayer);
+            g.transform.GetChild(0).GetChild(1).gameObject.SetActive(playerIsLocal);
         }
 
         playerCount.text = players.Count + "/4";

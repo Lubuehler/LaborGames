@@ -365,19 +365,19 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _interpolationDataSource: 0
   _projectilePrefab: {fileID: 1350390008315525890, guid: 95fb6b4a33b3a6543bcec83d35c8c1bf, type: 3}
-  emp: {fileID: 8074173194153705188, guid: 0e89155d64ca3414a917debfd04d761f, type: 3}
+  emp: {fileID: 1513753954886810915}
   teleport: {fileID: 6491229596450595746}
   magnet: {fileID: 3298815103803761486}
   dash: {fileID: 8265972787066332163}
   shield: {fileID: 1895929159068019520}
   slowness: {fileID: 358227513731961188}
   _shotCounter: 0
-  shieldActive: 0
   _specialAttacks: 
   _selectedSpecialAttack: 5
-  specialAttackAvailable: 0
+  _specialAttackAvailable: 0
   specialAttackTimer: 0
   cooldown: 2
+  shieldActive: 0
 --- !u!114 &7821246605013476734
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -786,6 +786,14 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 3162640359186079107}
     m_Modifications:
+    - target: {fileID: 121711905765659289, guid: 0e89155d64ca3414a917debfd04d761f, type: 3}
+      propertyPath: emp
+      value: 
+      objectReference: {fileID: 1329845292236604, guid: c2558d2dcb851ca459038cd298ff6b97, type: 3}
+    - target: {fileID: 121711905765659289, guid: 0e89155d64ca3414a917debfd04d761f, type: 3}
+      propertyPath: energyExplosionPrefab
+      value: 
+      objectReference: {fileID: 1329845292236604, guid: c2558d2dcb851ca459038cd298ff6b97, type: 3}
     - target: {fileID: 3135649560612828967, guid: 0e89155d64ca3414a917debfd04d761f, type: 3}
       propertyPath: Flags
       value: 134145
@@ -851,6 +859,11 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 0e89155d64ca3414a917debfd04d761f, type: 3}
+--- !u!1 &1513753954886810915 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 8074173194153705188, guid: 0e89155d64ca3414a917debfd04d761f, type: 3}
+  m_PrefabInstance: {fileID: 7281430604583650247}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &3852888163264801267 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 5797509105382418996, guid: 0e89155d64ca3414a917debfd04d761f, type: 3}
@@ -861,7 +874,7 @@ MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 3135649560612828967, guid: 0e89155d64ca3414a917debfd04d761f, type: 3}
   m_PrefabInstance: {fileID: 7281430604583650247}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
+  m_GameObject: {fileID: 1513753954886810915}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: -1552182283, guid: e725a070cec140c4caffb81624c8c787, type: 3}
@@ -934,6 +947,14 @@ PrefabInstance:
     - target: {fileID: 420267609786923840, guid: 6d9ca7debaf586448b44f27aef911576, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1193906676389632683, guid: 6d9ca7debaf586448b44f27aef911576, type: 3}
+      propertyPath: range
+      value: 20
+      objectReference: {fileID: 0}
+    - target: {fileID: 1193906676389632683, guid: 6d9ca7debaf586448b44f27aef911576, type: 3}
+      propertyPath: coinLayer.m_Bits
+      value: 256
       objectReference: {fileID: 0}
     - target: {fileID: 4996840210611348710, guid: 6d9ca7debaf586448b44f27aef911576, type: 3}
       propertyPath: m_Name

@@ -13,7 +13,6 @@ public class Projectile : MonoBehaviour
 
     public void Fire(Vector2 direction, Weapon weapon, int shotID)
     {
-        print("fire");
         _rigidbody.velocity = direction * speed;
         StartCoroutine(DestroyAfterTime());
         this.weapon = weapon;

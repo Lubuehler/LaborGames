@@ -42,16 +42,21 @@ public class Shield : NetworkBehaviour
 
             if (shieldTime <= 0.0f)
             {
-                weapon.shieldActive = false;
-                shield.SetActive(false);
-                shieldTime = 5.0f;
-                animationTriggered = false;
+                Reset();
             }
         }
     }
 
     public void OnDisable()
     {
+        Reset();
+    }
+
+    private void Reset()
+    {
         weapon.shieldActive = false;
+        shield.SetActive(false);
+        shieldTime = 10.0f;
+        animationTriggered = false;
     }
 }

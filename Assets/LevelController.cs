@@ -129,7 +129,6 @@ public class LevelController : NetworkBehaviour
         RpcShowGame();
 
         isShopping = false;
-        //TriggerPlayerListChanged();
         localPlayer.Heal(0f);
 
     }
@@ -142,6 +141,11 @@ public class LevelController : NetworkBehaviour
         waveInProgress = true;
         currentWave++;
         OnCurrentWaveChanged?.Invoke();
+
+        foreach (Player player in players)
+        {
+            player?.GetComponent<Weapon>().ResetTimer();
+        }
         StartCoroutine(WaveRoutine(waveDuration));
     }
 
@@ -190,10 +194,10 @@ public class LevelController : NetworkBehaviour
     {
         if (currentWave >= 0)
         {
-            //EnemySpawner.Instance.UpdateEnemySpawnRate(EnemyType.LaserDrone, 100);
-            //EnemySpawner.Instance.UpdateEnemySpawnRate(EnemyType.Jet, 1);
-            EnemySpawner.Instance.UpdateEnemySpawnRate(EnemyType.Drone, 1);
-            //EnemySpawner.Instance.UpdateEnemySpawnRate(EnemyType.Airship, 1);
+            EnemySpawner.Instance.UpdateEnemySpawnRate(EnemyType.LaserDrone, 1);
+            EnemySpawner.Instance.UpdateEnemySpawnRate(EnemyType.Jet, 1);
+            EnemySpawner.Instance.UpdateEnemySpawnRate(EnemyType.Drone, 5);
+            EnemySpawner.Instance.UpdateEnemySpawnRate(EnemyType.Airship, 1);
         }
     }
 
@@ -209,7 +213,7 @@ public class LevelController : NetworkBehaviour
     public void StartLevel()
     {
         StartNextWave();
-        this.gameRunning = true;
+        gameRunning = true;
     }
 
     [Rpc(RpcSources.All, RpcTargets.All)]
@@ -241,6 +245,10 @@ public class LevelController : NetworkBehaviour
     public void RpcGameOver()
     {
         RpcEndWave();
+        foreach (Player player in players)
+        {
+            player.GetComponent<Weapon>().ResetSpecialAttacks();
+        }
         UIController.Instance.ShowUIElement(UIElement.Endscreen);
         print("Game Over");
         StopGame();
