@@ -20,8 +20,8 @@ public class EnemySpawner : NetworkBehaviour
     [SerializeField] private GameObject airshipPrefab;
     [SerializeField] private GameObject laserDronePrefab;
 
-
-    [SerializeField] public float speed = 3f;
+    [SerializeField] public float defaultSpeed = 3f;
+    public float currentSpeed;
 
 
     public enum SpawnLocation
@@ -41,6 +41,8 @@ public class EnemySpawner : NetworkBehaviour
         {
             Destroy(gameObject);
         }
+
+        currentSpeed = defaultSpeed;
     }
 
     public void SpawnEnemy(EnemyType? type = null)

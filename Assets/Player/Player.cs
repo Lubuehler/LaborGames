@@ -99,7 +99,7 @@ public class Player : NetworkBehaviour
 
     public void InitiallySetStats()
     {
-        coins = 2000;
+        coins = 0;
         maxHealth = 100;
         attackDamage = 20;
         attackSpeed = 1;
@@ -289,6 +289,8 @@ public class Player : NetworkBehaviour
                         critChance += modifier.value; break;
                     case "Critical Strike Damage Factor":
                         critDamageMultiplier += modifier.value; break;
+                    case "Life Steal":
+                        lifesteal += modifier.value; break;
                     case "Movement Speed":
                         movementSpeed += modifier.value; break;
                     case "Luck":

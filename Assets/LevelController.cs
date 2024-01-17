@@ -178,7 +178,7 @@ public class LevelController : NetworkBehaviour
         RpcEndWave();
         if (gameRunning && GetLivingPlayers().Count() != 0)
         {
-            EnemySpawner.Instance.speed = 3f;
+            EnemySpawner.Instance.currentSpeed = 3f;
             RpcEnterShoppingPhase();
         }
     }
