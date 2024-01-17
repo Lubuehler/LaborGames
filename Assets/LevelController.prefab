@@ -48,7 +48,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _interpolationDataSource: 0
   _gameRunning: 0
-  _currentWave: 86
+  _currentWave: 0
   _waveInProgress: 0
   _RemainingWaveTime: 0
   localPlayer: {fileID: 0}

@@ -270,9 +270,9 @@ public class LevelController : NetworkBehaviour
     public void StartSpectator()
     {
         Player selectedPlayer = players.FirstOrDefault(player => player.GetComponent<Player>().isAlive);
-
-        UIController.Instance.ShowUIElement(UIElement.Spectator);
         Camera.main.GetComponent<CameraScript>().target = selectedPlayer.GetComponent<NetworkObject>();
+        UIController.Instance.ShowUIElement(UIElement.Spectator);
+
         print("Spectating");
     }
 
