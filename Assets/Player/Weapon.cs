@@ -202,7 +202,7 @@ public class Weapon : NetworkBehaviour
         {
             int damage = CalculateDamage();
             enemy.RPC_TakeDamage(damage);
-            player.Heal(damage * player.lifesteal);
+            player.Heal((int)(damage * player.lifesteal));
         }
     }
 

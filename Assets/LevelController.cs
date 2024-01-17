@@ -40,6 +40,7 @@ public class LevelController : NetworkBehaviour
     public bool isSpawning = true;
 
     [SerializeField] private LayerMask enemyMask;
+    [SerializeField] private float enemySpawnTime = 1;
 
     private void Awake()
     {
@@ -128,7 +129,7 @@ public class LevelController : NetworkBehaviour
         RpcShowGame();
 
         isShopping = false;
-        localPlayer.Heal(0f);
+        localPlayer.Heal(0);
 
     }
 
@@ -172,7 +173,7 @@ public class LevelController : NetworkBehaviour
             {
                 EnemySpawner.Instance.SpawnEnemy();
             }
-            yield return new WaitForSeconds(1);
+            yield return new WaitForSeconds(enemySpawnTime);
         }
 
         RpcEndWave();

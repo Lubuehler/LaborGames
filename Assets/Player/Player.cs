@@ -19,6 +19,8 @@ public class Player : NetworkBehaviour
     private SpriteRenderer _spriteRenderer;
     private CapsuleCollider2D _capsuleCollider;
 
+    [SerializeField] private float movementSmoothing = .5f;
+
     [Networked] public bool isAlive { get; set; }
     [Networked(OnChanged = nameof(PlayerInfoChanged))]
     public string playerName { get; set; }
@@ -117,25 +119,46 @@ public class Player : NetworkBehaviour
         RpcHealthChanged(currentHealth);
     }
 
+    private Vector2 previousDirection;
+
+    public void Move()
+    {
+        previousDirection.Normalize();
+        var intendedVelocity = previousDirection * movementSpeed;
+        _nrb2d.Rigidbody.velocity = intendedVelocity;
+
+        // var smoothie = movementSmoothing;
+
+        //if (previousDirection != previousDirection)
+        {
+            // smoothie = 1;
+        }
+
+        //_nrb2d.Rigidbody.velocity = Vector2.Lerp(_nrb2d.Rigidbody.velocity, intendedVelocity, smoothie);
+
+
+        // Image Tilting
+        float tilt = previousDirection.x * -tiltAmount;
+        transform.rotation = Quaternion.Euler(0, 0, tilt);
+    }
 
     public override void FixedUpdateNetwork()
     {
         if (GetInput(out NetworkInputData data) && LevelController.Instance.waveInProgress && isAlive)
         {
-            data.direction.Normalize();
-            _nrb2d.Rigidbody.velocity = data.direction * movementSpeed;
 
-            // Image Tilting
-            float tilt = data.direction.x * -tiltAmount;
-            transform.rotation = Quaternion.Euler(0, 0, tilt);
 
             // float clampedX = Mathf.Clamp(transform.position.x, minX + width / 2, maxX - width / 2);
             // float clampedY = Mathf.Clamp(transform.position.y, minY + height / 2, maxY - height / 2);
             // transform.position = new Vector2(clampedX, clampedY);
+
+            previousDirection = data.direction;
         }
         else
         {
-            _nrb2d.Rigidbody.velocity = new Vector2(0, 0);
+            previousDirection = Vector2.zero;
+            //_nrb2d.Rigidbody.velocity = Vector2.Lerp(_nrb2d.Rigidbody.velocity, Vector2.zero, Runner.DeltaTime * movementSmoothing);
+
         }
     }
 
@@ -162,6 +185,7 @@ public class Player : NetworkBehaviour
     {
         _spriteRenderer.enabled = isAlive;
         _capsuleCollider.enabled = isAlive;
+        Move();
 
 
         if (!allowFlameDamage)
@@ -214,16 +238,24 @@ public class Player : NetworkBehaviour
         LevelController.Instance.RpcPlayerDowned(this);
     }
 
-    public void Heal(float amount)
+    public void Heal(int amount)
     {
-        RpcHealthChanged(Mathf.Clamp(currentHealth + (int)amount, 0, maxHealth));
+        if (amount == int.MaxValue)
+        {
+            RpcHealthChanged(maxHealth);
+        }
+        else
+        {
+            RpcHealthChanged(Mathf.Clamp(currentHealth + amount, 0, maxHealth));
+        }
+
     }
 
     [Rpc(RpcSources.InputAuthority, RpcTargets.All)]
     public void RPC_IncreaseMaxHealth(float amount)
     {
         maxHealth += (int)amount;
-        Heal(amount);
+        Heal((int)amount);
     }
 
     [Rpc(RpcSources.All, RpcTargets.All)]
@@ -317,6 +349,7 @@ public class Player : NetworkBehaviour
     [Rpc(RpcSources.All, RpcTargets.All)]
     public void RpcHealthChanged(int newHealth)
     {
+        print("new health" + newHealth);
         currentHealth = newHealth;
         OnHealthChanged?.Invoke(currentHealth, maxHealth);
     }

@@ -21,6 +21,7 @@ public class ShopMenu : MonoBehaviour
     [SerializeField] private TMP_Text deadText;
     [SerializeField] private TMP_Text ressurectButtonPriceText;
     [SerializeField] private TMP_Text refreshButtonPriceText;
+    [SerializeField] private TMP_Text healButtonPriceText;
 
     private Player player;
 
@@ -50,7 +51,7 @@ public class ShopMenu : MonoBehaviour
     [SerializeField]
     private int initialHealPrice;
     [SerializeField]
-    private int refreshHealIncreasePerWave;
+    private int HealPriceIncreasePerWave;
 
 
     private void OnEnable()
@@ -108,6 +109,7 @@ public class ShopMenu : MonoBehaviour
 
         refreshButtonPriceText.text = (initialRefreshShopPrice + refreshShopPriceIncreasePerWave * LevelController.Instance.currentWave).ToString();
         ressurectButtonPriceText.text = (initialRespawnPrice + respawnPriceIncreasePerWave * LevelController.Instance.currentWave).ToString();
+        healButtonPriceText.text = (initialHealPrice + HealPriceIncreasePerWave * LevelController.Instance.currentWave).ToString();
 
         RandomizeShop();
         ClearCells();
@@ -118,6 +120,10 @@ public class ShopMenu : MonoBehaviour
             if (LevelController.Instance.localPlayer.currentHealth == LevelController.Instance.localPlayer.maxHealth)
             {
                 healButton.interactable = false;
+            }
+            else
+            {
+                healButton.interactable = true;
             }
             switch (LevelController.Instance.GetDeadPlayers().Count)
             {
@@ -213,9 +219,9 @@ public class ShopMenu : MonoBehaviour
 
     public void OnHealClicked()
     {
-        if (ShopSystem.Instance.BuyService(initialHealPrice + refreshHealIncreasePerWave * LevelController.Instance.currentWave))
+        if (ShopSystem.Instance.BuyService(initialHealPrice + HealPriceIncreasePerWave * LevelController.Instance.currentWave))
         {
-            LevelController.Instance.localPlayer.Heal(float.MaxValue);
+            LevelController.Instance.localPlayer.Heal(int.MaxValue);
             healButton.interactable = false;
         }
     }

@@ -243,6 +243,7 @@ MonoBehaviour:
     m_Bits: 256
   tiltAmount: 15
   background: {fileID: 0}
+  movementSmoothing: 0.5
   _isAlive: 0
   _playerName: 
   _lobbyReady: 0
@@ -254,6 +255,7 @@ MonoBehaviour:
   _attackSpeed: 0
   _critChance: 0
   _critDamageMultiplier: 0
+  _lifesteal: 0
   _dodgeChance: 0
   _movementSpeed: 0
   _luck: 0

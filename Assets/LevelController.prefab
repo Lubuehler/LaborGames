@@ -48,14 +48,16 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _interpolationDataSource: 0
   _gameRunning: 0
-  _currentWave: 0
+  _currentWave: 86
   _waveInProgress: 0
   _RemainingWaveTime: 0
   localPlayer: {fileID: 0}
   _isShopping: 0
+  isSpawning: 1
   enemyMask:
     serializedVersion: 2
     m_Bits: 64
+  enemySpawnTime: 0.6
 --- !u!114 &7840297883147135043
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -101,4 +103,5 @@ MonoBehaviour:
   jetPrefab: {fileID: 8933241707471840372, guid: 93f248326ffcc6e438b85289384b468e, type: 3}
   airshipPrefab: {fileID: 4397550704796765876, guid: e41c62e9597578143813fe3354300af2, type: 3}
   laserDronePrefab: {fileID: 3831136316225668827, guid: 1fdc72ff41471cc4984a5cd27eeccb1a, type: 3}
-  speed: 3
+  defaultSpeed: 3
+  currentSpeed: 0

@@ -24018,6 +24018,7 @@ MonoBehaviour:
   deadText: {fileID: 1122808216}
   ressurectButtonPriceText: {fileID: 1763688878}
   refreshButtonPriceText: {fileID: 330470686}
+  healButtonPriceText: {fileID: 2058222104}
   itemGroup: {fileID: 226711076}
   shopItemPrefab: {fileID: 5198735530017797241, guid: c217ce18c6f7409409649ad56954613b, type: 3}
   specialAttackCellGroup: {fileID: 2015267726}
@@ -24028,8 +24029,8 @@ MonoBehaviour:
   refreshShopPriceIncreasePerWave: 5
   initialRespawnPrice: 20
   respawnPriceIncreasePerWave: 5
-  initialHealPrice: 0
-  refreshHealIncreasePerWave: 0
+  initialHealPrice: 20
+  HealPriceIncreasePerWave: 2
 --- !u!114 &1829370976
 MonoBehaviour:
   m_ObjectHideFlags: 0
