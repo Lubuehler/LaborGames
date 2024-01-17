@@ -57,7 +57,7 @@ MonoBehaviour:
   enemyMask:
     serializedVersion: 2
     m_Bits: 64
-  enemySpawnTime: 0.6
+  enemySpawnTime: 1
 --- !u!114 &7840297883147135043
 MonoBehaviour:
   m_ObjectHideFlags: 0

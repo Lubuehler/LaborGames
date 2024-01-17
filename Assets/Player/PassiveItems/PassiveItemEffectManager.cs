@@ -12,7 +12,7 @@ public interface IEffect
 
 public class PassiveItemEffectManager : MonoBehaviour
 {
-    private Dictionary<Type, IEffect> effects = new Dictionary<Type, IEffect>();
+    private Dictionary<Type, IEffect> effects;
 
     [SerializeField] private GameObject aoeEffectExplosionPrefab;
     [SerializeField] private LayerMask enemyLayer;
@@ -27,6 +27,12 @@ public class PassiveItemEffectManager : MonoBehaviour
             {3074, () => new AoEDamageEffect(weapon, aoeEffectExplosionPrefab, enemyLayer) },
             {3087, () => new RicochetEffect(weapon) }
         };
+        effects = new Dictionary<Type, IEffect>();
+    }
+
+    public void Clear()
+    {
+        effects.Clear();
     }
 
     public void AddOrEnhanceEffect(int itemID)

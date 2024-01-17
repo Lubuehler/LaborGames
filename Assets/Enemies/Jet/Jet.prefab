@@ -74,7 +74,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: 21300000, guid: 9a6042958d3675342bc6a7e29af43095, type: 3}
+  m_Sprite: {fileID: 21300000, guid: e51d8acededc1a148b835c7532fa6857, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -110,7 +110,7 @@ GameObject:
   - component: {fileID: 2827710277521792308}
   - component: {fileID: 3553296336192315441}
   - component: {fileID: 6457949608489514799}
-  - component: {fileID: 4930917372539533304}
+  - component: {fileID: 9130936161107893326}
   m_Layer: 6
   m_Name: Jet
   m_TagString: Untagged
@@ -128,7 +128,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.13027631, y: 0.13027631, z: 0.13027631}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 1
   m_Children:
   - {fileID: 186824261282344461}
@@ -147,7 +147,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _interpolationDataSource: 0
-  health: 3
   viewingDistance: 20
   enemyLayerMask:
     serializedVersion: 2
@@ -242,8 +241,8 @@ MonoBehaviour:
     RotTeleportRadians: 1.5
   UseLegacySharedModeInterpolation: 0
   TargetInterpolationDelay: 0.03
---- !u!70 &4930917372539533304
-CapsuleCollider2D:
+--- !u!60 &9130936161107893326
+PolygonCollider2D:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -275,5 +274,34 @@ CapsuleCollider2D:
   m_UsedByEffector: 0
   m_UsedByComposite: 0
   m_Offset: {x: 0, y: 0}
-  m_Size: {x: 8.9, y: 3.1}
-  m_Direction: 1
+  m_SpriteTilingProperty:
+    border: {x: 0, y: 0, z: 0, w: 0}
+    pivot: {x: 0.5, y: 0.5}
+    oldSize: {x: 1.33, y: 1.33}
+    newSize: {x: 10.24, y: 10.24}
+    adaptiveTilingThreshold: 0.5
+    drawMode: 0
+    adaptiveTiling: 0
+  m_AutoTiling: 0
+  m_Points:
+    m_Paths:
+    - - {x: 0.60499996, y: -0.035}
+      - {x: 0.60499996, y: 0.005}
+      - {x: 0.515, y: 0.055}
+      - {x: 0.285, y: 0.13499999}
+      - {x: -0.024999999, y: 0.114999995}
+      - {x: -0.285, y: 0.105}
+      - {x: -0.415, y: 0.235}
+      - {x: -0.555, y: 0.235}
+      - {x: -0.585, y: 0.16499999}
+      - {x: -0.60499996, y: 0.024999999}
+      - {x: -0.60499996, y: -0.044999998}
+      - {x: -0.575, y: -0.145}
+      - {x: -0.36499998, y: -0.145}
+      - {x: -0.21499999, y: -0.205}
+      - {x: -0.125, y: -0.21499999}
+      - {x: 0.015, y: -0.21499999}
+      - {x: 0.255, y: -0.155}
+      - {x: 0.255, y: -0.065}
+      - {x: 0.505, y: -0.065}
+  m_UseDelaunayMesh: 0

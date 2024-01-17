@@ -17,7 +17,7 @@ public class Player : NetworkBehaviour
 
     private NetworkRigidbody2D _nrb2d;
     private SpriteRenderer _spriteRenderer;
-    private CapsuleCollider2D _capsuleCollider;
+    private Collider2D _collider;
 
     [SerializeField] private float movementSmoothing = .5f;
 
@@ -52,7 +52,7 @@ public class Player : NetworkBehaviour
     [Networked] public int currentHealth { get; set; }
 
     //Items
-    [Networked, Capacity(20)] public NetworkLinkedList<int> items { get; }
+    [Networked, Capacity(40)] public NetworkLinkedList<int> items { get; }
 
     // Actions
     public event Action OnStatsChanged;
@@ -63,7 +63,7 @@ public class Player : NetworkBehaviour
     {
         _nrb2d = GetComponent<NetworkRigidbody2D>();
         _spriteRenderer = GetComponentInChildren<SpriteRenderer>();
-        _capsuleCollider = GetComponent<CapsuleCollider2D>();
+        _collider = GetComponent<Collider2D>();
         weapon = GetComponent<Weapon>();
         passiveItemEffectManager = GetComponent<PassiveItemEffectManager>();
         passiveItemEffectManager.Initialize(weapon);
@@ -97,6 +97,8 @@ public class Player : NetworkBehaviour
         int margin = 2;
         _nrb2d.TeleportToPosition(new Vector2((GetComponentInChildren<SpriteRenderer>().size.x + margin) * lobbyNo, 0));
         InitiallySetStats();
+        items.Clear();
+        passiveItemEffectManager.Clear();
     }
 
     public void InitiallySetStats()
@@ -124,18 +126,22 @@ public class Player : NetworkBehaviour
     public void Move()
     {
         previousDirection.Normalize();
-        var intendedVelocity = previousDirection * movementSpeed;
-        _nrb2d.Rigidbody.velocity = intendedVelocity;
+        Vector2 intendedVelocity;
 
-        // var smoothie = movementSmoothing;
-
-        //if (previousDirection != previousDirection)
+        if (!isAlive)
         {
-            // smoothie = 1;
+            intendedVelocity = Vector2.zero;
+        }
+        else if (previousDirection == Vector2.zero)
+        {
+            intendedVelocity = Vector2.Lerp(_nrb2d.Rigidbody.velocity, Vector2.zero, movementSmoothing * Runner.DeltaTime);
+        }
+        else
+        {
+            intendedVelocity = previousDirection * movementSpeed;
         }
 
-        //_nrb2d.Rigidbody.velocity = Vector2.Lerp(_nrb2d.Rigidbody.velocity, intendedVelocity, smoothie);
-
+        _nrb2d.Rigidbody.velocity = intendedVelocity;
 
         // Image Tilting
         float tilt = previousDirection.x * -tiltAmount;
@@ -184,7 +190,7 @@ public class Player : NetworkBehaviour
     public override void Render()
     {
         _spriteRenderer.enabled = isAlive;
-        _capsuleCollider.enabled = isAlive;
+        _collider.enabled = isAlive;
         Move();
 
 

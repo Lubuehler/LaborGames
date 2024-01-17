@@ -41,7 +41,7 @@ public class DebugScript : MonoBehaviour
 
     public void onToggleSpawn(Boolean isSpawning)
     {
-        if (isSpawning)
+        if (!isSpawning)
         {
             EnemySpawner.Instance.RPC_DespawnEverything();
         }
