@@ -48,6 +48,10 @@ public class RicochetEffect : IEffect
         weapon.OnHitTarget += HandleOnHitTarget;
     }
 
+    public void Unsubscribe()
+    {
+        weapon.OnHitTarget -= HandleOnHitTarget;
+    }
     void IEffect.ReduceEffect()
     {
         if (maxJumps > 0) maxJumps -= increasePerItem;

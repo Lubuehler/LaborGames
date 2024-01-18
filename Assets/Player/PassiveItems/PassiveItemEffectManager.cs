@@ -7,12 +7,13 @@ public interface IEffect
     void SubscribeToActions(Weapon weapon);
     void EnhanceEffect();
     void ReduceEffect();
+    void Unsubscribe();
 }
 
 
 public class PassiveItemEffectManager : MonoBehaviour
 {
-    private Dictionary<Type, IEffect> effects;
+    private Dictionary<int, IEffect> effects;
 
     [SerializeField] private GameObject aoeEffectExplosionPrefab;
     [SerializeField] private LayerMask enemyLayer;
@@ -27,11 +28,15 @@ public class PassiveItemEffectManager : MonoBehaviour
             {3074, () => new AoEDamageEffect(weapon, aoeEffectExplosionPrefab, enemyLayer) },
             {3087, () => new RicochetEffect(weapon) }
         };
-        effects = new Dictionary<Type, IEffect>();
+        effects = new Dictionary<int, IEffect>();
     }
 
     public void Clear()
     {
+        foreach (IEffect effect in effects.Values)
+        {
+            effect.Unsubscribe();
+        }
         effects.Clear();
     }
 
@@ -41,15 +46,15 @@ public class PassiveItemEffectManager : MonoBehaviour
         {
             return;
         }
-        IEffect effect = itemEffectMappings[itemID]();
-        Type effectType = effect.GetType();
-        if (effects.ContainsKey(effectType))
+
+        if (effects.ContainsKey(itemID))
         {
-            effects[effectType].EnhanceEffect();
+            effects[itemID].EnhanceEffect();
         }
         else
         {
-            effects.Add(effectType, effect);
+            IEffect effect = itemEffectMappings[itemID]();
+            effects.Add(itemID, effect);
         }
     }
 }

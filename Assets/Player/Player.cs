@@ -9,7 +9,8 @@ public class Player : NetworkBehaviour
     [SerializeField] private GameObject deathExplosionPrefab;
     [SerializeField] private LayerMask coinMask;
     [SerializeField] private float tiltAmount = 15.0f;
-    [SerializeField] private GameObject background;
+
+    BoxCollider2D backgroundCollider;
 
     private Weapon weapon;
 
@@ -67,6 +68,7 @@ public class Player : NetworkBehaviour
         weapon = GetComponent<Weapon>();
         passiveItemEffectManager = GetComponent<PassiveItemEffectManager>();
         passiveItemEffectManager.Initialize(weapon);
+        backgroundCollider = GameController.Instance.background.GetComponent<BoxCollider2D>();
 
     }
 
@@ -97,8 +99,7 @@ public class Player : NetworkBehaviour
         int margin = 2;
         _nrb2d.TeleportToPosition(new Vector2((GetComponentInChildren<SpriteRenderer>().size.x + margin) * lobbyNo, 0));
         InitiallySetStats();
-        items.Clear();
-        passiveItemEffectManager.Clear();
+
     }
 
     public void InitiallySetStats()
@@ -123,6 +124,7 @@ public class Player : NetworkBehaviour
 
     private Vector2 previousDirection;
 
+
     public void Move()
     {
         previousDirection.Normalize();
@@ -143,6 +145,10 @@ public class Player : NetworkBehaviour
 
         _nrb2d.Rigidbody.velocity = intendedVelocity;
 
+        float clampedX = Mathf.Clamp(transform.position.x, (-1) * backgroundCollider.size.x / 2, backgroundCollider.size.x / 2);
+        float clampedY = Mathf.Clamp(transform.position.y, (-1) * backgroundCollider.size.y / 2, backgroundCollider.size.y / 2);
+        transform.position = new Vector2(clampedX, clampedY);
+
         // Image Tilting
         float tilt = previousDirection.x * -tiltAmount;
         transform.rotation = Quaternion.Euler(0, 0, tilt);
@@ -152,19 +158,11 @@ public class Player : NetworkBehaviour
     {
         if (GetInput(out NetworkInputData data) && LevelController.Instance.waveInProgress && isAlive)
         {
-
-
-            // float clampedX = Mathf.Clamp(transform.position.x, minX + width / 2, maxX - width / 2);
-            // float clampedY = Mathf.Clamp(transform.position.y, minY + height / 2, maxY - height / 2);
-            // transform.position = new Vector2(clampedX, clampedY);
-
             previousDirection = data.direction;
         }
         else
         {
             previousDirection = Vector2.zero;
-            //_nrb2d.Rigidbody.velocity = Vector2.Lerp(_nrb2d.Rigidbody.velocity, Vector2.zero, Runner.DeltaTime * movementSmoothing);
-
         }
     }
 
@@ -290,6 +288,8 @@ public class Player : NetworkBehaviour
     [Rpc(RpcSources.All, RpcTargets.All)]
     public void RpcReset()
     {
+        items.Clear();
+        passiveItemEffectManager.Clear();
         print("reset " + playerName);
         RPC_Configure(playerName);
         RpcRessurect();
@@ -355,7 +355,6 @@ public class Player : NetworkBehaviour
     [Rpc(RpcSources.All, RpcTargets.All)]
     public void RpcHealthChanged(int newHealth)
     {
-        print("new health" + newHealth);
         currentHealth = newHealth;
         OnHealthChanged?.Invoke(currentHealth, maxHealth);
     }

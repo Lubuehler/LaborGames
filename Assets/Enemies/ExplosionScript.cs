@@ -7,15 +7,11 @@ public class ExplosionScript : MonoBehaviour
         RpcPlayExplosion();
     }
 
-    
+
     private void RpcPlayExplosion()
     {
         ParticleSystem ps = GetComponent<ParticleSystem>();
-
-        print("Play explosion RPC called"+ ps.isPlaying);
         ps.Play();
-        print(GetComponent<ParticleSystem>());
-        print("played" + ps.isPlaying);
     }
 }
 
