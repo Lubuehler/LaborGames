@@ -26,6 +26,7 @@ public class Shield : NetworkBehaviour
     public void Activate()
     {
         shield.SetActive(true);
+        weapon.shieldActive = true;
     }
 
     public override void Render()

@@ -185,7 +185,7 @@ GameObject:
   - component: {fileID: 1631849922609019068}
   - component: {fileID: 653644740910711484}
   - component: {fileID: 7212084010594922431}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Shield
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -223,7 +223,6 @@ MonoBehaviour:
   _interpolationDataSource: 0
   shield: {fileID: 191367971836651224}
   shieldAnimator: {fileID: 6065284365486554324}
-  shieldActive: 0
 --- !u!114 &7212084010594922431
 MonoBehaviour:
   m_ObjectHideFlags: 0

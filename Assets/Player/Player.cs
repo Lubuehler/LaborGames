@@ -211,9 +211,11 @@ public class Player : NetworkBehaviour
             print("no input authority, therefore no ddmg.");
             return;
         }
+
+        Debug.Log(weapon.shieldActive);
         if (weapon.shieldActive)
         {
-            damage = 0;
+            return;
         }
 
         double randomNumber = new System.Random().NextDouble();

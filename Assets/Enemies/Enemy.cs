@@ -175,13 +175,13 @@ public class Enemy : NetworkBehaviour
         {
             collision.gameObject.GetComponent<Player>().TakeDamage(explosionDamage);
             Explode();
+            RPC_TakeDamage(int.MaxValue);
         }
     }
 
     private void Explode()
     {
         Runner.Spawn(deathExplosionPrefab, transform.position, transform.rotation);
-        health -= int.MaxValue;
     }
 
     protected virtual void Die()

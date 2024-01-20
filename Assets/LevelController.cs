@@ -262,6 +262,7 @@ public class LevelController : NetworkBehaviour
         {
             player.GetComponent<Weapon>().ResetSpecialAttacks();
         }
+        ShopSystem.Instance.ResetItemPool();
         UIController.Instance.ShowUIElement(UIElement.Endscreen);
         print("Game Over");
         StopGame();
