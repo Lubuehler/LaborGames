@@ -18,7 +18,6 @@ public class AoEDamageEffect : IEffect
 
     private void HandleOnHitTarget(Vector2 position, int targetID, int shotID)
     {
-        Debug.Log("HandleOnHit AOE");
         if (visualEffectPrefab != null)
         {
             GameObject effect = GameObject.Instantiate(visualEffectPrefab, position, Quaternion.identity);
@@ -27,13 +26,15 @@ public class AoEDamageEffect : IEffect
         }
 
         Collider[] hitColliders = Physics.OverlapSphere(position, damageRadius, enemyLayer);
+
         foreach (var hitCollider in hitColliders)
         {
+
             if (hitCollider.gameObject.GetInstanceID() == targetID)
             {
                 continue;
             }
-            weapon.OnBulletHit(hitCollider.GetComponent<Enemy>(), shotID);
+            weapon.DealDamage(hitCollider.GetComponent<Enemy>());
 
         }
 
@@ -54,6 +55,11 @@ public class AoEDamageEffect : IEffect
         this.weapon = weapon;
         weapon.OnHitTarget += HandleOnHitTarget;
 
+    }
+
+    public void Unsubscribe()
+    {
+        weapon.OnHitTarget -= HandleOnHitTarget;
     }
 
     ~AoEDamageEffect()

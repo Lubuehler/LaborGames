@@ -46,6 +46,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _interpolationDataSource: 0
+  dashSpeed: 50
+  dashDuration: 0.2
 --- !u!114 &1317045537830321144
 MonoBehaviour:
   m_ObjectHideFlags: 0

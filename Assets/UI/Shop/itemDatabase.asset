@@ -13,62 +13,72 @@ MonoBehaviour:
   m_Name: itemDatabase
   m_EditorClassIdentifier: 
   items:
-  - itemID: 1001
-    itemName: Boots
-    icon: {fileID: 21300000, guid: cb59b0c9997e9cd4bae5ef1631c8a1ea, type: 3}
+  - itemName: Boots
+    itemID: 1001
     price: 9
     description: 25 Move Speed
+    icon: {fileID: 0}
     modifiers:
     - statName: Movement Speed
       value: 1.25
     itemType: 0
     tier: 1
-    color: {r: 0.7411765, g: 0.7411765, b: 0.7137255, a: 1}
-  - itemID: 1037
-    itemName: Pickaxe
-    icon: {fileID: 21300000, guid: 3094f1228bcbef14d9b873ea52df6b10, type: 3}
+  - itemName: Pickaxe
+    itemID: 1037
     price: 28
     description: 25 Attack Damage
+    icon: {fileID: 0}
     modifiers:
     - statName: Attack Damage
-      value: 25
+      value: 2.5
     itemType: 0
     tier: 1
-    color: {r: 0.7411765, g: 0.7411765, b: 0.7137255, a: 1}
-  - itemID: 1042
-    itemName: Dagger
-    icon: {fileID: 21300000, guid: 76aa98d6076c04845a6d94fcfb76b9b6, type: 3}
+  - itemName: Dagger
+    itemID: 1042
     price: 9
     description: 12% Attack Speed
+    icon: {fileID: 0}
     modifiers:
     - statName: Attack Speed
-      value: 0.12
+      value: 0.024
     itemType: 0
     tier: 1
-    color: {r: 0.7411765, g: 0.7411765, b: 0.7137255, a: 1}
-  - itemID: 3074
-    itemName: Ravenous Hydra
-    icon: {fileID: 21300000, guid: f5152d68ff74b2f44af1daea0e662042, type: 3}
-    price: 112
-    description: 
+  - itemName: Vampiric Scepter
+    itemID: 1053
+    price: 29
+    description: 15 Attack Damage7% Life Steal
+    icon: {fileID: 0}
     modifiers:
     - statName: Attack Damage
-      value: 65
+      value: 1.5
+    - statName: Life Steal
+      value: 0.014000000000000002
+    itemType: 0
+    tier: 2
+  - itemName: Ravenous Hydra
+    itemID: 3074
+    price: 112
+    description: 65 Attack Damage25 Ability Haste10% Life StealCleave: Attacks and Abilities deal physical damage to other nearby enemies.Carnivorous: Gain AD whenever you kill a minion and 2 times that amount when you kill a Champion, Large Monster, or Siege Minion. Lose 60% of your stacks on death.
+    icon: {fileID: 0}
+    modifiers:
+    - statName: Attack Damage
+      value: 6.5
+    - statName: Life Steal
+      value: 0.020000000000000004
     itemType: 0
     tier: 3
-    color: {r: 0.882353, g: 0.48627454, b: 0.18039216, a: 1}
-  - itemID: 3085
-    itemName: Runaan's Hurricane
-    icon: {fileID: 21300000, guid: 24115e9a85cefbe478d820b98c9db0da, type: 3}
+  - itemName: Runaan's Hurricane
+    itemID: 3085
     price: 92
-    description: 
+    description: 40% Attack Speed20% Critical Strike Chance7% Move SpeedPeck: Attacks apply magic damage On-Hit.Wind's Fury: When Attacking, bolts are fired at up to 2 enemies near the target. Bolts apply On-Hit effects and can Critically Strike.Item is for Ranged champions only.
+    icon: {fileID: 0}
     modifiers:
     - statName: Critical Strike Chance
-      value: 0.2
+      value: 0.04000000000000001
     - statName: Movement Speed
-      value: 1
+      value: 1.0
     - statName: Attack Speed
-      value: 0.4
+      value: 0.08000000000000002
     itemType: 0
     tier: 3
   - itemName: Statikk Shiv
@@ -78,11 +88,11 @@ MonoBehaviour:
     icon: {fileID: 0}
     modifiers:
     - statName: Attack Damage
-      value: 50
+      value: 5.0
     - statName: Critical Strike Chance
-      value: 0.2
+      value: 0.04000000000000001
     - statName: Attack Speed
-      value: 0.3
+      value: 0.06
     itemType: 0
     tier: 3
   - itemID: 3

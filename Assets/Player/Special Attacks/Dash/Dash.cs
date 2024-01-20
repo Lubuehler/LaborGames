@@ -5,7 +5,7 @@ using UnityEngine;
 public class Dash : NetworkBehaviour
 {
     public float dashSpeed = 50f;
-    public float dashDuration = 1f;
+    public float dashDuration = 0.2f;
 
     public void Activate(NetworkRigidbody2D rigidbody)
     {

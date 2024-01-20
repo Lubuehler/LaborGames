@@ -24,7 +24,7 @@ public class Jet : Enemy
 
     protected override void Move()
     {
-        var speed = EnemySpawner.Instance.speed;
+        var speed = EnemySpawner.Instance.currentSpeed;
 
         if (!movementDisabled)
         {

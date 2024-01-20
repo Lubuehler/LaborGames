@@ -6,10 +6,10 @@ public class Slowness : NetworkBehaviour
     [SerializeField] private float slownessFactor = 0.5f;
     private float slownessTime = 10.0f;
     private bool slownessActive = false;
-    
+
     public void Activate()
     {
-        EnemySpawner.Instance.speed *= slownessFactor;
+        EnemySpawner.Instance.currentSpeed *= slownessFactor;
         slownessActive = true;
     }
 
@@ -41,6 +41,6 @@ public class Slowness : NetworkBehaviour
     {
         slownessActive = false;
         slownessTime = 10.0f;
-        EnemySpawner.Instance.speed /= slownessFactor;
+        EnemySpawner.Instance.currentSpeed = EnemySpawner.Instance.defaultSpeed;
     }
 }

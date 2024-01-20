@@ -9,7 +9,8 @@ public class Player : NetworkBehaviour
     [SerializeField] private GameObject deathExplosionPrefab;
     [SerializeField] private LayerMask coinMask;
     [SerializeField] private float tiltAmount = 15.0f;
-    [SerializeField] private GameObject background;
+
+    BoxCollider2D backgroundCollider;
 
     private Weapon weapon;
 
@@ -17,7 +18,9 @@ public class Player : NetworkBehaviour
 
     private NetworkRigidbody2D _nrb2d;
     private SpriteRenderer _spriteRenderer;
-    private CapsuleCollider2D _capsuleCollider;
+    private Collider2D _collider;
+
+    [SerializeField] private float movementSmoothing = .5f;
 
     [Networked] public bool isAlive { get; set; }
     [Networked(OnChanged = nameof(PlayerInfoChanged))]
@@ -50,7 +53,7 @@ public class Player : NetworkBehaviour
     [Networked] public int currentHealth { get; set; }
 
     //Items
-    [Networked, Capacity(20)] public NetworkLinkedList<int> items { get; }
+    [Networked, Capacity(40)] public NetworkLinkedList<int> items { get; }
 
     // Actions
     public event Action OnStatsChanged;
@@ -61,10 +64,11 @@ public class Player : NetworkBehaviour
     {
         _nrb2d = GetComponent<NetworkRigidbody2D>();
         _spriteRenderer = GetComponentInChildren<SpriteRenderer>();
-        _capsuleCollider = GetComponent<CapsuleCollider2D>();
+        _collider = GetComponent<Collider2D>();
         weapon = GetComponent<Weapon>();
         passiveItemEffectManager = GetComponent<PassiveItemEffectManager>();
         passiveItemEffectManager.Initialize(weapon);
+        backgroundCollider = GameController.Instance.background.GetComponent<BoxCollider2D>();
 
     }
 
@@ -95,11 +99,12 @@ public class Player : NetworkBehaviour
         int margin = 2;
         _nrb2d.TeleportToPosition(new Vector2((GetComponentInChildren<SpriteRenderer>().size.x + margin) * lobbyNo, 0));
         InitiallySetStats();
+
     }
 
     public void InitiallySetStats()
     {
-        coins = 2000;
+        coins = 0;
         maxHealth = 100;
         attackDamage = 20;
         attackSpeed = 1;
@@ -117,25 +122,47 @@ public class Player : NetworkBehaviour
         RpcHealthChanged(currentHealth);
     }
 
+    private Vector2 previousDirection;
+
+
+    public void Move()
+    {
+        previousDirection.Normalize();
+        Vector2 intendedVelocity;
+
+        if (!isAlive)
+        {
+            intendedVelocity = Vector2.zero;
+        }
+        else if (previousDirection == Vector2.zero)
+        {
+            intendedVelocity = Vector2.Lerp(_nrb2d.Rigidbody.velocity, Vector2.zero, movementSmoothing * Runner.DeltaTime);
+        }
+        else
+        {
+            intendedVelocity = previousDirection * movementSpeed;
+        }
+
+        _nrb2d.Rigidbody.velocity = intendedVelocity;
+
+        float clampedX = Mathf.Clamp(transform.position.x, (-1) * backgroundCollider.size.x / 2, backgroundCollider.size.x / 2);
+        float clampedY = Mathf.Clamp(transform.position.y, (-1) * backgroundCollider.size.y / 2, backgroundCollider.size.y / 2);
+        transform.position = new Vector2(clampedX, clampedY);
+
+        // Image Tilting
+        float tilt = previousDirection.x * -tiltAmount;
+        transform.rotation = Quaternion.Euler(0, 0, tilt);
+    }
 
     public override void FixedUpdateNetwork()
     {
         if (GetInput(out NetworkInputData data) && LevelController.Instance.waveInProgress && isAlive)
         {
-            data.direction.Normalize();
-            _nrb2d.Rigidbody.velocity = data.direction * movementSpeed;
-
-            // Image Tilting
-            float tilt = data.direction.x * -tiltAmount;
-            transform.rotation = Quaternion.Euler(0, 0, tilt);
-
-            // float clampedX = Mathf.Clamp(transform.position.x, minX + width / 2, maxX - width / 2);
-            // float clampedY = Mathf.Clamp(transform.position.y, minY + height / 2, maxY - height / 2);
-            // transform.position = new Vector2(clampedX, clampedY);
+            previousDirection = data.direction;
         }
         else
         {
-            _nrb2d.Rigidbody.velocity = new Vector2(0, 0);
+            previousDirection = Vector2.zero;
         }
     }
 
@@ -161,7 +188,8 @@ public class Player : NetworkBehaviour
     public override void Render()
     {
         _spriteRenderer.enabled = isAlive;
-        _capsuleCollider.enabled = isAlive;
+        _collider.enabled = isAlive;
+        Move();
 
 
         if (!allowFlameDamage)
@@ -214,16 +242,24 @@ public class Player : NetworkBehaviour
         LevelController.Instance.RpcPlayerDowned(this);
     }
 
-    public void Heal(float amount)
+    public void Heal(int amount)
     {
-        RpcHealthChanged(Mathf.Clamp(currentHealth + (int)amount, 0, maxHealth));
+        if (amount == int.MaxValue)
+        {
+            RpcHealthChanged(maxHealth);
+        }
+        else
+        {
+            RpcHealthChanged(Mathf.Clamp(currentHealth + amount, 0, maxHealth));
+        }
+
     }
 
     [Rpc(RpcSources.InputAuthority, RpcTargets.All)]
     public void RPC_IncreaseMaxHealth(float amount)
     {
         maxHealth += (int)amount;
-        Heal(amount);
+        Heal((int)amount);
     }
 
     [Rpc(RpcSources.All, RpcTargets.All)]
@@ -252,6 +288,8 @@ public class Player : NetworkBehaviour
     [Rpc(RpcSources.All, RpcTargets.All)]
     public void RpcReset()
     {
+        items.Clear();
+        passiveItemEffectManager.Clear();
         print("reset " + playerName);
         RPC_Configure(playerName);
         RpcRessurect();
@@ -289,6 +327,8 @@ public class Player : NetworkBehaviour
                         critChance += modifier.value; break;
                     case "Critical Strike Damage Factor":
                         critDamageMultiplier += modifier.value; break;
+                    case "Life Steal":
+                        lifesteal += modifier.value; break;
                     case "Movement Speed":
                         movementSpeed += modifier.value; break;
                     case "Luck":
@@ -339,8 +379,13 @@ public class Player : NetworkBehaviour
 
     public void OnParticleCollision(GameObject other)
     {
-        if(!allowFlameDamage) return;
+        if (!allowFlameDamage) return;
         TakeDamage(5);
         allowFlameDamage = false;
+    }
+
+    public void TriggerGoldChanged()
+    {
+        OnCoinsChanged?.Invoke();
     }
 }

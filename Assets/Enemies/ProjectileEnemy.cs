@@ -5,10 +5,11 @@ using UnityEngine;
 public class ProjectileEnemy : NetworkBehaviour
 {
     private NetworkRigidbody2D _rigidbody;
-    public LayerMask collisionLayers;
+    [SerializeField] private LayerMask collisionLayers;
     private ParticleSystem trail;
 
-    float maxDistance = 50f;
+    [SerializeField] private GameObject hitExplosionPrefab;
+
 
     private Jet firedBy;
 
@@ -38,9 +39,13 @@ public class ProjectileEnemy : NetworkBehaviour
     {
         if ((collisionLayers.value & (1 << collision.gameObject.layer)) != 0)
         {
+            Vector3 directionToShooter = (transform.position - firedBy.getTransform().position).normalized;
+            float offsetDistance = 0.2f;
+            Vector3 explosionPosition = transform.position - (directionToShooter * offsetDistance);
+
+            Instantiate(hitExplosionPrefab, explosionPosition, Quaternion.identity);
             if (HasStateAuthority)
             {
-
                 firedBy.OnProjectileHit(collision.gameObject.GetComponent<Player>());
                 Destroy(trail.gameObject);
                 Runner.Despawn(GetComponent<NetworkObject>());

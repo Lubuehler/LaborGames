@@ -37,8 +37,10 @@ public class LevelController : NetworkBehaviour
 
     [Networked]
     public bool isShopping { get; set; }
+    public bool isSpawning = true;
 
     [SerializeField] private LayerMask enemyMask;
+    [SerializeField] private float enemySpawnTime = 1;
 
     private void Awake()
     {
@@ -87,9 +89,7 @@ public class LevelController : NetworkBehaviour
                 foreach (Player player in players)
                 {
                     player.lobbyReady = false;
-
                 }
-
             }
         }
     }
@@ -129,7 +129,7 @@ public class LevelController : NetworkBehaviour
         RpcShowGame();
 
         isShopping = false;
-        localPlayer.Heal(0f);
+        localPlayer.Heal(0);
 
     }
 
@@ -167,17 +167,19 @@ public class LevelController : NetworkBehaviour
 
         while (RemainingWaveTime > 0 && waveInProgress && isShopping == false)
         {
-            // Assuming the game is not paused and you're counting down
             RemainingWaveTime -= 1;
 
-            EnemySpawner.Instance.SpawnEnemy();
-            yield return new WaitForSeconds(1);
+            if (isSpawning)
+            {
+                EnemySpawner.Instance.SpawnEnemy();
+            }
+            yield return new WaitForSeconds(enemySpawnTime);
         }
 
         RpcEndWave();
         if (gameRunning && GetLivingPlayers().Count() != 0)
         {
-            EnemySpawner.Instance.speed = 3f;
+            EnemySpawner.Instance.currentSpeed = 3f;
             RpcEnterShoppingPhase();
         }
     }
@@ -227,6 +229,17 @@ public class LevelController : NetworkBehaviour
     }
 
     [Rpc(RpcSources.All, RpcTargets.All)]
+    public void RPC_PlayerLeft(Player player)
+    {
+        if (players.Contains(player))
+        {
+            players.Remove(player);
+            OnPlayerListChanged?.Invoke();
+        }
+    }
+
+
+    [Rpc(RpcSources.All, RpcTargets.All)]
     public void RpcPlayerDowned(Player player)
     {
         if (GetLivingPlayers().Count == 0)
@@ -257,9 +270,9 @@ public class LevelController : NetworkBehaviour
     public void StartSpectator()
     {
         Player selectedPlayer = players.FirstOrDefault(player => player.GetComponent<Player>().isAlive);
-
-        UIController.Instance.ShowUIElement(UIElement.Spectator);
         Camera.main.GetComponent<CameraScript>().target = selectedPlayer.GetComponent<NetworkObject>();
+        UIController.Instance.ShowUIElement(UIElement.Spectator);
+
         print("Spectating");
     }
 

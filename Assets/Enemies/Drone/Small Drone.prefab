@@ -28,7 +28,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.1, y: 0.1, z: 0.1}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 7782415476479666623}
@@ -74,7 +74,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: 21300000, guid: bf25c60093b7131479323d60ef784c7c, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 1c61232ea28cdf041b22f8b59429421f, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -128,7 +128,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.7, y: 0.7, z: 0.7}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 1
   m_Children:
   - {fileID: 7190710070354511446}
@@ -172,7 +172,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _interpolationDataSource: 0
-  health: 2
   viewingDistance: 4
   enemyLayerMask:
     serializedVersion: 2
@@ -184,7 +183,6 @@ MonoBehaviour:
   explosionRange: 0.8
   explosionDamage: 40
   deathExplosionPrefab: {fileID: 1337198075554910, guid: 25c7aa9ad705fe143a4d71c1c8deb7d4, type: 3}
-  smokeGrenadePrefab: {fileID: 9129722000280626897, guid: c9390d258899ade40bf1e92801c0e88c, type: 3}
 --- !u!50 &6852596507332962957
 Rigidbody2D:
   serializedVersion: 4
@@ -249,7 +247,7 @@ PolygonCollider2D:
   m_GameObject: {fileID: 4776032338861653262}
   m_Enabled: 1
   m_Density: 1
-  m_Material: {fileID: 6200000, guid: 46bf9225396fb7546bf2ff74e5a4cf9d, type: 2}
+  m_Material: {fileID: 0}
   m_IncludeLayers:
     serializedVersion: 2
     m_Bits: 0
@@ -275,19 +273,30 @@ PolygonCollider2D:
   m_Offset: {x: 0, y: 0}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
-    pivot: {x: 0, y: 0}
-    oldSize: {x: 0, y: 0}
-    newSize: {x: 0, y: 0}
-    adaptiveTilingThreshold: 0
+    pivot: {x: 0.5, y: 0.5}
+    oldSize: {x: 0.72, y: 0.72}
+    newSize: {x: 10.24, y: 10.24}
+    adaptiveTilingThreshold: 0.5
     drawMode: 0
     adaptiveTiling: 0
   m_AutoTiling: 0
   m_Points:
     m_Paths:
-    - - {x: -0.060836375, y: 0.31520537}
-      - {x: -0.3914044, y: 0.08986156}
-      - {x: -0.44774583, y: 0.00023582578}
-      - {x: -0.37910488, y: -0.086229}
-      - {x: -0.032260478, y: -0.2537011}
-      - {x: 0.4264022, y: 0.05009684}
+    - - {x: 0.29, y: 0.14}
+      - {x: 0.22, y: 0.14999999}
+      - {x: 0.19999999, y: 0.11}
+      - {x: 0.14, y: 0.17}
+      - {x: 0.06, y: 0.19999999}
+      - {x: -0.13, y: 0.19999999}
+      - {x: -0.28, y: 0.14999999}
+      - {x: -0.32, y: 0.04}
+      - {x: -0.32, y: -0.03}
+      - {x: -0.26999998, y: -0.08}
+      - {x: -0.19999999, y: -0.089999996}
+      - {x: -0.099999994, y: -0.049999997}
+      - {x: -0.06, y: -0.17999999}
+      - {x: 0.03, y: -0.17999999}
+      - {x: 0.16, y: -0.14}
+      - {x: 0.29999998, y: 0.01}
+      - {x: 0.29999998, y: 0.049999997}
   m_UseDelaunayMesh: 0

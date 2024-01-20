@@ -48,7 +48,7 @@ public class Airship : Enemy
             Vector2 toTarget = currentTarget.transform.position - transform.position;
             Vector2 separationForce = CalculateSeparationForce();
 
-            var speed = EnemySpawner.Instance.speed / 2;
+            var speed = EnemySpawner.Instance.currentSpeed / 2;
 
             Vector2 desiredVelocity = (toTarget.normalized + separationForce).normalized * speed;
             networkRigidbody2D.Rigidbody.velocity = Vector2.Lerp(networkRigidbody2D.Rigidbody.velocity, desiredVelocity, Runner.DeltaTime * movementSmoothing);

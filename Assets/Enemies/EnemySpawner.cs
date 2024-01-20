@@ -20,8 +20,8 @@ public class EnemySpawner : NetworkBehaviour
     [SerializeField] private GameObject airshipPrefab;
     [SerializeField] private GameObject laserDronePrefab;
 
-
-    [SerializeField] public float speed = 3f;
+    [SerializeField] public float defaultSpeed = 3f;
+    public float currentSpeed;
 
 
     public enum SpawnLocation
@@ -41,11 +41,18 @@ public class EnemySpawner : NetworkBehaviour
         {
             Destroy(gameObject);
         }
+
+        currentSpeed = defaultSpeed;
     }
 
-    public void SpawnEnemy()
-    {        
+    public void SpawnEnemy(EnemyType? type = null)
+    {
         EnemyType enemyType = SelectEnemyTypeBasedOnSpawnRate();
+
+        if (type != null)
+        {
+            enemyType = (EnemyType)type;
+        }
         Vector2 position;
         NetworkObject spawnedEnemy;
         switch (enemyType)
@@ -135,6 +142,7 @@ public class EnemySpawner : NetworkBehaviour
         spawnedObjects.Add(gameObject);
     }
 
+    [Rpc]
     public void RPC_DespawnEverything()
     {
         foreach (NetworkObject coin in _spawnedCoins)

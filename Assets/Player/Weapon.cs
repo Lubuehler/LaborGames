@@ -198,11 +198,16 @@ public class Weapon : NetworkBehaviour
         if (enemy == null || enemy.gameObject == null) { return; }
         OnHitTarget?.Invoke(enemy.getPosition(), enemy.gameObject.GetInstanceID(), shotID);
 
+        DealDamage(enemy);
+    }
+
+    public void DealDamage(Enemy enemy)
+    {
         if (HasInputAuthority)
         {
             int damage = CalculateDamage();
             enemy.RPC_TakeDamage(damage);
-            player.Heal(damage * player.lifesteal);
+            player.Heal((int)(damage * player.lifesteal));
         }
     }
 

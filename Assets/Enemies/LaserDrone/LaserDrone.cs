@@ -2,7 +2,6 @@
 
 public class LaserDrone : Enemy
 {
-    [SerializeField] private float hitsPerSecond = 4f;
     [SerializeField] private float damagePerHit = 1.0f;
     [SerializeField] private float rotationSpeed = 10f;
 
@@ -60,6 +59,7 @@ public class LaserDrone : Enemy
         float currentAngle = laser.transform.eulerAngles.z;
 
         float angleDifference = Mathf.DeltaAngle(currentAngle, targetAngle);
+
 
         float newAngle = currentAngle + Mathf.Clamp(angleDifference, -rotationSpeed * Runner.DeltaTime, rotationSpeed * Runner.DeltaTime);
 

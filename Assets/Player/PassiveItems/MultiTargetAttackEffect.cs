@@ -28,6 +28,11 @@ public class MultiTargetAttackEffect : IEffect
         weapon.OnAttack += HandleOnAttack;
     }
 
+    public void Unsubscribe()
+    {
+        weapon.OnAttack -= HandleOnAttack;
+    }
+
     void IEffect.ReduceEffect()
     {
         if (additionalAttacks == 0) { return; }
